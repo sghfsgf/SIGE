@@ -1,24 +1,41 @@
-// ====================== AUTH TEMPORAIRE (pour tester l’interface) ======================
+// ====================== AUTHENTIFICATION ======================
 
 const loginPage = document.getElementById('login-page');
 const appPage = document.getElementById('app');
 const loginForm = document.getElementById('login-form');
+const loginError = document.getElementById('login-error');
 const logoutBtn = document.getElementById('logout-btn');
 
-// Afficher directement l’application (sans connexion)
-loginPage.classList.add('hidden');
-appPage.classList.remove('hidden');
-
-// Simuler la déconnexion
-logoutBtn?.addEventListener('click', (e) => {
-  e.preventDefault();
-  loginPage.classList.remove('hidden');
-  appPage.classList.add('hidden');
+// Vérifier l'état de connexion
+auth.onAuthStateChanged(user => {
+  if (user) {
+    loginPage.classList.add('hidden');
+    appPage.classList.remove('hidden');
+    // Charger les données initiales
+    if (typeof loadEnseignants === 'function') loadEnseignants();
+    if (typeof loadCategories === 'function') loadCategories();
+  } else {
+    loginPage.classList.remove('hidden');
+    appPage.classList.add('hidden');
+  }
 });
 
-// Simuler la connexion
-loginForm?.addEventListener('submit', (e) => {
+// Connexion
+loginForm?.addEventListener('submit', async (e) => {
   e.preventDefault();
-  loginPage.classList.add('hidden');
-  appPage.classList.remove('hidden');
+  loginError.textContent = '';
+  const email = document.getElementById('login-email').value;
+  const password = document.getElementById('login-password').value;
+
+  try {
+    await auth.signInWithEmailAndPassword(email, password);
+  } catch (error) {
+    loginError.textContent = 'البريد الإلكتروني أو كلمة المرور غير صحيحة';
+  }
+});
+
+// Déconnexion
+logoutBtn?.addEventListener('click', async (e) => {
+  e.preventDefault();
+  await auth.signOut();
 });
