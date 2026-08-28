@@ -27,7 +27,7 @@ function renderEnseignantsTable(list) {
     const grade = gradesList.find(g => g.id === e.gradeId)?.nom || '-';
     const specialite = specialitesList.find(s => s.id === e.specialiteId)?.nom || '-';
     const departement = departementsList.find(d => d.id === e.departementId)?.nom || '-';
-    const statutText = { titulaire: 'مرسم', contractuel: 'متعاقد', vacataire: 'متطوع' }[e.statut] || e.statut;
+    const statutText = { titulaire: 'مرسم', contractuel: 'متعاقد', vacataire: 'عرضي' }[e.statut] || e.statut;
     const genreText = e.genre === 'homme' ? 'ذكر' : 'أنثى';
 
     const tr = document.createElement('tr');
