@@ -24,7 +24,7 @@ function exportEnseignants(list) {
     e.tel1,
     e.tel2 || '',
     e.email,
-    {titulaire:'مرسم',contractuel:'متعاقد',vacataire:'متطوع'}[e.statut] || e.statut,
+    {titulaire:'مرسم',contractuel:'متعاقد',vacataire:'عرضي'}[e.statut] || e.statut,
     e.genre === 'homme' ? 'ذكر' : 'أنثى',
     e.dateRecrutement,
     e.dateNaissance,
@@ -44,7 +44,7 @@ function exportSIAD() {
     ['إجمالي الأساتذة', enseignants.length],
     ['مرسم', enseignants.filter(e => e.statut === 'titulaire').length],
     ['متعاقد', enseignants.filter(e => e.statut === 'contractuel').length],
-    ['متطوع', enseignants.filter(e => e.statut === 'vacataire').length],
+    ['عرضي', enseignants.filter(e => e.statut === 'vacataire').length],
     ['ذكور', enseignants.filter(e => e.genre === 'homme').length],
     ['إناث', enseignants.filter(e => e.genre === 'femme').length]
   ];
