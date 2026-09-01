@@ -2,212 +2,210 @@
 // SIGE - AUTHENTIFICATION FIREBASE
 // ============================================================
 
+document.addEventListener("DOMContentLoaded", function () {
 
-// ============================================================
-// ÉLÉMENTS HTML
-// ============================================================
+    const loginPage = document.getElementById("login-page");
+    const appPage = document.getElementById("app");
+    const loginForm = document.getElementById("login-form");
+    const loginEmail = document.getElementById("login-email");
+    const loginPassword = document.getElementById("login-password");
+    const loginError = document.getElementById("login-error");
+    const logoutBtn = document.getElementById("logout-btn");
 
-const loginPage = document.getElementById("login-page");
-const appPage = document.getElementById("app");
 
-const loginForm = document.getElementById("login-form");
+    // ========================================================
+    // VÉRIFICATION DES ÉLÉMENTS HTML
+    // ========================================================
 
-const loginEmail = document.getElementById("login-email");
-const loginPassword = document.getElementById("login-password");
+    console.log("SIGE - Authentification chargée");
 
-const loginError = document.getElementById("login-error");
+    console.log("loginPage :", loginPage);
+    console.log("appPage :", appPage);
+    console.log("loginForm :", loginForm);
+    console.log("auth :", auth);
 
-const logoutBtn = document.getElementById("logout-btn");
 
+    // ========================================================
+    // ÉTAT INITIAL
+    // ========================================================
 
-// ============================================================
-// VÉRIFICATION
-// ============================================================
+    // Par défaut :
+    // afficher la page de connexion
+    // cacher l'application
 
-console.log("SIGE - auth.js chargé");
+    loginPage.classList.remove("hidden");
+    appPage.classList.add("hidden");
 
 
-// ============================================================
-// ÉTAT D'AUTHENTIFICATION
-// ============================================================
+    // ========================================================
+    // SURVEILLER L'ÉTAT DE CONNEXION FIREBASE
+    // ========================================================
 
-auth.onAuthStateChanged((user) => {
+    auth.onAuthStateChanged(function (user) {
 
-    console.log("État utilisateur :", user);
+        if (user) {
 
+            console.log("Utilisateur connecté :", user.email);
 
-    if (user) {
+            // Utilisateur connecté
+            loginPage.classList.add("hidden");
+            appPage.classList.remove("hidden");
 
-        // ================================================
-        // UTILISATEUR CONNECTÉ
-        // ================================================
+        } else {
 
-        console.log("Utilisateur connecté :", user.email);
+            console.log("Aucun utilisateur connecté");
 
-        loginPage.classList.add("hidden");
-
-        appPage.classList.remove("hidden");
-
-    } else {
-
-        // ================================================
-        // UTILISATEUR NON CONNECTÉ
-        // ================================================
-
-        console.log("Aucun utilisateur connecté");
-
-        loginPage.classList.remove("hidden");
-
-        appPage.classList.add("hidden");
-    }
-
-});
-
-
-// ============================================================
-// CONNEXION
-// ============================================================
-
-loginForm.addEventListener("submit", async (e) => {
-
-    e.preventDefault();
-
-    console.log("Tentative de connexion...");
-
-
-    const email = loginEmail.value.trim();
-
-    const password = loginPassword.value;
-
-
-    // Effacer ancien message
-    loginError.textContent = "";
-
-
-    if (!email || !password) {
-
-        loginError.textContent =
-            "يرجى إدخال البريد الإلكتروني وكلمة المرور";
-
-        return;
-    }
-
-
-    try {
-
-        console.log("Connexion Firebase :", email);
-
-
-        const result =
-            await auth.signInWithEmailAndPassword(
-                email,
-                password
-            );
-
-
-        console.log(
-            "Connexion réussie :",
-            result.user.email
-        );
-
-
-    } catch (error) {
-
-        console.error(
-            "Erreur Firebase :",
-            error
-        );
-
-
-        // Messages en arabe
-
-        switch (error.code) {
-
-            case "auth/invalid-email":
-
-                loginError.textContent =
-                    "البريد الإلكتروني غير صالح";
-
-                break;
-
-
-            case "auth/user-not-found":
-
-                loginError.textContent =
-                    "هذا المستخدم غير موجود";
-
-                break;
-
-
-            case "auth/wrong-password":
-
-                loginError.textContent =
-                    "كلمة المرور غير صحيحة";
-
-                break;
-
-
-            case "auth/invalid-credential":
-
-                loginError.textContent =
-                    "البريد الإلكتروني أو كلمة المرور غير صحيحة";
-
-                break;
-
-
-            case "auth/user-disabled":
-
-                loginError.textContent =
-                    "تم تعطيل هذا الحساب";
-
-                break;
-
-
-            case "auth/too-many-requests":
-
-                loginError.textContent =
-                    "تم إجراء عدد كبير من المحاولات. حاول لاحقاً";
-
-                break;
-
-
-            default:
-
-                loginError.textContent =
-                    "حدث خطأ أثناء تسجيل الدخول: " +
-                    error.message;
-
-                break;
+            // Aucun utilisateur connecté
+            loginPage.classList.remove("hidden");
+            appPage.classList.add("hidden");
         }
 
-    }
-
-});
+    });
 
 
-// ============================================================
-// DÉCONNEXION
-// ============================================================
+    // ========================================================
+    // CONNEXION
+    // ========================================================
 
-logoutBtn?.addEventListener("click", async (e) => {
+    loginForm.addEventListener("submit", function (e) {
 
-    e.preventDefault();
+        e.preventDefault();
 
-    console.log("Déconnexion...");
+        console.log("Tentative de connexion...");
+
+        const email = loginEmail.value.trim();
+        const password = loginPassword.value;
+
+        // Effacer ancien message
+        loginError.textContent = "";
+
+        // Vérification
+        if (!email || !password) {
+
+            loginError.textContent =
+                "يرجى إدخال البريد الإلكتروني وكلمة المرور";
+
+            return;
+        }
 
 
-    try {
+        // Désactiver le bouton pendant la connexion
+        const submitBtn = loginForm.querySelector("button[type='submit']");
 
-        await auth.signOut();
+        if (submitBtn) {
+            submitBtn.disabled = true;
+            submitBtn.textContent = "جاري تسجيل الدخول...";
+        }
 
-        console.log("Déconnexion réussie");
 
-    } catch (error) {
+        // ====================================================
+        // FIREBASE AUTH
+        // ====================================================
 
-        console.error(
-            "Erreur de déconnexion :",
-            error
-        );
+        auth.signInWithEmailAndPassword(email, password)
+
+            .then(function (userCredential) {
+
+                console.log(
+                    "Connexion réussie :",
+                    userCredential.user.email
+                );
+
+                loginError.textContent = "";
+
+            })
+
+            .catch(function (error) {
+
+                console.error("Erreur Firebase :", error);
+
+                let message = "حدث خطأ أثناء تسجيل الدخول";
+
+
+                // Messages Firebase
+                switch (error.code) {
+
+                    case "auth/invalid-email":
+                        message = "البريد الإلكتروني غير صالح";
+                        break;
+
+                    case "auth/user-not-found":
+                        message = "المستخدم غير موجود";
+                        break;
+
+                    case "auth/wrong-password":
+                        message = "كلمة المرور غير صحيحة";
+                        break;
+
+                    case "auth/invalid-credential":
+                        message = "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+                        break;
+
+                    case "auth/user-disabled":
+                        message = "تم تعطيل هذا المستخدم";
+                        break;
+
+                    case "auth/api-key-not-valid":
+                        message = "مفتاح Firebase API غير صالح";
+                        break;
+
+                    case "auth/network-request-failed":
+                        message = "فشل الاتصال بالإنترنت";
+                        break;
+
+                    default:
+                        message =
+                            "حدث خطأ أثناء تسجيل الدخول: " +
+                            error.message;
+                }
+
+
+                loginError.textContent = message;
+
+            })
+
+            .finally(function () {
+
+                if (submitBtn) {
+
+                    submitBtn.disabled = false;
+                    submitBtn.textContent = "تسجيل الدخول";
+
+                }
+
+            });
+
+    });
+
+
+    // ========================================================
+    // DÉCONNEXION
+    // ========================================================
+
+    if (logoutBtn) {
+
+        logoutBtn.addEventListener("click", function (e) {
+
+            e.preventDefault();
+
+            auth.signOut()
+
+                .then(function () {
+
+                    console.log("Utilisateur déconnecté");
+
+                })
+
+                .catch(function (error) {
+
+                    console.error(
+                        "Erreur de déconnexion :",
+                        error
+                    );
+
+                });
+
+        });
 
     }
 
