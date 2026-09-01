@@ -2,28 +2,36 @@
 // SIGE - CONFIGURATION FIREBASE
 // ============================================================
 
-// Configuration du projet Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyAlz1RpbBJJFWHvjlaTODxF1YX5Jnyfz60",
-  authDomain: "sige-fsgf.firebaseapp.com",
-  projectId: "sige-fsgf",
-  storageBucket: "sige-fsgf.firebasestorage.app",
-  messagingSenderId: "952214498038",
-  appId: "1:952214498038:web:2850b4f103530dd70e5ad7"
+
+    apiKey: "AIzaSyAlz1RpbBJJFWHvjlaTODxF1YX5Jnyfz60",
+
+    authDomain: "sige-fsgf.firebaseapp.com",
+
+    projectId: "sige-fsgf",
+
+    storageBucket: "sige-fsgf.firebasestorage.app",
+
+    messagingSenderId: "952214498038",
+
+    appId: "1:952214498038:web:2850b4f103530dd70e5ad7"
+
 };
 
 
 // ============================================================
-// INITIALISATION FIREBASE
+// INITIALISATION
 // ============================================================
 
 if (!firebase.apps.length) {
+
     firebase.initializeApp(firebaseConfig);
+
 }
 
 
 // ============================================================
-// SERVICES FIREBASE
+// SERVICES
 // ============================================================
 
 const auth = firebase.auth();
@@ -32,7 +40,7 @@ const db = firebase.firestore();
 
 
 // ============================================================
-// COLLECTIONS FIRESTORE
+// COLLECTIONS
 // ============================================================
 
 const enseignantsRef = db.collection("enseignants");
@@ -43,11 +51,6 @@ const specialitesRef = db.collection("specialites");
 
 const departementsRef = db.collection("departements");
 
-
-// ============================================================
-// PARAMÈTRES
-// ============================================================
-
 const sifahRef = db.collection("sifah");
 
 const wadhiaRef = db.collection("wadhia");
@@ -57,13 +60,9 @@ const anneesRef = db.collection("anneesUniversitaires");
 const etablissementRef = db.collection("etablissement");
 
 
-// ============================================================
-// VÉRIFICATION
-// ============================================================
-
 console.log("======================================");
 console.log("SIGE - Firebase initialisé");
-console.log("Projet Firebase :", firebaseConfig.projectId);
+console.log("Projet :", firebaseConfig.projectId);
 console.log("Authentication :", auth);
 console.log("Firestore :", db);
 console.log("======================================");
