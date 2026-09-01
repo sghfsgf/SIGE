@@ -187,14 +187,34 @@
 <!-- DASHBOARD -->
 <!-- ===================================================== -->
 
+```html
+<!-- ===================================================== -->
+<!-- DASHBOARD -->
+<!-- ===================================================== -->
+
 <section
   id="dashboard-page"
   class="page-section"
 >
 
-  <h2>
-    لوحة التحكم
-  </h2>
+  <div class="page-header">
+
+    <div>
+      <h2>
+        لوحة التحكم
+      </h2>
+
+      <p>
+        إحصائيات الأساتذة
+      </p>
+    </div>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- TOTAL -->
+  <!-- ================================================= -->
 
   <div
     class="kpi-grid"
@@ -202,28 +222,253 @@
   >
 
     <div class="kpi-card">
-      <h3 id="dash-total">0</h3>
-      <p>إجمالي الأساتذة</p>
+
+      <h3 id="dash-total">
+        0
+      </h3>
+
+      <p>
+        إجمالي الأساتذة
+      </p>
+
     </div>
 
-    <div class="kpi-card">
-      <h3 id="dash-titulaire">0</h3>
-      <p>مرسم</p>
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- حسب الرتبة -->
+  <!-- ================================================= -->
+
+  <div class="stats-section">
+
+    <h3>
+      التوزيع حسب الرتبة
+    </h3>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>الرتبة</th>
+            <th>العدد</th>
+            <th>النسبة</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dashboard-grade-body"></tbody>
+
+      </table>
+
     </div>
 
-    <div class="kpi-card">
-      <h3 id="dash-contractuel">0</h3>
-      <p>متعاقد</p>
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- حسب الصفة -->
+  <!-- ================================================= -->
+
+  <div class="stats-section">
+
+    <h3>
+      التوزيع حسب الصفة
+    </h3>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>الصفة</th>
+            <th>العدد</th>
+            <th>النسبة</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dashboard-sifah-body"></tbody>
+
+      </table>
+
     </div>
 
-    <div class="kpi-card">
-      <h3 id="dash-vacataire">0</h3>
-      <p>عرضي</p>
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- حسب الوضعية -->
+  <!-- ================================================= -->
+
+  <div class="stats-section">
+
+    <h3>
+      التوزيع حسب الوضعية
+    </h3>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>الوضعية</th>
+            <th>العدد</th>
+            <th>النسبة</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dashboard-wadhia-body"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- حسب الجنس -->
+  <!-- ================================================= -->
+
+  <div class="stats-section">
+
+    <h3>
+      التوزيع حسب الجنس
+    </h3>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>الجنس</th>
+            <th>العدد</th>
+            <th>النسبة</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dashboard-genre-body"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- حسب القسم -->
+  <!-- ================================================= -->
+
+  <div class="stats-section">
+
+    <h3>
+      التوزيع حسب القسم
+    </h3>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>القسم</th>
+            <th>العدد</th>
+            <th>النسبة</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dashboard-departement-body"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- حسب التخصص -->
+  <!-- ================================================= -->
+
+  <div class="stats-section">
+
+    <h3>
+      التوزيع حسب التخصص
+    </h3>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>التخصص</th>
+            <th>العدد</th>
+            <th>النسبة</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dashboard-specialite-body"></tbody>
+
+      </table>
+
+    </div>
+
+  </div>
+
+
+  <!-- ================================================= -->
+  <!-- حسب السنة الجامعية -->
+  <!-- ================================================= -->
+
+  <div class="stats-section">
+
+    <h3>
+      التوزيع حسب السنة الجامعية
+    </h3>
+
+    <div class="table-container">
+
+      <table>
+
+        <thead>
+
+          <tr>
+            <th>السنة الجامعية</th>
+            <th>العدد</th>
+            <th>النسبة</th>
+          </tr>
+
+        </thead>
+
+        <tbody id="dashboard-annee-body"></tbody>
+
+      </table>
+
     </div>
 
   </div>
 
 </section>
+```
+
 
 
 <!-- ===================================================== -->
