@@ -2,9 +2,9 @@
 // SIGE - CONFIGURATION FIREBASE
 // ============================================================
 
-// Configuration du projet Firebase
+// Configuration Firebase
 const firebaseConfig = {
-  apiKey: "AIzaSyAlz1RpbBJJFWHvjlaTODxF1YX5Jnyfz60",
+  apiKey: "AIzaSyAlz1RpBJJFWHvjlaTODxF1YX5Jnyfz60",
   authDomain: "sige-fsgf.firebaseapp.com",
   projectId: "sige-fsgf",
   storageBucket: "sige-fsgf.firebasestorage.app",
@@ -32,7 +32,7 @@ const db = firebase.firestore();
 
 
 // ============================================================
-// COLLECTIONS ENSEIGNANTS
+// COLLECTIONS PRINCIPALES
 // ============================================================
 
 const enseignantsRef = db.collection("enseignants");
@@ -45,7 +45,7 @@ const departementsRef = db.collection("departements");
 
 
 // ============================================================
-// COLLECTIONS PARAMÈTRES
+// PARAMÈTRES
 // ============================================================
 
 const sifahRef = db.collection("sifah");
@@ -64,6 +64,6 @@ const etablissementRef = db.collection("etablissement");
 console.log("======================================");
 console.log("SIGE - Firebase initialisé");
 console.log("Projet Firebase :", firebaseConfig.projectId);
-console.log("Authentication :", auth);
 console.log("Firestore :", db);
+console.log("Authentication :", auth);
 console.log("======================================");
