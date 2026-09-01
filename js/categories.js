@@ -1,16 +1,19 @@
-```javascript
 // ============================================================
-// SIGE - CATEGORIES.JS
-// الرتب - التخصصات - الأقسام
+// SIGE - CATEGORIES
+// ============================================================
+// Gestion de :
+// 1. الرتب
+// 2. التخصصات
+// 3. الأقسام
 // ============================================================
 
 let categoriesData = {
 
-    grades: [],
+    grade: [],
 
-    specialites: [],
+    specialite: [],
 
-    departements: []
+    departement: []
 
 };
 
@@ -19,14 +22,11 @@ let categoriesData = {
 // INITIALISATION
 // ============================================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-        initialiserCategories();
+    initialiserCategories();
 
-    }
-);
+});
 
 
 // ============================================================
@@ -36,42 +36,39 @@ document.addEventListener(
 function initialiserCategories() {
 
     // --------------------------------------------------------
-    // Onglets
+    // ONGLET CATEGORIES
     // --------------------------------------------------------
 
-    document.querySelectorAll(".tab-btn").forEach(
-        function (button) {
+    document.querySelectorAll(".tab-btn").forEach(function (button) {
 
-            // uniquement les onglets catégories
-            if (
-                button.dataset.tab
-            ) {
-
-                button.addEventListener(
-                    "click",
-                    function () {
-
-                        afficherCategorieTab(
-                            this.dataset.tab
-                        );
-
-                    }
-                );
-
-            }
-
+        // On ne traite ici que les boutons des catégories
+        if (
+            button.classList.contains("param-tab-btn")
+        ) {
+            return;
         }
-    );
+
+
+        button.addEventListener("click", function () {
+
+            const tab =
+                this.dataset.tab;
+
+            if (!tab) return;
+
+            afficherCategorieTab(tab);
+
+        });
+
+    });
 
 
     // --------------------------------------------------------
-    // Ajouter grade
+    // AJOUT GRADE
     // --------------------------------------------------------
 
     const btnGrade =
-        document.getElementById(
-            "btn-add-grade"
-        );
+        document.getElementById("btn-add-grade");
 
     if (btnGrade) {
 
@@ -79,9 +76,7 @@ function initialiserCategories() {
             "click",
             function () {
 
-                ouvrirModalCategorie(
-                    "grade"
-                );
+                ouvrirModalCategorie("grade");
 
             }
         );
@@ -90,13 +85,11 @@ function initialiserCategories() {
 
 
     // --------------------------------------------------------
-    // Ajouter spécialité
+    // AJOUT SPECIALITE
     // --------------------------------------------------------
 
     const btnSpecialite =
-        document.getElementById(
-            "btn-add-specialite"
-        );
+        document.getElementById("btn-add-specialite");
 
     if (btnSpecialite) {
 
@@ -104,9 +97,7 @@ function initialiserCategories() {
             "click",
             function () {
 
-                ouvrirModalCategorie(
-                    "specialite"
-                );
+                ouvrirModalCategorie("specialite");
 
             }
         );
@@ -115,13 +106,11 @@ function initialiserCategories() {
 
 
     // --------------------------------------------------------
-    // Ajouter département
+    // AJOUT DEPARTEMENT
     // --------------------------------------------------------
 
     const btnDepartement =
-        document.getElementById(
-            "btn-add-departement"
-        );
+        document.getElementById("btn-add-departement");
 
     if (btnDepartement) {
 
@@ -129,9 +118,7 @@ function initialiserCategories() {
             "click",
             function () {
 
-                ouvrirModalCategorie(
-                    "departement"
-                );
+                ouvrirModalCategorie("departement");
 
             }
         );
@@ -140,13 +127,11 @@ function initialiserCategories() {
 
 
     // --------------------------------------------------------
-    // Formulaire
+    // FORMULAIRE
     // --------------------------------------------------------
 
     const form =
-        document.getElementById(
-            "categorie-form"
-        );
+        document.getElementById("categorie-form");
 
     if (form) {
 
@@ -159,7 +144,7 @@ function initialiserCategories() {
 
 
     // --------------------------------------------------------
-    // Firebase
+    // FIRESTORE
     // --------------------------------------------------------
 
     chargerGrades();
@@ -172,22 +157,18 @@ function initialiserCategories() {
 
 
 // ============================================================
-// ONGLET CATEGORIE
+// AFFICHER ONGLET
 // ============================================================
 
 function afficherCategorieTab(type) {
 
-    document
-        .querySelectorAll(
-            "#categories-page .tab-btn"
-        )
-        .forEach(function (button) {
+    document.querySelectorAll(
+        "#categories-page .tab-btn"
+    ).forEach(function (button) {
 
-            button.classList.remove(
-                "active"
-            );
+        button.classList.remove("active");
 
-        });
+    });
 
 
     const bouton =
@@ -198,24 +179,18 @@ function afficherCategorieTab(type) {
 
     if (bouton) {
 
-        bouton.classList.add(
-            "active"
-        );
+        bouton.classList.add("active");
 
     }
 
 
-    document
-        .querySelectorAll(
-            "#categories-page .tab-content"
-        )
-        .forEach(function (content) {
+    document.querySelectorAll(
+        "#categories-page .tab-content"
+    ).forEach(function (content) {
 
-            content.classList.add(
-                "hidden"
-            );
+        content.classList.add("hidden");
 
-        });
+    });
 
 
     const contenu =
@@ -226,9 +201,7 @@ function afficherCategorieTab(type) {
 
     if (contenu) {
 
-        contenu.classList.remove(
-            "hidden"
-        );
+        contenu.classList.remove("hidden");
 
     }
 
@@ -247,30 +220,31 @@ function chargerGrades() {
 
             function (snapshot) {
 
-                categoriesData.grades = [];
+                categoriesData.grade = [];
 
-                snapshot.forEach(
-                    function (doc) {
+                snapshot.forEach(function (doc) {
 
-                        categoriesData.grades.push({
+                    categoriesData.grade.push({
 
-                            id: doc.id,
+                        id: doc.id,
 
-                            ...doc.data()
+                        ...doc.data()
 
-                        });
+                    });
 
-                    }
-                );
+                });
+
 
                 afficherGrades();
+
+                remplirSelectGrades();
 
             },
 
             function (error) {
 
                 console.error(
-                    "Firebase grades :",
+                    "Erreur grades :",
                     error
                 );
 
@@ -288,75 +262,59 @@ function chargerGrades() {
 function afficherGrades() {
 
     const tbody =
-        document.getElementById(
-            "grades-body"
-        );
+        document.getElementById("grades-body");
 
     if (!tbody) return;
 
     tbody.innerHTML = "";
 
 
-    categoriesData.grades.forEach(
-        function (item) {
+    categoriesData.grade.forEach(function (item) {
 
-            const tr =
-                document.createElement(
-                    "tr"
-                );
+        const tr =
+            document.createElement("tr");
 
 
-            tr.innerHTML = `
+        tr.innerHTML = `
 
-                <td>
-                    ${item.ordre ?? ""}
-                </td>
+            <td>${item.ordre ?? ""}</td>
 
-                <td>
-                    ${echapperHTML(
-                        item.nom ?? ""
-                    )}
-                </td>
+            <td>
+                ${echapperHTML(item.nom ?? "")}
+            </td>
 
-                <td>
-                    ${
-                        item.actif === true
-                            ? '<span class="status-active">نشط</span>'
-                            : '<span class="status-inactive">غير نشط</span>'
-                    }
-                </td>
+            <td>
+                ${
+                    item.actif !== false
+                        ? '<span class="status-active">نشط</span>'
+                        : '<span class="status-inactive">غير نشط</span>'
+                }
+            </td>
 
-                <td>
+            <td>
 
-                    <button
-                        class="btn-secondary"
-                        onclick="modifierCategorie(
-                            'grade',
-                            '${item.id}'
-                        )"
-                    >
-                        تعديل
-                    </button>
+                <button
+                    class="btn-secondary"
+                    onclick="modifierCategorie('grade','${item.id}')"
+                >
+                    تعديل
+                </button>
 
-                    <button
-                        class="btn-danger"
-                        onclick="supprimerCategorie(
-                            'grade',
-                            '${item.id}'
-                        )"
-                    >
-                        حذف
-                    </button>
+                <button
+                    class="btn-danger"
+                    onclick="supprimerCategorie('grade','${item.id}')"
+                >
+                    حذف
+                </button>
 
-                </td>
+            </td>
 
-            `;
+        `;
 
 
-            tbody.appendChild(tr);
+        tbody.appendChild(tr);
 
-        }
-    );
+    });
 
 }
 
@@ -373,30 +331,31 @@ function chargerSpecialites() {
 
             function (snapshot) {
 
-                categoriesData.specialites = [];
+                categoriesData.specialite = [];
 
-                snapshot.forEach(
-                    function (doc) {
+                snapshot.forEach(function (doc) {
 
-                        categoriesData.specialites.push({
+                    categoriesData.specialite.push({
 
-                            id: doc.id,
+                        id: doc.id,
 
-                            ...doc.data()
+                        ...doc.data()
 
-                        });
+                    });
 
-                    }
-                );
+                });
+
 
                 afficherSpecialites();
+
+                remplirSelectSpecialites();
 
             },
 
             function (error) {
 
                 console.error(
-                    "Firebase spécialités :",
+                    "Erreur specialites :",
                     error
                 );
 
@@ -423,30 +382,24 @@ function afficherSpecialites() {
     tbody.innerHTML = "";
 
 
-    categoriesData.specialites.forEach(
+    categoriesData.specialite.forEach(
         function (item) {
 
             const tr =
-                document.createElement(
-                    "tr"
-                );
+                document.createElement("tr");
 
 
             tr.innerHTML = `
 
-                <td>
-                    ${item.ordre ?? ""}
-                </td>
+                <td>${item.ordre ?? ""}</td>
 
                 <td>
-                    ${echapperHTML(
-                        item.nom ?? ""
-                    )}
+                    ${echapperHTML(item.nom ?? "")}
                 </td>
 
                 <td>
                     ${
-                        item.actif === true
+                        item.actif !== false
                             ? '<span class="status-active">نشط</span>'
                             : '<span class="status-inactive">غير نشط</span>'
                     }
@@ -456,20 +409,14 @@ function afficherSpecialites() {
 
                     <button
                         class="btn-secondary"
-                        onclick="modifierCategorie(
-                            'specialite',
-                            '${item.id}'
-                        )"
+                        onclick="modifierCategorie('specialite','${item.id}')"
                     >
                         تعديل
                     </button>
 
                     <button
                         class="btn-danger"
-                        onclick="supprimerCategorie(
-                            'specialite',
-                            '${item.id}'
-                        )"
+                        onclick="supprimerCategorie('specialite','${item.id}')"
                     >
                         حذف
                     </button>
@@ -499,30 +446,31 @@ function chargerDepartements() {
 
             function (snapshot) {
 
-                categoriesData.departements = [];
+                categoriesData.departement = [];
 
-                snapshot.forEach(
-                    function (doc) {
+                snapshot.forEach(function (doc) {
 
-                        categoriesData.departements.push({
+                    categoriesData.departement.push({
 
-                            id: doc.id,
+                        id: doc.id,
 
-                            ...doc.data()
+                        ...doc.data()
 
-                        });
+                    });
 
-                    }
-                );
+                });
+
 
                 afficherDepartements();
+
+                remplirSelectDepartements();
 
             },
 
             function (error) {
 
                 console.error(
-                    "Firebase départements :",
+                    "Erreur departements :",
                     error
                 );
 
@@ -549,30 +497,24 @@ function afficherDepartements() {
     tbody.innerHTML = "";
 
 
-    categoriesData.departements.forEach(
+    categoriesData.departement.forEach(
         function (item) {
 
             const tr =
-                document.createElement(
-                    "tr"
-                );
+                document.createElement("tr");
 
 
             tr.innerHTML = `
 
-                <td>
-                    ${item.ordre ?? ""}
-                </td>
+                <td>${item.ordre ?? ""}</td>
 
                 <td>
-                    ${echapperHTML(
-                        item.nom ?? ""
-                    )}
+                    ${echapperHTML(item.nom ?? "")}
                 </td>
 
                 <td>
                     ${
-                        item.actif === true
+                        item.actif !== false
                             ? '<span class="status-active">نشط</span>'
                             : '<span class="status-inactive">غير نشط</span>'
                     }
@@ -582,20 +524,14 @@ function afficherDepartements() {
 
                     <button
                         class="btn-secondary"
-                        onclick="modifierCategorie(
-                            'departement',
-                            '${item.id}'
-                        )"
+                        onclick="modifierCategorie('departement','${item.id}')"
                     >
                         تعديل
                     </button>
 
                     <button
                         class="btn-danger"
-                        onclick="supprimerCategorie(
-                            'departement',
-                            '${item.id}'
-                        )"
+                        onclick="supprimerCategorie('departement','${item.id}')"
                     >
                         حذف
                     </button>
@@ -609,6 +545,64 @@ function afficherDepartements() {
 
         }
     );
+
+}
+
+
+// ============================================================
+// RÉFÉRENCE COLLECTION
+// ============================================================
+
+function getCategorieCollection(type) {
+
+    if (type === "grade") {
+
+        return gradesRef;
+
+    }
+
+    if (type === "specialite") {
+
+        return specialitesRef;
+
+    }
+
+    if (type === "departement") {
+
+        return departementsRef;
+
+    }
+
+    return null;
+
+}
+
+
+// ============================================================
+// DONNÉES LOCALES
+// ============================================================
+
+function getCategorieData(type) {
+
+    if (type === "grade") {
+
+        return categoriesData.grade;
+
+    }
+
+    if (type === "specialite") {
+
+        return categoriesData.specialite;
+
+    }
+
+    if (type === "departement") {
+
+        return categoriesData.departement;
+
+    }
+
+    return [];
 
 }
 
@@ -632,14 +626,12 @@ function ouvrirModalCategorie(
 
     document.getElementById(
         "categorie-id"
-    ).value =
-        id || "";
+    ).value = id || "";
 
 
     document.getElementById(
         "categorie-type"
-    ).value =
-        type;
+    ).value = type;
 
 
     document.getElementById(
@@ -658,40 +650,19 @@ function ouvrirModalCategorie(
 
 
     // --------------------------------------------------------
-    // Modification
+    // MODIFICATION
     // --------------------------------------------------------
 
     if (id) {
 
-        let liste = [];
-
-
-        if (type === "grade") {
-
-            liste =
-                categoriesData.grades;
-
-        }
-
-        else if (type === "specialite") {
-
-            liste =
-                categoriesData.specialites;
-
-        }
-
-        else if (type === "departement") {
-
-            liste =
-                categoriesData.departements;
-
-        }
+        const collection =
+            getCategorieData(type);
 
 
         const item =
-            liste.find(function (x) {
+            collection.find(function (element) {
 
-                return x.id === id;
+                return element.id === id;
 
             });
 
@@ -700,8 +671,7 @@ function ouvrirModalCategorie(
 
             document.getElementById(
                 "categorie-nom"
-            ).value =
-                item.nom || "";
+            ).value = item.nom || "";
 
 
             document.getElementById(
@@ -720,46 +690,13 @@ function ouvrirModalCategorie(
     }
 
 
-    let titre = "إضافة";
-
-
-    if (type === "grade") {
-
-        titre =
-            id
-                ? "تعديل رتبة"
-                : "إضافة رتبة";
-
-    }
-
-    else if (type === "specialite") {
-
-        titre =
-            id
-                ? "تعديل تخصص"
-                : "إضافة تخصص";
-
-    }
-
-    else if (type === "departement") {
-
-        titre =
-            id
-                ? "تعديل قسم"
-                : "إضافة قسم";
-
-    }
-
-
     document.getElementById(
         "modal-categorie-title"
     ).textContent =
-        titre;
+        id ? "تعديل" : "إضافة";
 
 
-    modal.classList.remove(
-        "hidden"
-    );
+    modal.classList.remove("hidden");
 
 }
 
@@ -833,31 +770,11 @@ async function enregistrerCategorie(event) {
     }
 
 
-    let collection;
+    const collection =
+        getCategorieCollection(type);
 
 
-    if (type === "grade") {
-
-        collection =
-            gradesRef;
-
-    }
-
-    else if (type === "specialite") {
-
-        collection =
-            specialitesRef;
-
-    }
-
-    else if (type === "departement") {
-
-        collection =
-            departementsRef;
-
-    }
-
-    else {
+    if (!collection) {
 
         alert(
             "نوع التصنيف غير معروف"
@@ -877,18 +794,16 @@ async function enregistrerCategorie(event) {
         actif: actif,
 
         updatedAt:
-            firebase.firestore
-                .FieldValue
-                .serverTimestamp()
+            firebase.firestore.FieldValue.serverTimestamp()
 
     };
 
 
     try {
 
-        // -------------------------------
+        // ----------------------------------------------------
         // MODIFICATION
-        // -------------------------------
+        // ----------------------------------------------------
 
         if (id) {
 
@@ -898,16 +813,14 @@ async function enregistrerCategorie(event) {
 
         }
 
-        // -------------------------------
+        // ----------------------------------------------------
         // AJOUT
-        // -------------------------------
+        // ----------------------------------------------------
 
         else {
 
             data.createdAt =
-                firebase.firestore
-                    .FieldValue
-                    .serverTimestamp();
+                firebase.firestore.FieldValue.serverTimestamp();
 
 
             await collection.add(data);
@@ -915,21 +828,23 @@ async function enregistrerCategorie(event) {
         }
 
 
-        fermerModal(
-            "modal-categorie"
-        );
+        fermerModalCategorie();
+
+        document.getElementById(
+            "categorie-form"
+        ).reset();
 
     }
 
     catch (error) {
 
         console.error(
-            "Erreur Firebase catégorie :",
+            "Erreur catégorie :",
             error
         );
 
         alert(
-            "حدث خطأ أثناء حفظ التصنيف\n" +
+            "حدث خطأ أثناء حفظ التصنيف : " +
             error.message
         );
 
@@ -947,46 +862,20 @@ async function supprimerCategorie(
     id
 ) {
 
-    if (
-        !confirm(
-            "هل أنت متأكد من حذف هذا العنصر ؟"
-        )
-    ) {
+    if (!confirm(
+        "هل أنت متأكد من حذف هذا العنصر ؟"
+    )) {
 
         return;
 
     }
 
 
-    let collection;
+    const collection =
+        getCategorieCollection(type);
 
 
-    if (type === "grade") {
-
-        collection =
-            gradesRef;
-
-    }
-
-    else if (type === "specialite") {
-
-        collection =
-            specialitesRef;
-
-    }
-
-    else if (type === "departement") {
-
-        collection =
-            departementsRef;
-
-    }
-
-    else {
-
-        return;
-
-    }
+    if (!collection) return;
 
 
     try {
@@ -1000,12 +889,12 @@ async function supprimerCategorie(
     catch (error) {
 
         console.error(
-            "Erreur suppression :",
+            "Erreur suppression catégorie :",
             error
         );
 
         alert(
-            "حدث خطأ أثناء الحذف\n" +
+            "حدث خطأ أثناء الحذف : " +
             error.message
         );
 
@@ -1015,35 +904,280 @@ async function supprimerCategorie(
 
 
 // ============================================================
-// FONCTIONS POUR ENSEIGNANTS.JS
+// FERMER MODAL
+// ============================================================
+
+function fermerModalCategorie() {
+
+    const modal =
+        document.getElementById(
+            "modal-categorie"
+        );
+
+    if (modal) {
+
+        modal.classList.add("hidden");
+
+    }
+
+}
+
+
+// ============================================================
+// SELECT GRADE
+// ============================================================
+
+function remplirSelectGrades() {
+
+    const select =
+        document.getElementById(
+            "gradeId"
+        );
+
+    if (!select) return;
+
+
+    const ancienneValeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر الرتبة</option>';
+
+
+    categoriesData.grade
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                item.id;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (
+        ancienneValeur &&
+        categoriesData.grade.some(
+            item => item.id === ancienneValeur
+        )
+    ) {
+
+        select.value =
+            ancienneValeur;
+
+    }
+
+}
+
+
+// ============================================================
+// SELECT SPECIALITE
+// ============================================================
+
+function remplirSelectSpecialites() {
+
+    const select =
+        document.getElementById(
+            "specialiteId"
+        );
+
+    if (!select) return;
+
+
+    const ancienneValeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر التخصص</option>';
+
+
+    categoriesData.specialite
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                item.id;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (
+        ancienneValeur &&
+        categoriesData.specialite.some(
+            item => item.id === ancienneValeur
+        )
+    ) {
+
+        select.value =
+            ancienneValeur;
+
+    }
+
+}
+
+
+// ============================================================
+// SELECT DEPARTEMENT
+// ============================================================
+
+function remplirSelectDepartements() {
+
+    const select =
+        document.getElementById(
+            "departementId"
+        );
+
+    if (!select) return;
+
+
+    const ancienneValeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر القسم</option>';
+
+
+    categoriesData.departement
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement("option");
+
+
+            option.value =
+                item.id;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (
+        ancienneValeur &&
+        categoriesData.departement.some(
+            item => item.id === ancienneValeur
+        )
+    ) {
+
+        select.value =
+            ancienneValeur;
+
+    }
+
+}
+
+
+// ============================================================
+// API PUBLIQUE
 // ============================================================
 
 function getGradesData() {
 
-    return categoriesData.grades;
+    return categoriesData.grade;
 
 }
 
 
 function getSpecialitesData() {
 
-    return categoriesData.specialites;
+    return categoriesData.specialite;
 
 }
 
 
 function getDepartementsData() {
 
-    return categoriesData.departements;
+    return categoriesData.departement;
 
 }
 
 
 // ============================================================
-// FIN
+// SÉCURITÉ HTML
 // ============================================================
 
-console.log(
-    "SIGE - categories.js chargé avec Firebase"
+function echapperHTML(value) {
+
+    return String(value)
+
+        .replace(/&/g, "&amp;")
+
+        .replace(/</g, "&lt;")
+
+        .replace(/>/g, "&gt;")
+
+        .replace(/"/g, "&quot;")
+
+        .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================================================
+// FERMETURE PAR .close-modal
+// ============================================================
+
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const bouton =
+            event.target.closest(
+                "#modal-categorie .close-modal"
+            );
+
+
+        if (!bouton) return;
+
+
+        fermerModalCategorie();
+
+    }
 );
-```
+
+
+console.log(
+    "SIGE - categories.js chargé"
+);
