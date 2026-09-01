@@ -1,7 +1,7 @@
-```javascript
 // ============================================================
-// SIGE - ENSEIGNANTS.JS
-// Gestion complète des enseignants avec Firebase
+// SIGE - ENSEIGNANTS
+// ============================================================
+// Gestion complète des enseignants
 // ============================================================
 
 let enseignantsData = [];
@@ -11,14 +11,11 @@ let enseignantsData = [];
 // INITIALISATION
 // ============================================================
 
-document.addEventListener(
-    "DOMContentLoaded",
-    function () {
+document.addEventListener("DOMContentLoaded", function () {
 
-        initialiserEnseignants();
+    initialiserEnseignants();
 
-    }
-);
+});
 
 
 // ============================================================
@@ -28,13 +25,14 @@ document.addEventListener(
 function initialiserEnseignants() {
 
     // --------------------------------------------------------
-    // Ajouter enseignant
+    // BOUTON AJOUTER
     // --------------------------------------------------------
 
     const btnAjouter =
         document.getElementById(
             "btn-add-enseignant"
         );
+
 
     if (btnAjouter) {
 
@@ -51,13 +49,14 @@ function initialiserEnseignants() {
 
 
     // --------------------------------------------------------
-    // Formulaire enseignant
+    // FORMULAIRE
     // --------------------------------------------------------
 
     const form =
         document.getElementById(
             "enseignant-form"
         );
+
 
     if (form) {
 
@@ -70,7 +69,7 @@ function initialiserEnseignants() {
 
 
     // --------------------------------------------------------
-    // Filtres
+    // FILTRES
     // --------------------------------------------------------
 
     const filtres = [
@@ -99,12 +98,14 @@ function initialiserEnseignants() {
         const element =
             document.getElementById(id);
 
+
         if (element) {
 
             element.addEventListener(
                 "input",
                 appliquerFiltres
             );
+
 
             element.addEventListener(
                 "change",
@@ -117,13 +118,14 @@ function initialiserEnseignants() {
 
 
     // --------------------------------------------------------
-    // Reset filtres
+    // RESET
     // --------------------------------------------------------
 
     const btnReset =
         document.getElementById(
             "btn-reset-filters"
         );
+
 
     if (btnReset) {
 
@@ -136,12 +138,10 @@ function initialiserEnseignants() {
 
 
     // --------------------------------------------------------
-    // Firebase
+    // FIRESTORE
     // --------------------------------------------------------
 
     chargerEnseignants();
-
-    chargerListesEnseignant();
 
 }
 
@@ -160,574 +160,40 @@ function chargerEnseignants() {
 
                 enseignantsData = [];
 
-                snapshot.forEach(
-                    function (doc) {
+                snapshot.forEach(function (doc) {
 
-                        enseignantsData.push({
+                    enseignantsData.push({
 
-                            id: doc.id,
+                        id: doc.id,
 
-                            ...doc.data()
+                        ...doc.data()
 
-                        });
+                    });
 
-                    }
-                );
+                });
 
 
                 afficherEnseignants(
                     enseignantsData
                 );
 
+
+                mettreAJourFiltres();
+
+                mettreAJourDashboard();
+
             },
 
             function (error) {
 
                 console.error(
-                    "Firebase enseignants :",
+                    "Erreur chargement enseignants :",
                     error
-                );
-
-                alert(
-                    "تعذر تحميل قائمة الأساتذة\n" +
-                    error.message
                 );
 
             }
 
         );
-
-}
-
-
-// ============================================================
-// CHARGER LISTES
-// ============================================================
-
-function chargerListesEnseignant() {
-
-    // Attendre que les autres fichiers aient
-    // chargé leurs données Firebase.
-
-    setTimeout(
-        function () {
-
-            remplirSelectGrade();
-
-            remplirSelectSpecialite();
-
-            remplirSelectDepartement();
-
-            remplirSelectSifah();
-
-            remplirSelectWadhia();
-
-            remplirSelectAnnee();
-
-        },
-        500
-    );
-
-}
-
-
-// ============================================================
-// GRADE
-// ============================================================
-
-function remplirSelectGrade() {
-
-    const select =
-        document.getElementById(
-            "gradeId"
-        );
-
-    const filtre =
-        document.getElementById(
-            "filter-grade"
-        );
-
-
-    if (select) {
-
-        select.innerHTML =
-            '<option value="">اختر الرتبة</option>';
-
-
-        if (
-            typeof getGradesData ===
-            "function"
-        ) {
-
-            getGradesData()
-                .filter(
-                    item => item.actif !== false
-                )
-                .forEach(function (item) {
-
-                    select.innerHTML += `
-
-                        <option value="${item.id}">
-                            ${echapperHTML(
-                                item.nom
-                            )}
-                        </option>
-
-                    `;
-
-                });
-
-        }
-
-    }
-
-
-    if (filtre) {
-
-        filtre.innerHTML =
-            '<option value="">كل الرتب</option>';
-
-
-        if (
-            typeof getGradesData ===
-            "function"
-        ) {
-
-            getGradesData()
-                .filter(
-                    item => item.actif !== false
-                )
-                .forEach(function (item) {
-
-                    filtre.innerHTML += `
-
-                        <option value="${item.id}">
-                            ${echapperHTML(
-                                item.nom
-                            )}
-                        </option>
-
-                    `;
-
-                });
-
-        }
-
-    }
-
-}
-
-
-// ============================================================
-// SPECIALITE
-// ============================================================
-
-function remplirSelectSpecialite() {
-
-    const select =
-        document.getElementById(
-            "specialiteId"
-        );
-
-    const filtre =
-        document.getElementById(
-            "filter-specialite"
-        );
-
-
-    if (select) {
-
-        select.innerHTML =
-            '<option value="">اختر التخصص</option>';
-
-
-        if (
-            typeof getSpecialitesData ===
-            "function"
-        ) {
-
-            getSpecialitesData()
-                .filter(
-                    item => item.actif !== false
-                )
-                .forEach(function (item) {
-
-                    select.innerHTML += `
-
-                        <option value="${item.id}">
-                            ${echapperHTML(
-                                item.nom
-                            )}
-                        </option>
-
-                    `;
-
-                });
-
-        }
-
-    }
-
-
-    if (filtre) {
-
-        filtre.innerHTML =
-            '<option value="">كل التخصصات</option>';
-
-
-        if (
-            typeof getSpecialitesData ===
-            "function"
-        ) {
-
-            getSpecialitesData()
-                .filter(
-                    item => item.actif !== false
-                )
-                .forEach(function (item) {
-
-                    filtre.innerHTML += `
-
-                        <option value="${item.id}">
-                            ${echapperHTML(
-                                item.nom
-                            )}
-                        </option>
-
-                    `;
-
-                });
-
-        }
-
-    }
-
-}
-
-
-// ============================================================
-// DEPARTEMENT
-// ============================================================
-
-function remplirSelectDepartement() {
-
-    const select =
-        document.getElementById(
-            "departementId"
-        );
-
-    const filtre =
-        document.getElementById(
-            "filter-departement"
-        );
-
-
-    if (select) {
-
-        select.innerHTML =
-            '<option value="">اختر القسم</option>';
-
-
-        if (
-            typeof getDepartementsData ===
-            "function"
-        ) {
-
-            getDepartementsData()
-                .filter(
-                    item => item.actif !== false
-                )
-                .forEach(function (item) {
-
-                    select.innerHTML += `
-
-                        <option value="${item.id}">
-                            ${echapperHTML(
-                                item.nom
-                            )}
-                        </option>
-
-                    `;
-
-                });
-
-        }
-
-    }
-
-
-    if (filtre) {
-
-        filtre.innerHTML =
-            '<option value="">كل الأقسام</option>';
-
-
-        if (
-            typeof getDepartementsData ===
-            "function"
-        ) {
-
-            getDepartementsData()
-                .filter(
-                    item => item.actif !== false
-                )
-                .forEach(function (item) {
-
-                    filtre.innerHTML += `
-
-                        <option value="${item.id}">
-                            ${echapperHTML(
-                                item.nom
-                            )}
-                        </option>
-
-                    `;
-
-                });
-
-        }
-
-    }
-
-}
-
-
-// ============================================================
-// SIFAH
-// ============================================================
-
-function remplirSelectSifah() {
-
-    const select =
-        document.getElementById(
-            "sifah"
-        );
-
-    const filtre =
-        document.getElementById(
-            "filter-sifah"
-        );
-
-
-    const data =
-        typeof getSifahData ===
-        "function"
-            ? getSifahData()
-            : [];
-
-
-    if (select) {
-
-        select.innerHTML =
-            '<option value="">اختر الصفة</option>';
-
-
-        data
-            .filter(
-                item => item.actif !== false
-            )
-            .forEach(function (item) {
-
-                select.innerHTML += `
-
-                    <option value="${item.id}">
-                        ${echapperHTML(
-                            item.nom
-                        )}
-                    </option>
-
-                `;
-
-            });
-
-    }
-
-
-    if (filtre) {
-
-        filtre.innerHTML =
-            '<option value="">كل الصفات</option>';
-
-
-        data
-            .filter(
-                item => item.actif !== false
-            )
-            .forEach(function (item) {
-
-                filtre.innerHTML += `
-
-                    <option value="${item.id}">
-                        ${echapperHTML(
-                            item.nom
-                        )}
-                    </option>
-
-                `;
-
-            });
-
-    }
-
-}
-
-
-// ============================================================
-// WADHIA
-// ============================================================
-
-function remplirSelectWadhia() {
-
-    const select =
-        document.getElementById(
-            "wadhia"
-        );
-
-    const filtre =
-        document.getElementById(
-            "filter-wadhia"
-        );
-
-
-    const data =
-        typeof getWadhiaData ===
-        "function"
-            ? getWadhiaData()
-            : [];
-
-
-    if (select) {
-
-        select.innerHTML =
-            '<option value="">اختر الوضعية</option>';
-
-
-        data
-            .filter(
-                item => item.actif !== false
-            )
-            .forEach(function (item) {
-
-                select.innerHTML += `
-
-                    <option value="${item.id}">
-                        ${echapperHTML(
-                            item.nom
-                        )}
-                    </option>
-
-                `;
-
-            });
-
-    }
-
-
-    if (filtre) {
-
-        filtre.innerHTML =
-            '<option value="">كل الوضعيات</option>';
-
-
-        data
-            .filter(
-                item => item.actif !== false
-            )
-            .forEach(function (item) {
-
-                filtre.innerHTML += `
-
-                    <option value="${item.id}">
-                        ${echapperHTML(
-                            item.nom
-                        )}
-                    </option>
-
-                `;
-
-            });
-
-    }
-
-}
-
-
-// ============================================================
-// ANNEE
-// ============================================================
-
-function remplirSelectAnnee() {
-
-    const select =
-        document.getElementById(
-            "anneeUniversitaire"
-        );
-
-    const filtre =
-        document.getElementById(
-            "filter-anneeUniversitaire"
-        );
-
-
-    const data =
-        typeof getAnneesData ===
-        "function"
-            ? getAnneesData()
-            : [];
-
-
-    if (select) {
-
-        select.innerHTML =
-            '<option value="">اختر السنة الجامعية</option>';
-
-
-        data
-            .filter(
-                item => item.actif !== false
-            )
-            .forEach(function (item) {
-
-                select.innerHTML += `
-
-                    <option value="${item.id}">
-                        ${echapperHTML(
-                            item.nom
-                        )}
-                    </option>
-
-                `;
-
-            });
-
-    }
-
-
-    if (filtre) {
-
-        filtre.innerHTML =
-            '<option value="">كل السنوات الجامعية</option>';
-
-
-        data
-            .filter(
-                item => item.actif !== false
-            )
-            .forEach(function (item) {
-
-                filtre.innerHTML += `
-
-                    <option value="${item.id}">
-                        ${echapperHTML(
-                            item.nom
-                        )}
-                    </option>
-
-                `;
-
-            });
-
-    }
 
 }
 
@@ -745,56 +211,51 @@ function afficherEnseignants(
             "enseignants-body"
         );
 
+
     if (!tbody) return;
 
 
     tbody.innerHTML = "";
 
 
-    liste.forEach(function (item) {
+    liste.forEach(function (item, index) {
 
         const tr =
             document.createElement("tr");
 
 
         const grade =
-            trouverNom(
-                getGradesData(),
+            trouverNomGrade(
                 item.gradeId
             );
 
 
         const specialite =
-            trouverNom(
-                getSpecialitesData(),
+            trouverNomSpecialite(
                 item.specialiteId
             );
 
 
         const departement =
-            trouverNom(
-                getDepartementsData(),
+            trouverNomDepartement(
                 item.departementId
             );
 
 
         const sifah =
-            trouverNom(
-                getSifahData(),
+            trouverNomSifah(
                 item.sifah
             );
 
 
         const wadhia =
-            trouverNom(
-                getWadhiaData(),
+            trouverNomWadhia(
                 item.wadhia
             );
 
 
         const annee =
-            trouverNom(
-                getAnneesData(),
+            trouverNomAnnee(
                 item.anneeUniversitaire
             );
 
@@ -802,7 +263,7 @@ function afficherEnseignants(
         tr.innerHTML = `
 
             <td>
-                ${item.numero ?? ""}
+                ${item.numero ?? index + 1}
             </td>
 
             <td>
@@ -859,18 +320,14 @@ function afficherEnseignants(
 
                 <button
                     class="btn-secondary"
-                    onclick="modifierEnseignant(
-                        '${item.id}'
-                    )"
+                    onclick="modifierEnseignant('${item.id}')"
                 >
                     تعديل
                 </button>
 
                 <button
                     class="btn-danger"
-                    onclick="supprimerEnseignant(
-                        '${item.id}'
-                    )"
+                    onclick="supprimerEnseignant('${item.id}')"
                 >
                     حذف
                 </button>
@@ -888,34 +345,7 @@ function afficherEnseignants(
 
 
 // ============================================================
-// TROUVER NOM
-// ============================================================
-
-function trouverNom(
-    liste,
-    id
-) {
-
-    if (!id) return "";
-
-
-    const item =
-        liste.find(function (x) {
-
-            return x.id === id;
-
-        });
-
-
-    return item
-        ? item.nom
-        : "";
-
-}
-
-
-// ============================================================
-// OUVRIR MODAL
+// OUVRIR MODAL ENSEIGNANT
 // ============================================================
 
 function ouvrirModalEnseignant(
@@ -927,166 +357,96 @@ function ouvrirModalEnseignant(
             "modal-enseignant"
         );
 
+
     if (!modal) return;
 
 
+    const form =
+        document.getElementById(
+            "enseignant-form"
+        );
+
+
+    if (form) {
+
+        form.reset();
+
+    }
+
+
     document.getElementById(
         "enseignant-id"
-    ).value =
-        id || "";
+    ).value = id || "";
 
 
-    document.getElementById(
-        "enseignant-form"
-    ).reset();
+    // --------------------------------------------------------
+    // REMPLIR LES SELECTS
+    // --------------------------------------------------------
+
+    remplirSelectsEnseignant();
 
 
-    document.getElementById(
-        "enseignant-id"
-    ).value =
-        id || "";
+    // --------------------------------------------------------
+    // AJOUT
+    // --------------------------------------------------------
+
+    if (!id) {
+
+        document.getElementById(
+            "modal-enseignant-title"
+        ).textContent =
+            "إضافة أستاذ جديد";
+
+
+        document.getElementById(
+            "genre"
+        ).value = "homme";
+
+
+        modal.classList.remove("hidden");
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // MODIFICATION
+    // --------------------------------------------------------
+
+    const enseignant =
+        enseignantsData.find(
+            function (item) {
+
+                return item.id === id;
+
+            }
+        );
+
+
+    if (!enseignant) {
+
+        alert(
+            "لم يتم العثور على الأستاذ"
+        );
+
+        return;
+
+    }
+
+
+    remplirFormulaireEnseignant(
+        enseignant
+    );
 
 
     document.getElementById(
         "modal-enseignant-title"
     ).textContent =
-        id
-            ? "تعديل أستاذ"
-            : "إضافة أستاذ جديد";
+        "تعديل بيانات الأستاذ";
 
 
-    // Les listes doivent être disponibles
-    remplirSelectGrade();
-    remplirSelectSpecialite();
-    remplirSelectDepartement();
-    remplirSelectSifah();
-    remplirSelectWadhia();
-    remplirSelectAnnee();
-
-
-    if (id) {
-
-        const item =
-            enseignantsData.find(
-                function (x) {
-
-                    return x.id === id;
-
-                }
-            );
-
-
-        if (item) {
-
-            document.getElementById(
-                "numero"
-            ).value =
-                item.numero ?? "";
-
-
-            document.getElementById(
-                "matriculeCNRPS"
-            ).value =
-                item.matriculeCNRPS ?? "";
-
-
-            document.getElementById(
-                "nom"
-            ).value =
-                item.nom ?? "";
-
-
-            document.getElementById(
-                "prenom"
-            ).value =
-                item.prenom ?? "";
-
-
-            document.getElementById(
-                "gradeId"
-            ).value =
-                item.gradeId ?? "";
-
-
-            document.getElementById(
-                "specialiteId"
-            ).value =
-                item.specialiteId ?? "";
-
-
-            document.getElementById(
-                "departementId"
-            ).value =
-                item.departementId ?? "";
-
-
-            document.getElementById(
-                "tel1"
-            ).value =
-                item.tel1 ?? "";
-
-
-            document.getElementById(
-                "tel2"
-            ).value =
-                item.tel2 ?? "";
-
-
-            document.getElementById(
-                "email"
-            ).value =
-                item.email ?? "";
-
-
-            document.getElementById(
-                "sifah"
-            ).value =
-                item.sifah ?? "";
-
-
-            document.getElementById(
-                "wadhia"
-            ).value =
-                item.wadhia ?? "";
-
-
-            document.getElementById(
-                "anneeUniversitaire"
-            ).value =
-                item.anneeUniversitaire ?? "";
-
-
-            document.getElementById(
-                "genre"
-            ).value =
-                item.genre ?? "homme";
-
-
-            document.getElementById(
-                "dateNaissance"
-            ).value =
-                item.dateNaissance ?? "";
-
-
-            document.getElementById(
-                "dateRecrutement"
-            ).value =
-                item.dateRecrutement ?? "";
-
-
-            document.getElementById(
-                "dateDernierGrade"
-            ).value =
-                item.dateDernierGrade ?? "";
-
-        }
-
-    }
-
-
-    modal.classList.remove(
-        "hidden"
-    );
+    modal.classList.remove("hidden");
 
 }
 
@@ -1098,6 +458,560 @@ function ouvrirModalEnseignant(
 function modifierEnseignant(id) {
 
     ouvrirModalEnseignant(id);
+
+}
+
+
+// ============================================================
+// REMPLIR FORMULAIRE
+// ============================================================
+
+function remplirFormulaireEnseignant(
+    item
+) {
+
+    definirValeur("numero", item.numero);
+
+    definirValeur(
+        "matriculeCNRPS",
+        item.matriculeCNRPS
+    );
+
+    definirValeur(
+        "nom",
+        item.nom
+    );
+
+    definirValeur(
+        "prenom",
+        item.prenom
+    );
+
+    definirValeur(
+        "gradeId",
+        item.gradeId
+    );
+
+    definirValeur(
+        "specialiteId",
+        item.specialiteId
+    );
+
+    definirValeur(
+        "departementId",
+        item.departementId
+    );
+
+    definirValeur(
+        "tel1",
+        item.tel1
+    );
+
+    definirValeur(
+        "tel2",
+        item.tel2
+    );
+
+    definirValeur(
+        "email",
+        item.email
+    );
+
+    definirValeur(
+        "sifah",
+        item.sifah
+    );
+
+    definirValeur(
+        "wadhia",
+        item.wadhia
+    );
+
+    definirValeur(
+        "anneeUniversitaire",
+        item.anneeUniversitaire
+    );
+
+    definirValeur(
+        "genre",
+        item.genre || "homme"
+    );
+
+    definirValeur(
+        "dateNaissance",
+        item.dateNaissance
+    );
+
+    definirValeur(
+        "dateRecrutement",
+        item.dateRecrutement
+    );
+
+    definirValeur(
+        "dateDernierGrade",
+        item.dateDernierGrade
+    );
+
+}
+
+
+// ============================================================
+// DEFINIR VALEUR
+// ============================================================
+
+function definirValeur(
+    id,
+    valeur
+) {
+
+    const element =
+        document.getElementById(id);
+
+
+    if (!element) return;
+
+
+    element.value =
+        valeur ?? "";
+
+}
+
+
+// ============================================================
+// REMPLIR TOUS LES SELECTS
+// ============================================================
+
+function remplirSelectsEnseignant() {
+
+    remplirSelectGradesEnseignant();
+
+    remplirSelectSpecialitesEnseignant();
+
+    remplirSelectDepartementsEnseignant();
+
+    remplirSelectSifahEnseignant();
+
+    remplirSelectWadhiaEnseignant();
+
+    remplirSelectAnneesEnseignant();
+
+}
+
+
+// ============================================================
+// GRADES
+// ============================================================
+
+function remplirSelectGradesEnseignant() {
+
+    const select =
+        document.getElementById(
+            "gradeId"
+        );
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر الرتبة</option>';
+
+
+    if (typeof getGradesData !== "function") {
+
+        return;
+
+    }
+
+
+    getGradesData()
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.id;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
+
+}
+
+
+// ============================================================
+// SPECIALITES
+// ============================================================
+
+function remplirSelectSpecialitesEnseignant() {
+
+    const select =
+        document.getElementById(
+            "specialiteId"
+        );
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر التخصص</option>';
+
+
+    if (
+        typeof getSpecialitesData !==
+        "function"
+    ) {
+
+        return;
+
+    }
+
+
+    getSpecialitesData()
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.id;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
+
+}
+
+
+// ============================================================
+// DEPARTEMENTS
+// ============================================================
+
+function remplirSelectDepartementsEnseignant() {
+
+    const select =
+        document.getElementById(
+            "departementId"
+        );
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر القسم</option>';
+
+
+    if (
+        typeof getDepartementsData !==
+        "function"
+    ) {
+
+        return;
+
+    }
+
+
+    getDepartementsData()
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.id;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
+
+}
+
+
+// ============================================================
+// SIFAH
+// ============================================================
+
+function remplirSelectSifahEnseignant() {
+
+    const select =
+        document.getElementById(
+            "sifah"
+        );
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر الصفة</option>';
+
+
+    if (
+        typeof getSifahData !==
+        "function"
+    ) {
+
+        return;
+
+    }
+
+
+    getSifahData()
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            // On enregistre le CODE
+            option.value =
+                item.code;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
+
+}
+
+
+// ============================================================
+// WADHIA
+// ============================================================
+
+function remplirSelectWadhiaEnseignant() {
+
+    const select =
+        document.getElementById(
+            "wadhia"
+        );
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر الوضعية</option>';
+
+
+    if (
+        typeof getWadhiaData !==
+        "function"
+    ) {
+
+        return;
+
+    }
+
+
+    getWadhiaData()
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.code;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
+
+}
+
+
+// ============================================================
+// ANNÉES
+// ============================================================
+
+function remplirSelectAnneesEnseignant() {
+
+    const select =
+        document.getElementById(
+            "anneeUniversitaire"
+        );
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">اختر السنة الجامعية</option>';
+
+
+    if (
+        typeof getAnneesData !==
+        "function"
+    ) {
+
+        return;
+
+    }
+
+
+    getAnneesData()
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.nom;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
 
 }
 
@@ -1119,17 +1033,14 @@ async function enregistrerEnseignant(
         ).value;
 
 
-    const numero =
-        Number(
-            document.getElementById(
-                "numero"
-            ).value
-        );
-
-
     const data = {
 
-        numero: numero,
+        numero:
+            Number(
+                document.getElementById(
+                    "numero"
+                ).value
+            ),
 
         matriculeCNRPS:
             document.getElementById(
@@ -1176,16 +1087,21 @@ async function enregistrerEnseignant(
                 "email"
             ).value.trim(),
 
+        // IMPORTANT :
+        // on enregistre le CODE de sifah
         sifah:
             document.getElementById(
                 "sifah"
             ).value,
 
+        // IMPORTANT :
+        // on enregistre le CODE de wadhia
         wadhia:
             document.getElementById(
                 "wadhia"
             ).value,
 
+        // année
         anneeUniversitaire:
             document.getElementById(
                 "anneeUniversitaire"
@@ -1212,8 +1128,7 @@ async function enregistrerEnseignant(
             ).value,
 
         updatedAt:
-            firebase.firestore
-                .FieldValue
+            firebase.firestore.FieldValue
                 .serverTimestamp()
 
     };
@@ -1222,17 +1137,6 @@ async function enregistrerEnseignant(
     // --------------------------------------------------------
     // VALIDATION
     // --------------------------------------------------------
-
-    if (!data.matriculeCNRPS) {
-
-        alert(
-            "يرجى إدخال رقم التسجيل CNRPS"
-        );
-
-        return;
-
-    }
-
 
     if (!data.nom) {
 
@@ -1256,65 +1160,10 @@ async function enregistrerEnseignant(
     }
 
 
-    if (!data.gradeId) {
+    if (!data.matriculeCNRPS) {
 
         alert(
-            "يرجى اختيار الرتبة"
-        );
-
-        return;
-
-    }
-
-
-    if (!data.specialiteId) {
-
-        alert(
-            "يرجى اختيار التخصص"
-        );
-
-        return;
-
-    }
-
-
-    if (!data.departementId) {
-
-        alert(
-            "يرجى اختيار القسم"
-        );
-
-        return;
-
-    }
-
-
-    if (!data.sifah) {
-
-        alert(
-            "يرجى اختيار الصفة"
-        );
-
-        return;
-
-    }
-
-
-    if (!data.wadhia) {
-
-        alert(
-            "يرجى اختيار الوضعية"
-        );
-
-        return;
-
-    }
-
-
-    if (!data.anneeUniversitaire) {
-
-        alert(
-            "يرجى اختيار السنة الجامعية"
+            "يرجى إدخال رقم التسجيل CNRPS"
         );
 
         return;
@@ -1343,21 +1192,21 @@ async function enregistrerEnseignant(
         else {
 
             data.createdAt =
-                firebase.firestore
-                    .FieldValue
+                firebase.firestore.FieldValue
                     .serverTimestamp();
 
 
-            await enseignantsRef.add(
-                data
-            );
+            await enseignantsRef.add(data);
 
         }
 
 
-        fermerModal(
-            "modal-enseignant"
-        );
+        fermerModalEnseignant();
+
+
+        document.getElementById(
+            "enseignant-form"
+        ).reset();
 
 
         alert(
@@ -1369,12 +1218,12 @@ async function enregistrerEnseignant(
     catch (error) {
 
         console.error(
-            "Erreur Firebase enseignant :",
+            "Erreur enseignant :",
             error
         );
 
         alert(
-            "حدث خطأ أثناء حفظ بيانات الأستاذ\n" +
+            "حدث خطأ أثناء حفظ بيانات الأستاذ : " +
             error.message
         );
 
@@ -1384,18 +1233,16 @@ async function enregistrerEnseignant(
 
 
 // ============================================================
-// SUPPRIMER
+// SUPPRIMER ENSEIGNANT
 // ============================================================
 
 async function supprimerEnseignant(
     id
 ) {
 
-    if (
-        !confirm(
-            "هل أنت متأكد من حذف هذا الأستاذ ؟"
-        )
-    ) {
+    if (!confirm(
+        "هل أنت متأكد من حذف هذا الأستاذ ؟"
+    )) {
 
         return;
 
@@ -1410,7 +1257,7 @@ async function supprimerEnseignant(
 
 
         alert(
-            "تم حذف الأستاذ بنجاح"
+            "تم حذف الأستاذ"
         );
 
     }
@@ -1423,8 +1270,31 @@ async function supprimerEnseignant(
         );
 
         alert(
-            "حدث خطأ أثناء حذف الأستاذ\n" +
+            "حدث خطأ أثناء الحذف : " +
             error.message
+        );
+
+    }
+
+}
+
+
+// ============================================================
+// FERMER MODAL
+// ============================================================
+
+function fermerModalEnseignant() {
+
+    const modal =
+        document.getElementById(
+            "modal-enseignant"
+        );
+
+
+    if (modal) {
+
+        modal.classList.add(
+            "hidden"
         );
 
     }
@@ -1492,69 +1362,96 @@ function appliquerFiltres() {
         enseignantsData.filter(
             function (item) {
 
-                const okMatricule =
-                    !matricule ||
+                const matriculeItem =
                     String(
-                        item.matriculeCNRPS ?? ""
+                        item.matriculeCNRPS || ""
                     )
-                    .toLowerCase()
-                    .includes(matricule);
+                    .toLowerCase();
 
 
-                const okGrade =
-                    !grade ||
-                    item.gradeId === grade;
+                if (
+                    matricule &&
+                    !matriculeItem.includes(
+                        matricule
+                    )
+                ) {
+
+                    return false;
+
+                }
 
 
-                const okSpecialite =
-                    !specialite ||
-                    item.specialiteId === specialite;
+                if (
+                    grade &&
+                    item.gradeId !== grade
+                ) {
+
+                    return false;
+
+                }
 
 
-                const okDepartement =
-                    !departement ||
-                    item.departementId === departement;
+                if (
+                    specialite &&
+                    item.specialiteId !== specialite
+                ) {
+
+                    return false;
+
+                }
 
 
-                const okSifah =
-                    !sifah ||
-                    item.sifah === sifah;
+                if (
+                    departement &&
+                    item.departementId !== departement
+                ) {
+
+                    return false;
+
+                }
 
 
-                const okWadhia =
-                    !wadhia ||
-                    item.wadhia === wadhia;
+                if (
+                    sifah &&
+                    item.sifah !== sifah
+                ) {
+
+                    return false;
+
+                }
 
 
-                const okAnnee =
-                    !annee ||
-                    item.anneeUniversitaire === annee;
+                if (
+                    wadhia &&
+                    item.wadhia !== wadhia
+                ) {
+
+                    return false;
+
+                }
 
 
-                const okGenre =
-                    !genre ||
-                    item.genre === genre;
+                if (
+                    annee &&
+                    item.anneeUniversitaire !== annee
+                ) {
+
+                    return false;
+
+                }
 
 
-                return (
+                if (
+                    genre &&
+                    item.genre !== genre
+                ) {
 
-                    okMatricule &&
+                    return false;
 
-                    okGrade &&
+                }
 
-                    okSpecialite &&
 
-                    okDepartement &&
-
-                    okSifah &&
-
-                    okWadhia &&
-
-                    okAnnee &&
-
-                    okGenre
-
-                );
+                return true;
 
             }
         );
@@ -1563,6 +1460,236 @@ function appliquerFiltres() {
     afficherEnseignants(
         resultat
     );
+
+}
+
+
+// ============================================================
+// REMPLIR LES FILTRES
+// ============================================================
+
+function mettreAJourFiltres() {
+
+    remplirFiltre(
+        "filter-grade",
+        getGradesData(),
+        "كل الرتب"
+    );
+
+
+    remplirFiltre(
+        "filter-specialite",
+        getSpecialitesData(),
+        "كل التخصصات"
+    );
+
+
+    remplirFiltre(
+        "filter-departement",
+        getDepartementsData(),
+        "كل الأقسام"
+    );
+
+
+    remplirFiltreCodes(
+        "filter-sifah",
+        getSifahData(),
+        "كل الصفات"
+    );
+
+
+    remplirFiltreCodes(
+        "filter-wadhia",
+        getWadhiaData(),
+        "كل الوضعيات"
+    );
+
+
+    remplirFiltreAnnees();
+
+}
+
+
+// ============================================================
+// FILTRE NORMAL
+// ============================================================
+
+function remplirFiltre(
+    id,
+    data,
+    texteDefaut
+) {
+
+    const select =
+        document.getElementById(id);
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        `<option value="">${texteDefaut}</option>`;
+
+
+    data
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.id;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
+
+}
+
+
+// ============================================================
+// FILTRE CODE
+// ============================================================
+
+function remplirFiltreCodes(
+    id,
+    data,
+    texteDefaut
+) {
+
+    const select =
+        document.getElementById(id);
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        `<option value="">${texteDefaut}</option>`;
+
+
+    data
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.code;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
+
+}
+
+
+// ============================================================
+// FILTRE ANNÉES
+// ============================================================
+
+function remplirFiltreAnnees() {
+
+    const select =
+        document.getElementById(
+            "filter-anneeUniversitaire"
+        );
+
+
+    if (!select) return;
+
+
+    const valeur =
+        select.value;
+
+
+    select.innerHTML =
+        '<option value="">كل السنوات الجامعية</option>';
+
+
+    getAnneesData()
+        .filter(function (item) {
+
+            return item.actif !== false;
+
+        })
+        .forEach(function (item) {
+
+            const option =
+                document.createElement(
+                    "option"
+                );
+
+
+            option.value =
+                item.nom;
+
+
+            option.textContent =
+                item.nom;
+
+
+            select.appendChild(option);
+
+        });
+
+
+    if (valeur) {
+
+        select.value =
+            valeur;
+
+    }
 
 }
 
@@ -1599,6 +1726,7 @@ function reinitialiserFiltres() {
         const element =
             document.getElementById(id);
 
+
         if (element) {
 
             element.value = "";
@@ -1616,19 +1744,262 @@ function reinitialiserFiltres() {
 
 
 // ============================================================
-// FERMER MODAL
+// RECHERCHE GRADE
 // ============================================================
 
-function fermerModal(id) {
+function trouverNomGrade(id) {
 
-    const modal =
+    const item =
+        getGradesData().find(
+            function (element) {
+
+                return element.id === id;
+
+            }
+        );
+
+
+    return item
+        ? item.nom
+        : "";
+
+}
+
+
+// ============================================================
+// RECHERCHE SPECIALITE
+// ============================================================
+
+function trouverNomSpecialite(id) {
+
+    const item =
+        getSpecialitesData().find(
+            function (element) {
+
+                return element.id === id;
+
+            }
+        );
+
+
+    return item
+        ? item.nom
+        : "";
+
+}
+
+
+// ============================================================
+// RECHERCHE DEPARTEMENT
+// ============================================================
+
+function trouverNomDepartement(id) {
+
+    const item =
+        getDepartementsData().find(
+            function (element) {
+
+                return element.id === id;
+
+            }
+        );
+
+
+    return item
+        ? item.nom
+        : "";
+
+}
+
+
+// ============================================================
+// RECHERCHE SIFAH
+// ============================================================
+
+function trouverNomSifah(code) {
+
+    const item =
+        getSifahData().find(
+            function (element) {
+
+                return element.code === code;
+
+            }
+        );
+
+
+    return item
+        ? item.nom
+        : code || "";
+
+}
+
+
+// ============================================================
+// RECHERCHE WADHIA
+// ============================================================
+
+function trouverNomWadhia(code) {
+
+    const item =
+        getWadhiaData().find(
+            function (element) {
+
+                return element.code === code;
+
+            }
+        );
+
+
+    return item
+        ? item.nom
+        : code || "";
+
+}
+
+
+// ============================================================
+// RECHERCHE ANNÉE
+// ============================================================
+
+function trouverNomAnnee(nom) {
+
+    return nom || "";
+
+}
+
+
+// ============================================================
+// DASHBOARD
+// ============================================================
+
+function mettreAJourDashboard() {
+
+    const total =
+        enseignantsData.length;
+
+
+    const titulaire =
+        enseignantsData.filter(
+            function (item) {
+
+                return item.sifah === "titulaire";
+
+            }
+        ).length;
+
+
+    const contractuel =
+        enseignantsData.filter(
+            function (item) {
+
+                return item.sifah === "contractuel";
+
+            }
+        ).length;
+
+
+    const vacataire =
+        enseignantsData.filter(
+            function (item) {
+
+                return item.sifah === "vacataire";
+
+            }
+        ).length;
+
+
+    definirTexte(
+        "dash-total",
+        total
+    );
+
+
+    definirTexte(
+        "dash-titulaire",
+        titulaire
+    );
+
+
+    definirTexte(
+        "dash-contractuel",
+        contractuel
+    );
+
+
+    definirTexte(
+        "dash-vacataire",
+        vacataire
+    );
+
+
+    definirTexte(
+        "kpi-total",
+        total
+    );
+
+
+    definirTexte(
+        "kpi-titulaire",
+        titulaire
+    );
+
+
+    definirTexte(
+        "kpi-contractuel",
+        contractuel
+    );
+
+
+    definirTexte(
+        "kpi-vacataire",
+        vacataire
+    );
+
+
+    const homme =
+        enseignantsData.filter(
+            item => item.genre === "homme"
+        ).length;
+
+
+    const femme =
+        enseignantsData.filter(
+            item => item.genre === "femme"
+        ).length;
+
+
+    definirTexte(
+        "kpi-homme",
+        homme
+    );
+
+
+    definirTexte(
+        "kpi-femme",
+        femme
+    );
+
+}
+
+
+// ============================================================
+// TEXTE
+// ============================================================
+
+function definirTexte(
+    id,
+    valeur
+) {
+
+    const element =
         document.getElementById(id);
 
-    if (modal) {
 
-        modal.classList.add(
-            "hidden"
-        );
+    if (element) {
+
+        element.textContent =
+            valeur;
 
     }
 
@@ -1636,7 +2007,7 @@ function fermerModal(id) {
 
 
 // ============================================================
-// SECURITE HTML
+// SÉCURITÉ HTML
 // ============================================================
 
 function echapperHTML(value) {
@@ -1657,10 +2028,28 @@ function echapperHTML(value) {
 
 
 // ============================================================
-// FIN
+// FERMETURE MODAL
 // ============================================================
 
-console.log(
-    "SIGE - enseignants.js chargé avec Firebase"
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const bouton =
+            event.target.closest(
+                "#modal-enseignant .close-modal"
+            );
+
+
+        if (!bouton) return;
+
+
+        fermerModalEnseignant();
+
+    }
 );
-```
+
+
+console.log(
+    "SIGE - enseignants.js chargé"
+);
