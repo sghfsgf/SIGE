@@ -2,14 +2,25 @@
 // SIGE - CONFIGURATION FIREBASE
 // ============================================================
 
-// Configuration Firebase
+
+// ============================================================
+// CONFIGURATION DU PROJET FIREBASE
+// ============================================================
+
 const firebaseConfig = {
+
   apiKey: "AIzaSyAlz1RpBJJFWHvjlaTODxF1YX5Jnyfz60",
+
   authDomain: "sige-fsgf.firebaseapp.com",
+
   projectId: "sige-fsgf",
+
   storageBucket: "sige-fsgf.firebasestorage.app",
+
   messagingSenderId: "952214498038",
+
   appId: "1:952214498038:web:2850b4f103530dd70e5ad7"
+
 };
 
 
@@ -18,52 +29,86 @@ const firebaseConfig = {
 // ============================================================
 
 if (!firebase.apps.length) {
-    firebase.initializeApp(firebaseConfig);
+
+  firebase.initializeApp(firebaseConfig);
+
 }
 
 
 // ============================================================
-// SERVICES FIREBASE
+// FIREBASE AUTHENTICATION
 // ============================================================
 
 const auth = firebase.auth();
+
+
+// ============================================================
+// FIRESTORE
+// ============================================================
 
 const db = firebase.firestore();
 
 
 // ============================================================
-// COLLECTIONS PRINCIPALES
+// COLLECTION : ENSEIGNANTS
 // ============================================================
 
-const enseignantsRef = db.collection("enseignants");
-
-const gradesRef = db.collection("grades");
-
-const specialitesRef = db.collection("specialites");
-
-const departementsRef = db.collection("departements");
+const enseignantsRef =
+  db.collection("enseignants");
 
 
 // ============================================================
-// PARAMÈTRES
+// COLLECTIONS : CATEGORIES
 // ============================================================
 
-const sifahRef = db.collection("sifah");
+const gradesRef =
+  db.collection("grades");
 
-const wadhiaRef = db.collection("wadhia");
+const specialitesRef =
+  db.collection("specialites");
 
-const anneesRef = db.collection("anneesUniversitaires");
-
-const etablissementRef = db.collection("etablissement");
+const departementsRef =
+  db.collection("departements");
 
 
 // ============================================================
-// VÉRIFICATION
+// COLLECTIONS : PARAMETRES
+// ============================================================
+
+const sifahRef =
+  db.collection("sifah");
+
+const wadhiaRef =
+  db.collection("wadhia");
+
+const anneesRef =
+  db.collection("anneesUniversitaires");
+
+const etablissementRef =
+  db.collection("etablissement");
+
+
+// ============================================================
+// INFORMATIONS DE CONTROLE
 // ============================================================
 
 console.log("======================================");
+
 console.log("SIGE - Firebase initialisé");
-console.log("Projet Firebase :", firebaseConfig.projectId);
-console.log("Firestore :", db);
-console.log("Authentication :", auth);
+
+console.log(
+  "Projet Firebase :",
+  firebaseConfig.projectId
+);
+
+console.log(
+  "Authentication :",
+  auth
+);
+
+console.log(
+  "Firestore :",
+  db
+);
+
 console.log("======================================");
