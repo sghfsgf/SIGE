@@ -5,23 +5,23 @@
 // Configuration de votre projet Firebase
 // ============================================================
 
+// Import the functions you need from the SDKs you need
+import { initializeApp } from "firebase/app";
+// TODO: Add SDKs for Firebase products that you want to use
+// https://firebase.google.com/docs/web/setup#available-libraries
+
+// Your web app's Firebase configuration
 const firebaseConfig = {
-
-  apiKey: "VOTRE_API_KEY",
-
-  authDomain: "VOTRE_PROJECT_ID.firebaseapp.com",
-
-  projectId: "VOTRE_PROJECT_ID",
-
-  storageBucket: "VOTRE_PROJECT_ID.firebasestorage.app",
-
-  messagingSenderId: "VOTRE_MESSAGING_SENDER_ID",
-
-  appId: "VOTRE_APP_ID"
-
+  apiKey: "AIzaSyAlz1RpbBJJFWHvjlaTODxF1YX5Jnyfz60",
+  authDomain: "sige-fsgf.firebaseapp.com",
+  projectId: "sige-fsgf",
+  storageBucket: "sige-fsgf.firebasestorage.app",
+  messagingSenderId: "952214498038",
+  appId: "1:952214498038:web:2850b4f103530dd70e5ad7"
 };
 
-
+// Initialize Firebase
+const app = initializeApp(firebaseConfig);
 // ============================================================
 // INITIALISATION FIREBASE
 // ============================================================
