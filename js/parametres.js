@@ -1,11 +1,14 @@
+```javascript
 // ============================================================
-// SIGE - PARAMÈTRES
+// SIGE - PARAMETRES FIREBASE
 // ============================================================
-// Gestion complète de :
+// Gestion de :
 // 1. الصفة
 // 2. الوضعية
 // 3. السنوات الجامعية
 // 4. معلومات المؤسسة
+//
+// Compatible avec firebase-config.js
 // ============================================================
 
 
@@ -14,15 +17,9 @@
 // ============================================================
 
 let parametresData = {
-
     sifah: [],
-
     wadhia: [],
-
-    annees: [],
-
-    etablissement: {}
-
+    annees: []
 };
 
 
@@ -43,27 +40,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initialiserParametres() {
 
+    console.log("SIGE - Initialisation parametres.js");
+
+
     // --------------------------------------------------------
-    // ONGLET PARAMÈTRES
+    // ONGLETS
     // --------------------------------------------------------
 
-    document
-        .querySelectorAll(".param-tab-btn")
-        .forEach(function (button) {
+    document.querySelectorAll(".param-tab-btn").forEach(function (button) {
 
-            button.addEventListener("click", function () {
+        button.addEventListener("click", function () {
 
-                const tab = this.dataset.paramTab;
+            const tab = this.dataset.paramTab;
 
-                afficherParametreTab(tab);
-
-            });
+            afficherParametreTab(tab);
 
         });
 
+    });
+
 
     // --------------------------------------------------------
-    // BOUTON AJOUTER SIFAH
+    // BOUTON AJOUT SIFAH
     // --------------------------------------------------------
 
     const btnSifah =
@@ -81,7 +79,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // BOUTON AJOUTER WADHIA
+    // BOUTON AJOUT WADHIA
     // --------------------------------------------------------
 
     const btnWadhia =
@@ -99,7 +97,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // BOUTON AJOUTER ANNÉE
+    // BOUTON AJOUT ANNEE
     // --------------------------------------------------------
 
     const btnAnnee =
@@ -117,7 +115,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // FORMULAIRE PARAMÈTRE
+    // FORMULAIRE PARAMETRE
     // --------------------------------------------------------
 
     const parametreForm =
@@ -134,7 +132,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // FORMULAIRE ÉTABLISSEMENT
+    // FORMULAIRE ETABLISSEMENT
     // --------------------------------------------------------
 
     const etablissementForm =
@@ -171,8 +169,6 @@ function initialiserParametres() {
 
 function afficherParametreTab(type) {
 
-    // Boutons
-
     document
         .querySelectorAll(".param-tab-btn")
         .forEach(function (button) {
@@ -194,8 +190,6 @@ function afficherParametreTab(type) {
 
     }
 
-
-    // Contenus
 
     document
         .querySelectorAll(".param-tab-content")
@@ -222,10 +216,19 @@ function afficherParametreTab(type) {
 
 
 // ============================================================
-// SIFAH - CHARGER
+// SIFAH - CHARGEMENT
 // ============================================================
 
 function chargerSifah() {
+
+    if (typeof sifahRef === "undefined") {
+
+        console.error("sifahRef non défini");
+
+        return;
+
+    }
+
 
     sifahRef
         .orderBy("ordre", "asc")
@@ -234,6 +237,7 @@ function chargerSifah() {
             function (snapshot) {
 
                 parametresData.sifah = [];
+
 
                 snapshot.forEach(function (doc) {
 
@@ -255,7 +259,7 @@ function chargerSifah() {
             function (error) {
 
                 console.error(
-                    "Erreur chargement sifah :",
+                    "Erreur Firebase sifah :",
                     error
                 );
 
@@ -267,7 +271,7 @@ function chargerSifah() {
 
 
 // ============================================================
-// SIFAH - AFFICHER
+// SIFAH - AFFICHAGE
 // ============================================================
 
 function afficherSifah() {
@@ -279,21 +283,6 @@ function afficherSifah() {
 
 
     tbody.innerHTML = "";
-
-
-    if (parametresData.sifah.length === 0) {
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    لا توجد بيانات
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
 
 
     parametresData.sifah.forEach(function (item) {
@@ -317,11 +306,13 @@ function afficherSifah() {
             </td>
 
             <td>
+
                 ${
                     item.actif
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
+
             </td>
 
             <td>
@@ -353,10 +344,19 @@ function afficherSifah() {
 
 
 // ============================================================
-// WADHIA - CHARGER
+// WADHIA - CHARGEMENT
 // ============================================================
 
 function chargerWadhia() {
+
+    if (typeof wadhiaRef === "undefined") {
+
+        console.error("wadhiaRef non défini");
+
+        return;
+
+    }
+
 
     wadhiaRef
         .orderBy("ordre", "asc")
@@ -365,6 +365,7 @@ function chargerWadhia() {
             function (snapshot) {
 
                 parametresData.wadhia = [];
+
 
                 snapshot.forEach(function (doc) {
 
@@ -386,7 +387,7 @@ function chargerWadhia() {
             function (error) {
 
                 console.error(
-                    "Erreur chargement wadhia :",
+                    "Erreur Firebase wadhia :",
                     error
                 );
 
@@ -398,7 +399,7 @@ function chargerWadhia() {
 
 
 // ============================================================
-// WADHIA - AFFICHER
+// WADHIA - AFFICHAGE
 // ============================================================
 
 function afficherWadhia() {
@@ -410,21 +411,6 @@ function afficherWadhia() {
 
 
     tbody.innerHTML = "";
-
-
-    if (parametresData.wadhia.length === 0) {
-
-        tbody.innerHTML = `
-            <tr>
-                <td colspan="5">
-                    لا توجد بيانات
-                </td>
-            </tr>
-        `;
-
-        return;
-
-    }
 
 
     parametresData.wadhia.forEach(function (item) {
@@ -448,11 +434,13 @@ function afficherWadhia() {
             </td>
 
             <td>
+
                 ${
                     item.actif
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
+
             </td>
 
             <td>
@@ -484,10 +472,21 @@ function afficherWadhia() {
 
 
 // ============================================================
-// ANNÉES UNIVERSITAIRES - CHARGER
+// ANNEES UNIVERSITAIRES - CHARGEMENT
 // ============================================================
 
 function chargerAnnees() {
+
+    if (typeof anneesRef === "undefined") {
+
+        console.error(
+            "anneesRef non défini"
+        );
+
+        return;
+
+    }
+
 
     anneesRef
         .orderBy("ordre", "asc")
@@ -496,6 +495,7 @@ function chargerAnnees() {
             function (snapshot) {
 
                 parametresData.annees = [];
+
 
                 snapshot.forEach(function (doc) {
 
@@ -517,7 +517,7 @@ function chargerAnnees() {
             function (error) {
 
                 console.error(
-                    "Erreur chargement années :",
+                    "Erreur Firebase anneesUniversitaires :",
                     error
                 );
 
@@ -529,7 +529,7 @@ function chargerAnnees() {
 
 
 // ============================================================
-// ANNÉES UNIVERSITAIRES - AFFICHER
+// ANNEES - AFFICHAGE
 // ============================================================
 
 function afficherAnnees() {
@@ -546,11 +546,17 @@ function afficherAnnees() {
     if (parametresData.annees.length === 0) {
 
         tbody.innerHTML = `
+
             <tr>
-                <td colspan="5">
-                    لا توجد سنوات جامعية
+
+                <td colspan="5" style="text-align:center">
+
+                    لا توجد سنوات جامعية مسجلة
+
                 </td>
+
             </tr>
+
         `;
 
         return;
@@ -575,19 +581,23 @@ function afficherAnnees() {
             </td>
 
             <td>
+
                 ${
                     item.current
                         ? '<span class="status-active">نعم</span>'
                         : '<span class="status-inactive">لا</span>'
                 }
+
             </td>
 
             <td>
+
                 ${
                     item.actif
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
+
             </td>
 
             <td>
@@ -619,7 +629,7 @@ function afficherAnnees() {
 
 
 // ============================================================
-// OUVRIR MODAL PARAMÈTRE
+// OUVRIR MODAL PARAMETRE
 // ============================================================
 
 function ouvrirModalParametre(type, id = null) {
@@ -657,11 +667,10 @@ function ouvrirModalParametre(type, id = null) {
         document.getElementById("parametre-actif");
 
 
-    // Valeurs initiales
-
     idInput.value = id || "";
 
     typeInput.value = type;
+
 
     code.value = "";
 
@@ -675,49 +684,26 @@ function ouvrirModalParametre(type, id = null) {
 
 
     // --------------------------------------------------------
-    // ANNÉE
+    // ANNEE
     // --------------------------------------------------------
 
     if (type === "annee") {
 
-        code.parentElement.style.display = "none";
+        code.parentElement.style.display =
+            "none";
 
-        currentGroup.style.display = "block";
-
-        nom.placeholder =
-            "مثال: 2026-2027";
+        currentGroup.style.display =
+            "block";
 
     }
 
-    // --------------------------------------------------------
-    // SIFAH / WADHIA
-    // --------------------------------------------------------
-
     else {
 
-        code.parentElement.style.display = "block";
+        code.parentElement.style.display =
+            "block";
 
-        currentGroup.style.display = "none";
-
-        if (type === "sifah") {
-
-            code.placeholder =
-                "مثال: TIT";
-
-            nom.placeholder =
-                "مثال: مرسم";
-
-        }
-
-        if (type === "wadhia") {
-
-            code.placeholder =
-                "مثال: ACT";
-
-            nom.placeholder =
-                "مثال: مباشر";
-
-        }
+        currentGroup.style.display =
+            "none";
 
     }
 
@@ -783,15 +769,12 @@ function ouvrirModalParametre(type, id = null) {
     }
 
 
-    // --------------------------------------------------------
-    // TITRE
-    // --------------------------------------------------------
-
     document.getElementById(
         "modal-parametre-title"
-    ).textContent = id
-        ? "تعديل"
-        : "إضافة";
+    ).textContent =
+        id
+            ? "تعديل"
+            : "إضافة";
 
 
     modal.classList.remove("hidden");
@@ -811,7 +794,7 @@ function modifierParametre(type, id) {
 
 
 // ============================================================
-// ENREGISTRER PARAMÈTRE
+// ENREGISTRER PARAMETRE
 // ============================================================
 
 async function enregistrerParametre(event) {
@@ -869,7 +852,9 @@ async function enregistrerParametre(event) {
 
     if (!nom) {
 
-        alert("يرجى إدخال الاسم");
+        alert(
+            "يرجى إدخال الاسم"
+        );
 
         return;
 
@@ -878,19 +863,20 @@ async function enregistrerParametre(event) {
 
     if (!Number.isFinite(ordre) || ordre < 1) {
 
-        alert("يرجى إدخال ترتيب صحيح");
+        alert(
+            "يرجى إدخال ترتيب صحيح"
+        );
 
         return;
 
     }
 
 
-    if (
-        type !== "annee" &&
-        !code
-    ) {
+    if (type !== "annee" && !code) {
 
-        alert("يرجى إدخال الرمز");
+        alert(
+            "يرجى إدخال الرمز"
+        );
 
         return;
 
@@ -898,7 +884,7 @@ async function enregistrerParametre(event) {
 
 
     // --------------------------------------------------------
-    // COLLECTION FIREBASE
+    // CHOIX COLLECTION
     // --------------------------------------------------------
 
     let collection;
@@ -924,7 +910,9 @@ async function enregistrerParametre(event) {
 
     else {
 
-        alert("نوع المعلمة غير معروف");
+        alert(
+            "نوع المعلمة غير معروف"
+        );
 
         return;
 
@@ -932,7 +920,7 @@ async function enregistrerParametre(event) {
 
 
     // --------------------------------------------------------
-    // DATA
+    // DONNEES
     // --------------------------------------------------------
 
     const data = {
@@ -944,8 +932,7 @@ async function enregistrerParametre(event) {
         actif: actif,
 
         updatedAt:
-            firebase.firestore.FieldValue
-                .serverTimestamp()
+            firebase.firestore.FieldValue.serverTimestamp()
 
     };
 
@@ -964,10 +951,6 @@ async function enregistrerParametre(event) {
     }
 
 
-    // --------------------------------------------------------
-    // FIREBASE
-    // --------------------------------------------------------
-
     try {
 
         // ----------------------------------------------------
@@ -979,6 +962,16 @@ async function enregistrerParametre(event) {
             await collection
                 .doc(id)
                 .update(data);
+
+
+            if (
+                type === "annee" &&
+                current === true
+            ) {
+
+                await rendreAnneesNonCourantes(id);
+
+            }
 
         }
 
@@ -997,11 +990,9 @@ async function enregistrerParametre(event) {
                 await collection.add(data);
 
 
-            // Si cette année est définie comme actuelle
-
             if (
                 type === "annee" &&
-                current
+                current === true
             ) {
 
                 await rendreAnneesNonCourantes(
@@ -1013,38 +1004,33 @@ async function enregistrerParametre(event) {
         }
 
 
-        // ----------------------------------------------------
-        // SI MODIFICATION D'UNE ANNÉE COURANTE
-        // ----------------------------------------------------
-
-        if (
-            type === "annee" &&
-            current
-        ) {
-
-            await rendreAnneesNonCourantes(id);
-
-        }
+        fermerModal(
+            "modal-parametre"
+        );
 
 
-        fermerModal("modal-parametre");
+        document
+            .getElementById("parametre-form")
+            .reset();
 
 
-        event.target.reset();
-
+        alert(
+            "تم حفظ البيانات بنجاح"
+        );
 
     }
 
     catch (error) {
 
         console.error(
-            "Erreur enregistrement paramètre :",
+            "Erreur Firebase enregistrement :",
             error
         );
 
 
         alert(
-            "حدث خطأ أثناء حفظ البيانات"
+            "حدث خطأ أثناء حفظ البيانات :\n" +
+            error.message
         );
 
     }
@@ -1053,60 +1039,56 @@ async function enregistrerParametre(event) {
 
 
 // ============================================================
-// UNE SEULE ANNÉE COURANTE
+// UNE SEULE ANNEE COURANTE
 // ============================================================
 
 async function rendreAnneesNonCourantes(
     idCourante
 ) {
 
-    if (!idCourante) return;
+    if (typeof anneesRef === "undefined") {
 
-
-    try {
-
-        const snapshot =
-            await anneesRef.get();
-
-
-        const batch =
-            db.batch();
-
-
-        snapshot.forEach(function (doc) {
-
-            if (doc.id !== idCourante) {
-
-                batch.update(
-                    doc.ref,
-                    {
-                        current: false
-                    }
-                );
-
-            }
-
-        });
-
-
-        await batch.commit();
-
-    }
-
-    catch (error) {
-
-        console.error(
-            "Erreur mise à jour année courante :",
-            error
+        throw new Error(
+            "anneesRef غير موجود"
         );
 
     }
+
+
+    const snapshot =
+        await anneesRef.get();
+
+
+    const batch =
+        db.batch();
+
+
+    snapshot.forEach(function (doc) {
+
+        if (doc.id !== idCourante) {
+
+            batch.update(
+
+                doc.ref,
+
+                {
+                    current: false
+                }
+
+            );
+
+        }
+
+    });
+
+
+    await batch.commit();
 
 }
 
 
 // ============================================================
-// SUPPRIMER PARAMÈTRE
+// SUPPRIMER PARAMETRE
 // ============================================================
 
 async function supprimerParametre(
@@ -1157,6 +1139,11 @@ async function supprimerParametre(
             .doc(id)
             .delete();
 
+
+        alert(
+            "تم حذف البيانات بنجاح"
+        );
+
     }
 
     catch (error) {
@@ -1168,7 +1155,8 @@ async function supprimerParametre(
 
 
         alert(
-            "حدث خطأ أثناء الحذف"
+            "حدث خطأ أثناء الحذف :\n" +
+            error.message
         );
 
     }
@@ -1177,20 +1165,34 @@ async function supprimerParametre(
 
 
 // ============================================================
-// ETABLISSEMENT - CHARGER
+// ETABLISSEMENT - CHARGEMENT
 // ============================================================
 
 async function chargerEtablissement() {
 
+    if (
+        typeof etablissementRef ===
+        "undefined"
+    ) {
+
+        console.error(
+            "etablissementRef non défini"
+        );
+
+        return;
+
+    }
+
+
     try {
 
-        const snapshot =
+        const doc =
             await etablissementRef
                 .doc("principal")
                 .get();
 
 
-        if (!snapshot.exists) {
+        if (!doc.exists) {
 
             console.log(
                 "Aucune information établissement"
@@ -1202,113 +1204,69 @@ async function chargerEtablissement() {
 
 
         const data =
-            snapshot.data();
+            doc.data();
 
-
-        parametresData.etablissement =
-            data;
-
-
-        // ----------------------------------------------------
-        // NOM
-        // ----------------------------------------------------
 
         const nom =
             document.getElementById(
                 "etablissement-nom"
             );
 
-        if (nom) {
-
-            nom.value =
-                data.nom || "";
-
-        }
-
-
-        // ----------------------------------------------------
-        // UNIVERSITÉ
-        // ----------------------------------------------------
-
         const universite =
             document.getElementById(
                 "etablissement-universite"
             );
-
-        if (universite) {
-
-            universite.value =
-                data.universite || "";
-
-        }
-
-
-        // ----------------------------------------------------
-        // CODE
-        // ----------------------------------------------------
 
         const code =
             document.getElementById(
                 "etablissement-code"
             );
 
-        if (code) {
-
-            code.value =
-                data.code || "";
-
-        }
-
-
-        // ----------------------------------------------------
-        // ADRESSE
-        // ----------------------------------------------------
-
         const adresse =
             document.getElementById(
                 "etablissement-adresse"
             );
-
-        if (adresse) {
-
-            adresse.value =
-                data.adresse || "";
-
-        }
-
-
-        // ----------------------------------------------------
-        // TÉLÉPHONE
-        // ----------------------------------------------------
 
         const tel =
             document.getElementById(
                 "etablissement-tel"
             );
 
-        if (tel) {
-
-            tel.value =
-                data.tel || "";
-
-        }
-
-
-        // ----------------------------------------------------
-        // EMAIL
-        // ----------------------------------------------------
-
         const email =
             document.getElementById(
                 "etablissement-email"
             );
 
-        if (email) {
 
+        if (nom)
+            nom.value =
+                data.nom || "";
+
+
+        if (universite)
+            universite.value =
+                data.universite || "";
+
+
+        if (code)
+            code.value =
+                data.code || "";
+
+
+        if (adresse)
+            adresse.value =
+                data.adresse || "";
+
+
+        if (tel)
+            tel.value =
+                data.tel || "";
+
+
+        if (email)
             email.value =
                 data.email || "";
 
-        }
 
     }
 
@@ -1319,16 +1277,24 @@ async function chargerEtablissement() {
             error
         );
 
+
+        alert(
+            "حدث خطأ أثناء تحميل معلومات المؤسسة :\n" +
+            error.message
+        );
+
     }
 
 }
 
 
 // ============================================================
-// ETABLISSEMENT - ENREGISTRER
+// ETABLISSEMENT - ENREGISTREMENT
 // ============================================================
 
-async function enregistrerEtablissement(event) {
+async function enregistrerEtablissement(
+    event
+) {
 
     event.preventDefault();
 
@@ -1385,7 +1351,7 @@ async function enregistrerEtablissement(event) {
 
 
     // --------------------------------------------------------
-    // DATA
+    // DONNEES
     // --------------------------------------------------------
 
     const data = {
@@ -1409,11 +1375,24 @@ async function enregistrerEtablissement(event) {
     };
 
 
-    // --------------------------------------------------------
-    // FIREBASE
-    // --------------------------------------------------------
-
     try {
+
+        if (
+            typeof etablissementRef ===
+            "undefined"
+        ) {
+
+            throw new Error(
+                "etablissementRef غير موجود"
+            );
+
+        }
+
+
+        // ----------------------------------------------------
+        // IMPORTANT :
+        // Toujours utiliser le document "principal"
+        // ----------------------------------------------------
 
         await etablissementRef
             .doc("principal")
@@ -1425,26 +1404,24 @@ async function enregistrerEtablissement(event) {
             );
 
 
-        parametresData.etablissement =
-            data;
-
-
         alert(
             "تم حفظ معلومات المؤسسة بنجاح"
         );
+
 
     }
 
     catch (error) {
 
         console.error(
-            "Erreur établissement :",
+            "Erreur Firebase établissement :",
             error
         );
 
 
         alert(
-            "حدث خطأ أثناء حفظ معلومات المؤسسة"
+            "حدث خطأ أثناء حفظ معلومات المؤسسة :\n" +
+            error.message
         );
 
     }
@@ -1472,7 +1449,7 @@ function fermerModal(id) {
 
 
 // ============================================================
-// BOUTONS FERMER
+// FERMETURE MODALS
 // ============================================================
 
 document.addEventListener(
@@ -1503,7 +1480,7 @@ document.addEventListener(
 
 
 // ============================================================
-// SÉCURITÉ HTML
+// SECURITE HTML
 // ============================================================
 
 function echapperHTML(value) {
@@ -1540,7 +1517,6 @@ function echapperHTML(value) {
 
 // ============================================================
 // FONCTIONS PUBLIQUES
-// UTILISÉES PAR enseignants.js
 // ============================================================
 
 function getSifahData() {
@@ -1564,9 +1540,20 @@ function getAnneesData() {
 }
 
 
-function getEtablissementData() {
+// ============================================================
+// RECUPERER L'ANNEE COURANTE
+// ============================================================
 
-    return parametresData.etablissement;
+function getAnneeCourante() {
+
+    return parametresData.annees.find(
+        function (item) {
+
+            return item.current === true &&
+                   item.actif !== false;
+
+        }
+    ) || null;
 
 }
 
@@ -1576,5 +1563,6 @@ function getEtablissementData() {
 // ============================================================
 
 console.log(
-    "SIGE - parametres.js chargé complètement"
+    "SIGE - parametres.js chargé correctement"
 );
+```
