@@ -1,7 +1,11 @@
-```javascript
 // ============================================================
-// SIGE - PARAMETRES.JS
-// Gestion Firebase Firestore
+// SIGE - PARAMÈTRES
+// ============================================================
+// Gestion de :
+// 1. الصفة
+// 2. الوضعية
+// 3. السنوات الجامعية
+// 4. معلومات المؤسسة
 // ============================================================
 
 let parametresData = {
@@ -16,9 +20,7 @@ let parametresData = {
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
-
     initialiserParametres();
-
 });
 
 
@@ -28,29 +30,28 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initialiserParametres() {
 
-    // -------------------------------
-    // Onglets paramètres
-    // -------------------------------
+    // --------------------------------------------------------
+    // ONGLET PARAMÈTRES
+    // --------------------------------------------------------
 
     document.querySelectorAll(".param-tab-btn").forEach(function (button) {
 
         button.addEventListener("click", function () {
 
-            afficherParametreTab(
-                this.dataset.paramTab
-            );
+            const type = this.dataset.paramTab;
+
+            afficherParametreTab(type);
 
         });
 
     });
 
 
-    // -------------------------------
-    // Ajouter SIFAH
-    // -------------------------------
+    // --------------------------------------------------------
+    // BOUTON AJOUTER SIFAH
+    // --------------------------------------------------------
 
-    const btnSifah =
-        document.getElementById("btn-add-sifah");
+    const btnSifah = document.getElementById("btn-add-sifah");
 
     if (btnSifah) {
 
@@ -63,12 +64,11 @@ function initialiserParametres() {
     }
 
 
-    // -------------------------------
-    // Ajouter WADHIA
-    // -------------------------------
+    // --------------------------------------------------------
+    // BOUTON AJOUTER WADHIA
+    // --------------------------------------------------------
 
-    const btnWadhia =
-        document.getElementById("btn-add-wadhia");
+    const btnWadhia = document.getElementById("btn-add-wadhia");
 
     if (btnWadhia) {
 
@@ -81,12 +81,11 @@ function initialiserParametres() {
     }
 
 
-    // -------------------------------
-    // Ajouter ANNEE
-    // -------------------------------
+    // --------------------------------------------------------
+    // BOUTON AJOUTER ANNÉE
+    // --------------------------------------------------------
 
-    const btnAnnee =
-        document.getElementById("btn-add-annee");
+    const btnAnnee = document.getElementById("btn-add-annee");
 
     if (btnAnnee) {
 
@@ -99,9 +98,9 @@ function initialiserParametres() {
     }
 
 
-    // -------------------------------
-    // Formulaire paramètre
-    // -------------------------------
+    // --------------------------------------------------------
+    // FORMULAIRE PARAMÈTRE
+    // --------------------------------------------------------
 
     const formParametre =
         document.getElementById("parametre-form");
@@ -116,9 +115,9 @@ function initialiserParametres() {
     }
 
 
-    // -------------------------------
-    // Formulaire établissement
-    // -------------------------------
+    // --------------------------------------------------------
+    // FORMULAIRE ÉTABLISSEMENT
+    // --------------------------------------------------------
 
     const formEtablissement =
         document.getElementById("etablissement-form");
@@ -133,29 +132,25 @@ function initialiserParametres() {
     }
 
 
-    // -------------------------------
-    // Chargement Firebase
-    // -------------------------------
+    // --------------------------------------------------------
+    // CHARGEMENT FIRESTORE
+    // --------------------------------------------------------
 
     chargerSifah();
-
     chargerWadhia();
-
     chargerAnnees();
-
     chargerEtablissement();
 
 }
 
 
 // ============================================================
-// AFFICHER ONGLET
+// ONGLET
 // ============================================================
 
 function afficherParametreTab(type) {
 
-    document
-        .querySelectorAll(".param-tab-btn")
+    document.querySelectorAll(".param-tab-btn")
         .forEach(function (button) {
 
             button.classList.remove("active");
@@ -176,8 +171,7 @@ function afficherParametreTab(type) {
     }
 
 
-    document
-        .querySelectorAll(".param-tab-content")
+    document.querySelectorAll(".param-tab-content")
         .forEach(function (content) {
 
             content.classList.add("hidden");
@@ -186,9 +180,7 @@ function afficherParametreTab(type) {
 
 
     const contenu =
-        document.getElementById(
-            "param-tab-" + type
-        );
+        document.getElementById("param-tab-" + type);
 
 
     if (contenu) {
@@ -201,7 +193,7 @@ function afficherParametreTab(type) {
 
 
 // ============================================================
-// SIFAH
+// SIFAH - CHARGEMENT
 // ============================================================
 
 function chargerSifah() {
@@ -217,11 +209,8 @@ function chargerSifah() {
                 snapshot.forEach(function (doc) {
 
                     parametresData.sifah.push({
-
                         id: doc.id,
-
                         ...doc.data()
-
                     });
 
                 });
@@ -233,7 +222,7 @@ function chargerSifah() {
             function (error) {
 
                 console.error(
-                    "Firebase SIFAH :",
+                    "Erreur chargement sifah :",
                     error
                 );
 
@@ -245,7 +234,7 @@ function chargerSifah() {
 
 
 // ============================================================
-// AFFICHER SIFAH
+// SIFAH - AFFICHAGE
 // ============================================================
 
 function afficherSifah() {
@@ -260,8 +249,7 @@ function afficherSifah() {
 
     parametresData.sifah.forEach(function (item) {
 
-        const tr =
-            document.createElement("tr");
+        const tr = document.createElement("tr");
 
 
         tr.innerHTML = `
@@ -274,7 +262,7 @@ function afficherSifah() {
 
             <td>
                 ${
-                    item.actif === true
+                    item.actif !== false
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
@@ -309,7 +297,7 @@ function afficherSifah() {
 
 
 // ============================================================
-// WADHIA
+// WADHIA - CHARGEMENT
 // ============================================================
 
 function chargerWadhia() {
@@ -325,11 +313,8 @@ function chargerWadhia() {
                 snapshot.forEach(function (doc) {
 
                     parametresData.wadhia.push({
-
                         id: doc.id,
-
                         ...doc.data()
-
                     });
 
                 });
@@ -341,7 +326,7 @@ function chargerWadhia() {
             function (error) {
 
                 console.error(
-                    "Firebase WADHIA :",
+                    "Erreur chargement wadhia :",
                     error
                 );
 
@@ -353,7 +338,7 @@ function chargerWadhia() {
 
 
 // ============================================================
-// AFFICHER WADHIA
+// WADHIA - AFFICHAGE
 // ============================================================
 
 function afficherWadhia() {
@@ -368,8 +353,7 @@ function afficherWadhia() {
 
     parametresData.wadhia.forEach(function (item) {
 
-        const tr =
-            document.createElement("tr");
+        const tr = document.createElement("tr");
 
 
         tr.innerHTML = `
@@ -382,7 +366,7 @@ function afficherWadhia() {
 
             <td>
                 ${
-                    item.actif === true
+                    item.actif !== false
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
@@ -417,7 +401,7 @@ function afficherWadhia() {
 
 
 // ============================================================
-// ANNEES UNIVERSITAIRES
+// ANNÉES - CHARGEMENT
 // ============================================================
 
 function chargerAnnees() {
@@ -433,11 +417,8 @@ function chargerAnnees() {
                 snapshot.forEach(function (doc) {
 
                     parametresData.annees.push({
-
                         id: doc.id,
-
                         ...doc.data()
-
                     });
 
                 });
@@ -449,7 +430,7 @@ function chargerAnnees() {
             function (error) {
 
                 console.error(
-                    "Firebase ANNEES :",
+                    "Erreur chargement années :",
                     error
                 );
 
@@ -461,7 +442,7 @@ function chargerAnnees() {
 
 
 // ============================================================
-// AFFICHER ANNEES
+// ANNÉES - AFFICHAGE
 // ============================================================
 
 function afficherAnnees() {
@@ -476,19 +457,20 @@ function afficherAnnees() {
 
     parametresData.annees.forEach(function (item) {
 
-        const tr =
-            document.createElement("tr");
+        const tr = document.createElement("tr");
 
 
         tr.innerHTML = `
 
             <td>${item.ordre ?? ""}</td>
 
-            <td>${echapperHTML(item.nom ?? "")}</td>
+            <td>
+                ${echapperHTML(item.nom ?? "")}
+            </td>
 
             <td>
                 ${
-                    item.current === true
+                    item.current
                         ? '<span class="status-active">نعم</span>'
                         : '<span class="status-inactive">لا</span>'
                 }
@@ -496,7 +478,7 @@ function afficherAnnees() {
 
             <td>
                 ${
-                    item.actif === true
+                    item.actif !== false
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
@@ -531,7 +513,7 @@ function afficherAnnees() {
 
 
 // ============================================================
-// OUVRIR MODAL PARAMETRE
+// OUVRIR MODAL
 // ============================================================
 
 function ouvrirModalParametre(type, id = null) {
@@ -548,114 +530,98 @@ function ouvrirModalParametre(type, id = null) {
     const inputType =
         document.getElementById("parametre-type");
 
-    const inputCode =
+    const code =
         document.getElementById("parametre-code");
 
-    const inputNom =
+    const nom =
         document.getElementById("parametre-nom");
 
-    const inputOrdre =
+    const ordre =
         document.getElementById("parametre-ordre");
 
-    const inputCurrent =
+    const current =
         document.getElementById("parametre-current");
 
     const currentGroup =
-        document.getElementById(
-            "parametre-current-group"
-        );
+        document.getElementById("parametre-current-group");
 
-    const inputActif =
+    const actif =
         document.getElementById("parametre-actif");
 
 
     inputId.value = id || "";
-
     inputType.value = type;
 
-    inputCode.value = "";
+    code.value = "";
+    nom.value = "";
+    ordre.value = "1";
+    current.checked = false;
+    actif.checked = true;
 
-    inputNom.value = "";
 
-    inputOrdre.value = "1";
-
-    inputCurrent.checked = false;
-
-    inputActif.checked = true;
-
+    // --------------------------------------------------------
+    // ANNÉE
+    // --------------------------------------------------------
 
     if (type === "annee") {
 
-        inputCode.parentElement.style.display =
-            "none";
+        code.parentElement.style.display = "none";
 
-        currentGroup.style.display =
-            "block";
+        currentGroup.style.display = "block";
 
     }
 
     else {
 
-        inputCode.parentElement.style.display =
-            "block";
+        code.parentElement.style.display = "block";
 
-        currentGroup.style.display =
-            "none";
+        currentGroup.style.display = "none";
 
     }
 
 
-    // -------------------------------
-    // Modification
-    // -------------------------------
+    // --------------------------------------------------------
+    // MODIFICATION
+    // --------------------------------------------------------
 
     if (id) {
 
-        let liste = [];
+        let collection = [];
 
 
         if (type === "sifah") {
-
-            liste = parametresData.sifah;
-
+            collection = parametresData.sifah;
         }
 
         else if (type === "wadhia") {
-
-            liste = parametresData.wadhia;
-
+            collection = parametresData.wadhia;
         }
 
         else if (type === "annee") {
-
-            liste = parametresData.annees;
-
+            collection = parametresData.annees;
         }
 
 
         const item =
-            liste.find(function (x) {
+            collection.find(function (element) {
 
-                return x.id === id;
+                return element.id === id;
 
             });
 
 
         if (item) {
 
-            inputCode.value =
-                item.code || "";
+            code.value = item.code || "";
 
-            inputNom.value =
-                item.nom || "";
+            nom.value = item.nom || "";
 
-            inputOrdre.value =
-                item.ordre || 1;
+            ordre.value = item.ordre || 1;
 
-            inputCurrent.checked =
+            current.checked =
                 item.current === true;
 
-            inputActif.checked =
+            actif.checked =
                 item.actif !== false;
 
         }
@@ -675,7 +641,18 @@ function ouvrirModalParametre(type, id = null) {
 
 
 // ============================================================
-// ENREGISTRER PARAMETRE
+// MODIFIER
+// ============================================================
+
+function modifierParametre(type, id) {
+
+    ouvrirModalParametre(type, id);
+
+}
+
+
+// ============================================================
+// ENREGISTRER PARAMÈTRE
 // ============================================================
 
 async function enregistrerParametre(event) {
@@ -684,34 +661,28 @@ async function enregistrerParametre(event) {
 
 
     const id =
-        document.getElementById(
-            "parametre-id"
-        ).value;
+        document.getElementById("parametre-id").value;
 
 
     const type =
-        document.getElementById(
-            "parametre-type"
-        ).value;
+        document.getElementById("parametre-type").value;
 
 
     const code =
-        document.getElementById(
-            "parametre-code"
-        ).value.trim();
+        document.getElementById("parametre-code")
+            .value
+            .trim();
 
 
     const nom =
-        document.getElementById(
-            "parametre-nom"
-        ).value.trim();
+        document.getElementById("parametre-nom")
+            .value
+            .trim();
 
 
     const ordre =
         Number(
-            document.getElementById(
-                "parametre-ordre"
-            ).value
+            document.getElementById("parametre-ordre").value
         );
 
 
@@ -736,10 +707,7 @@ async function enregistrerParametre(event) {
     }
 
 
-    if (
-        type !== "annee" &&
-        !code
-    ) {
+    if (type !== "annee" && !code) {
 
         alert("يرجى إدخال الرمز");
 
@@ -787,8 +755,7 @@ async function enregistrerParametre(event) {
         actif: actif,
 
         updatedAt:
-            firebase.firestore.FieldValue
-                .serverTimestamp()
+            firebase.firestore.FieldValue.serverTimestamp()
 
     };
 
@@ -799,7 +766,8 @@ async function enregistrerParametre(event) {
 
     }
 
-    else {
+
+    if (type === "annee") {
 
         data.current = current;
 
@@ -808,12 +776,12 @@ async function enregistrerParametre(event) {
 
     try {
 
-        let idFinal = id;
+        let docId = id;
 
 
-        // -------------------------------
+        // ----------------------------------------------------
         // MODIFICATION
-        // -------------------------------
+        // ----------------------------------------------------
 
         if (id) {
 
@@ -823,55 +791,54 @@ async function enregistrerParametre(event) {
 
         }
 
-        // -------------------------------
+        // ----------------------------------------------------
         // AJOUT
-        // -------------------------------
+        // ----------------------------------------------------
 
         else {
 
             data.createdAt =
-                firebase.firestore.FieldValue
-                    .serverTimestamp();
+                firebase.firestore.FieldValue.serverTimestamp();
+
 
             const docRef =
                 await collection.add(data);
 
-            idFinal = docRef.id;
+            docId = docRef.id;
 
         }
 
 
-        // -------------------------------
-        // Une seule année courante
-        // -------------------------------
+        // ----------------------------------------------------
+        // ANNÉE COURANTE
+        // ----------------------------------------------------
 
-        if (
-            type === "annee" &&
-            current
-        ) {
+        if (type === "annee" && current) {
 
-            await rendreAnneesNonCourantes(
-                idFinal
-            );
+            await rendreAnneesNonCourantes(docId);
 
         }
 
 
-        fermerModal(
-            "modal-parametre"
-        );
+        fermerModal("modal-parametre");
+
+
+        document.getElementById(
+            "parametre-form"
+        ).reset();
+
 
     }
 
     catch (error) {
 
         console.error(
-            "Erreur enregistrement :",
+            "Erreur enregistrement paramètre :",
             error
         );
 
         alert(
-            "حدث خطأ أثناء حفظ البيانات\n" +
+            "حدث خطأ أثناء حفظ البيانات : " +
             error.message
         );
 
@@ -881,12 +848,10 @@ async function enregistrerParametre(event) {
 
 
 // ============================================================
-// UNE SEULE ANNEE COURANTE
+// UNE SEULE ANNÉE COURANTE
 // ============================================================
 
-async function rendreAnneesNonCourantes(
-    idCourante
-) {
+async function rendreAnneesNonCourantes(idCourante) {
 
     const snapshot =
         await anneesRef.get();
@@ -918,19 +883,14 @@ async function rendreAnneesNonCourantes(
 
 
 // ============================================================
-// SUPPRIMER PARAMETRE
+// SUPPRIMER
 // ============================================================
 
-async function supprimerParametre(
-    type,
-    id
-) {
+async function supprimerParametre(type, id) {
 
-    if (
-        !confirm(
-            "هل أنت متأكد من حذف هذا العنصر ؟"
-        )
-    ) {
+    if (!confirm(
+        "هل أنت متأكد من حذف هذا العنصر ؟"
+    )) {
 
         return;
 
@@ -981,7 +941,7 @@ async function supprimerParametre(
         );
 
         alert(
-            "حدث خطأ أثناء الحذف\n" +
+            "حدث خطأ أثناء الحذف : " +
             error.message
         );
 
@@ -991,66 +951,65 @@ async function supprimerParametre(
 
 
 // ============================================================
-// ETABLISSEMENT
+// ÉTABLISSEMENT - CHARGEMENT
 // ============================================================
 
 async function chargerEtablissement() {
 
     try {
 
-        const doc =
+        const snapshot =
             await etablissementRef
                 .doc("principal")
                 .get();
 
 
-        if (!doc.exists) return;
+        if (!snapshot.exists) {
+
+            return;
+
+        }
 
 
-        const data = doc.data();
+        const data =
+            snapshot.data();
 
 
         document.getElementById(
             "etablissement-nom"
-        ).value =
-            data.nom || "";
+        ).value = data.nom || "";
 
 
         document.getElementById(
             "etablissement-universite"
-        ).value =
-            data.universite || "";
+        ).value = data.universite || "";
 
 
         document.getElementById(
             "etablissement-code"
-        ).value =
-            data.code || "";
+        ).value = data.code || "";
 
 
         document.getElementById(
             "etablissement-adresse"
-        ).value =
-            data.adresse || "";
+        ).value = data.adresse || "";
 
 
         document.getElementById(
             "etablissement-tel"
-        ).value =
-            data.tel || "";
+        ).value = data.tel || "";
 
 
         document.getElementById(
             "etablissement-email"
-        ).value =
-            data.email || "";
+        ).value = data.email || "";
 
     }
 
     catch (error) {
 
         console.error(
-            "Erreur établissement :",
+            "Erreur chargement établissement :",
             error
         );
 
@@ -1060,7 +1019,7 @@ async function chargerEtablissement() {
 
 
 // ============================================================
-// ENREGISTRER ETABLISSEMENT
+// ÉTABLISSEMENT - ENREGISTRER
 // ============================================================
 
 async function enregistrerEtablissement(event) {
@@ -1101,8 +1060,7 @@ async function enregistrerEtablissement(event) {
             ).value.trim(),
 
         updatedAt:
-            firebase.firestore.FieldValue
-                .serverTimestamp()
+            firebase.firestore.FieldValue.serverTimestamp()
 
     };
 
@@ -1133,7 +1091,7 @@ async function enregistrerEtablissement(event) {
         );
 
         alert(
-            "حدث خطأ أثناء حفظ معلومات المؤسسة\n" +
+            "حدث خطأ أثناء حفظ معلومات المؤسسة : " +
             error.message
         );
 
@@ -1160,8 +1118,31 @@ function fermerModal(id) {
 }
 
 
+document.addEventListener(
+    "click",
+    function (event) {
+
+        const bouton =
+            event.target.closest(".close-modal");
+
+        if (!bouton) return;
+
+
+        const modalId =
+            bouton.dataset.modal;
+
+        if (modalId) {
+
+            fermerModal(modalId);
+
+        }
+
+    }
+);
+
+
 // ============================================================
-// SECURITE HTML
+// SÉCURITÉ HTML
 // ============================================================
 
 function echapperHTML(value) {
@@ -1182,7 +1163,7 @@ function echapperHTML(value) {
 
 
 // ============================================================
-// DONNEES POUR ENSEIGNANTS.JS
+// API POUR ENSEIGNANTS.JS
 // ============================================================
 
 function getSifahData() {
@@ -1206,11 +1187,6 @@ function getAnneesData() {
 }
 
 
-// ============================================================
-// FIN
-// ============================================================
-
 console.log(
-    "SIGE - parametres.js chargé avec Firebase"
+    "SIGE - parametres.js chargé"
 );
-```
