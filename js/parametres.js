@@ -7,8 +7,6 @@
 // 2. الوضعية
 // 3. السنوات الجامعية
 // 4. معلومات المؤسسة
-//
-// Compatible avec firebase-config.js
 // ============================================================
 
 
@@ -29,6 +27,8 @@ let parametresData = {
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    console.log("SIGE - Initialisation parametres.js");
+
     initialiserParametres();
 
 });
@@ -40,11 +40,8 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function initialiserParametres() {
 
-    console.log("SIGE - Initialisation parametres.js");
-
-
     // --------------------------------------------------------
-    // ONGLETS
+    // ONGLETS PARAMETRES
     // --------------------------------------------------------
 
     document.querySelectorAll(".param-tab-btn").forEach(function (button) {
@@ -61,7 +58,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // BOUTON AJOUT SIFAH
+    // AJOUT SIFAH
     // --------------------------------------------------------
 
     const btnSifah =
@@ -79,7 +76,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // BOUTON AJOUT WADHIA
+    // AJOUT WADHIA
     // --------------------------------------------------------
 
     const btnWadhia =
@@ -97,7 +94,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // BOUTON AJOUT ANNEE
+    // AJOUT ANNEE
     // --------------------------------------------------------
 
     const btnAnnee =
@@ -149,7 +146,7 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // CHARGEMENT FIREBASE
+    // CHARGEMENT
     // --------------------------------------------------------
 
     chargerSifah();
@@ -180,7 +177,7 @@ function afficherParametreTab(type) {
 
     const bouton =
         document.querySelector(
-            `.param-tab-btn[data-param-tab="${type}"]`
+            '.param-tab-btn[data-param-tab="' + type + '"]'
         );
 
 
@@ -259,7 +256,7 @@ function chargerSifah() {
             function (error) {
 
                 console.error(
-                    "Erreur Firebase sifah :",
+                    "Erreur chargement sifah :",
                     error
                 );
 
@@ -293,26 +290,18 @@ function afficherSifah() {
 
         tr.innerHTML = `
 
-            <td>
-                ${item.ordre ?? ""}
-            </td>
+            <td>${item.ordre ?? ""}</td>
+
+            <td>${echapperHTML(item.code ?? "")}</td>
+
+            <td>${echapperHTML(item.nom ?? "")}</td>
 
             <td>
-                ${echapperHTML(item.code ?? "")}
-            </td>
-
-            <td>
-                ${echapperHTML(item.nom ?? "")}
-            </td>
-
-            <td>
-
                 ${
-                    item.actif
+                    item.actif !== false
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
-
             </td>
 
             <td>
@@ -387,7 +376,7 @@ function chargerWadhia() {
             function (error) {
 
                 console.error(
-                    "Erreur Firebase wadhia :",
+                    "Erreur chargement wadhia :",
                     error
                 );
 
@@ -421,26 +410,18 @@ function afficherWadhia() {
 
         tr.innerHTML = `
 
-            <td>
-                ${item.ordre ?? ""}
-            </td>
+            <td>${item.ordre ?? ""}</td>
+
+            <td>${echapperHTML(item.code ?? "")}</td>
+
+            <td>${echapperHTML(item.nom ?? "")}</td>
 
             <td>
-                ${echapperHTML(item.code ?? "")}
-            </td>
-
-            <td>
-                ${echapperHTML(item.nom ?? "")}
-            </td>
-
-            <td>
-
                 ${
-                    item.actif
+                    item.actif !== false
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
-
             </td>
 
             <td>
@@ -479,9 +460,7 @@ function chargerAnnees() {
 
     if (typeof anneesRef === "undefined") {
 
-        console.error(
-            "anneesRef non défini"
-        );
+        console.error("anneesRef non défini");
 
         return;
 
@@ -517,7 +496,7 @@ function chargerAnnees() {
             function (error) {
 
                 console.error(
-                    "Erreur Firebase anneesUniversitaires :",
+                    "Erreur chargement anneesUniversitaires :",
                     error
                 );
 
@@ -549,10 +528,11 @@ function afficherAnnees() {
 
             <tr>
 
-                <td colspan="5" style="text-align:center">
-
+                <td
+                    colspan="5"
+                    style="text-align:center"
+                >
                     لا توجد سنوات جامعية مسجلة
-
                 </td>
 
             </tr>
@@ -581,23 +561,19 @@ function afficherAnnees() {
             </td>
 
             <td>
-
                 ${
-                    item.current
+                    item.current === true
                         ? '<span class="status-active">نعم</span>'
                         : '<span class="status-inactive">لا</span>'
                 }
-
             </td>
 
             <td>
-
                 ${
-                    item.actif
+                    item.actif !== false
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
-
             </td>
 
             <td>
@@ -646,24 +622,22 @@ function ouvrirModalParametre(type, id = null) {
     const typeInput =
         document.getElementById("parametre-type");
 
-    const code =
+    const codeInput =
         document.getElementById("parametre-code");
 
-    const nom =
+    const nomInput =
         document.getElementById("parametre-nom");
 
-    const ordre =
+    const ordreInput =
         document.getElementById("parametre-ordre");
 
-    const current =
+    const currentInput =
         document.getElementById("parametre-current");
 
     const currentGroup =
-        document.getElementById(
-            "parametre-current-group"
-        );
+        document.getElementById("parametre-current-group");
 
-    const actif =
+    const actifInput =
         document.getElementById("parametre-actif");
 
 
@@ -671,16 +645,15 @@ function ouvrirModalParametre(type, id = null) {
 
     typeInput.value = type;
 
+    codeInput.value = "";
 
-    code.value = "";
+    nomInput.value = "";
 
-    nom.value = "";
+    ordreInput.value = "1";
 
-    ordre.value = "1";
+    currentInput.checked = false;
 
-    current.checked = false;
-
-    actif.checked = true;
+    actifInput.checked = true;
 
 
     // --------------------------------------------------------
@@ -689,21 +662,17 @@ function ouvrirModalParametre(type, id = null) {
 
     if (type === "annee") {
 
-        code.parentElement.style.display =
-            "none";
+        codeInput.parentElement.style.display = "none";
 
-        currentGroup.style.display =
-            "block";
+        currentGroup.style.display = "block";
 
     }
 
     else {
 
-        code.parentElement.style.display =
-            "block";
+        codeInput.parentElement.style.display = "block";
 
-        currentGroup.style.display =
-            "none";
+        currentGroup.style.display = "none";
 
     }
 
@@ -719,22 +688,19 @@ function ouvrirModalParametre(type, id = null) {
 
         if (type === "sifah") {
 
-            collection =
-                parametresData.sifah;
+            collection = parametresData.sifah;
 
         }
 
         else if (type === "wadhia") {
 
-            collection =
-                parametresData.wadhia;
+            collection = parametresData.wadhia;
 
         }
 
         else if (type === "annee") {
 
-            collection =
-                parametresData.annees;
+            collection = parametresData.annees;
 
         }
 
@@ -749,19 +715,19 @@ function ouvrirModalParametre(type, id = null) {
 
         if (item) {
 
-            code.value =
+            codeInput.value =
                 item.code || "";
 
-            nom.value =
+            nomInput.value =
                 item.nom || "";
 
-            ordre.value =
+            ordreInput.value =
                 item.ordre || 1;
 
-            current.checked =
+            currentInput.checked =
                 item.current === true;
 
-            actif.checked =
+            actifInput.checked =
                 item.actif !== false;
 
         }
@@ -772,9 +738,7 @@ function ouvrirModalParametre(type, id = null) {
     document.getElementById(
         "modal-parametre-title"
     ).textContent =
-        id
-            ? "تعديل"
-            : "إضافة";
+        id ? "تعديل" : "إضافة";
 
 
     modal.classList.remove("hidden");
@@ -783,7 +747,7 @@ function ouvrirModalParametre(type, id = null) {
 
 
 // ============================================================
-// MODIFIER
+// MODIFIER PARAMETRE
 // ============================================================
 
 function modifierParametre(type, id) {
@@ -803,47 +767,33 @@ async function enregistrerParametre(event) {
 
 
     const id =
-        document.getElementById(
-            "parametre-id"
-        ).value;
+        document.getElementById("parametre-id").value;
 
 
     const type =
-        document.getElementById(
-            "parametre-type"
-        ).value;
+        document.getElementById("parametre-type").value;
 
 
     const code =
-        document.getElementById(
-            "parametre-code"
-        ).value.trim();
+        document.getElementById("parametre-code").value.trim();
 
 
     const nom =
-        document.getElementById(
-            "parametre-nom"
-        ).value.trim();
+        document.getElementById("parametre-nom").value.trim();
 
 
     const ordre =
         Number(
-            document.getElementById(
-                "parametre-ordre"
-            ).value
+            document.getElementById("parametre-ordre").value
         );
 
 
     const current =
-        document.getElementById(
-            "parametre-current"
-        ).checked;
+        document.getElementById("parametre-current").checked;
 
 
     const actif =
-        document.getElementById(
-            "parametre-actif"
-        ).checked;
+        document.getElementById("parametre-actif").checked;
 
 
     // --------------------------------------------------------
@@ -852,9 +802,7 @@ async function enregistrerParametre(event) {
 
     if (!nom) {
 
-        alert(
-            "يرجى إدخال الاسم"
-        );
+        alert("يرجى إدخال الاسم");
 
         return;
 
@@ -863,9 +811,7 @@ async function enregistrerParametre(event) {
 
     if (!Number.isFinite(ordre) || ordre < 1) {
 
-        alert(
-            "يرجى إدخال ترتيب صحيح"
-        );
+        alert("يرجى إدخال ترتيب صحيح");
 
         return;
 
@@ -874,9 +820,7 @@ async function enregistrerParametre(event) {
 
     if (type !== "annee" && !code) {
 
-        alert(
-            "يرجى إدخال الرمز"
-        );
+        alert("يرجى إدخال الرمز");
 
         return;
 
@@ -884,10 +828,10 @@ async function enregistrerParametre(event) {
 
 
     // --------------------------------------------------------
-    // CHOIX COLLECTION
+    // COLLECTION
     // --------------------------------------------------------
 
-    let collection;
+    let collection = null;
 
 
     if (type === "sifah") {
@@ -908,10 +852,16 @@ async function enregistrerParametre(event) {
 
     }
 
-    else {
+
+    if (!collection) {
 
         alert(
-            "نوع المعلمة غير معروف"
+            "تعذر الوصول إلى قاعدة بيانات " + type
+        );
+
+        console.error(
+            "Collection non définie :",
+            type
         );
 
         return;
@@ -937,7 +887,7 @@ async function enregistrerParametre(event) {
     };
 
 
-    if (type !== "annee") {
+    if (type === "sifah" || type === "wadhia") {
 
         data.code = code;
 
@@ -951,11 +901,11 @@ async function enregistrerParametre(event) {
     }
 
 
-    try {
+    // --------------------------------------------------------
+    // ENREGISTREMENT FIREBASE
+    // --------------------------------------------------------
 
-        // ----------------------------------------------------
-        // MODIFICATION
-        // ----------------------------------------------------
+    try {
 
         if (id) {
 
@@ -963,40 +913,25 @@ async function enregistrerParametre(event) {
                 .doc(id)
                 .update(data);
 
-
-            if (
-                type === "annee" &&
-                current === true
-            ) {
-
-                await rendreAnneesNonCourantes(id);
-
-            }
-
         }
-
-        // ----------------------------------------------------
-        // AJOUT
-        // ----------------------------------------------------
 
         else {
 
             data.createdAt =
-                firebase.firestore.FieldValue
-                    .serverTimestamp();
+                firebase.firestore.FieldValue.serverTimestamp();
 
-
-            const docRef =
+            const nouveauDoc =
                 await collection.add(data);
 
 
+            // Une seule année courante
             if (
                 type === "annee" &&
                 current === true
             ) {
 
                 await rendreAnneesNonCourantes(
-                    docRef.id
+                    nouveauDoc.id
                 );
 
             }
@@ -1004,9 +939,19 @@ async function enregistrerParametre(event) {
         }
 
 
-        fermerModal(
-            "modal-parametre"
-        );
+        // Modification d'une année courante
+        if (
+            id &&
+            type === "annee" &&
+            current === true
+        ) {
+
+            await rendreAnneesNonCourantes(id);
+
+        }
+
+
+        fermerModal("modal-parametre");
 
 
         document
@@ -1014,9 +959,7 @@ async function enregistrerParametre(event) {
             .reset();
 
 
-        alert(
-            "تم حفظ البيانات بنجاح"
-        );
+        alert("تم حفظ البيانات بنجاح");
 
     }
 
@@ -1026,7 +969,6 @@ async function enregistrerParametre(event) {
             "Erreur Firebase enregistrement :",
             error
         );
-
 
         alert(
             "حدث خطأ أثناء حفظ البيانات :\n" +
@@ -1042,11 +984,9 @@ async function enregistrerParametre(event) {
 // UNE SEULE ANNEE COURANTE
 // ============================================================
 
-async function rendreAnneesNonCourantes(
-    idCourante
-) {
+async function rendreAnneesNonCourantes(idCourante) {
 
-    if (typeof anneesRef === "undefined") {
+    if (!anneesRef) {
 
         throw new Error(
             "anneesRef غير موجود"
@@ -1068,13 +1008,10 @@ async function rendreAnneesNonCourantes(
         if (doc.id !== idCourante) {
 
             batch.update(
-
                 doc.ref,
-
                 {
                     current: false
                 }
-
             );
 
         }
@@ -1091,21 +1028,18 @@ async function rendreAnneesNonCourantes(
 // SUPPRIMER PARAMETRE
 // ============================================================
 
-async function supprimerParametre(
-    type,
-    id
-) {
+async function supprimerParametre(type, id) {
 
-    const confirmation =
-        confirm(
-            "هل أنت متأكد من حذف هذا العنصر ؟"
-        );
+    if (!confirm(
+        "هل أنت متأكد من حذف هذا العنصر ؟"
+    )) {
 
+        return;
 
-    if (!confirmation) return;
+    }
 
 
-    let collection;
+    let collection = null;
 
 
     if (type === "sifah") {
@@ -1126,7 +1060,10 @@ async function supprimerParametre(
 
     }
 
-    else {
+
+    if (!collection) {
+
+        alert("تعذر الوصول إلى قاعدة البيانات");
 
         return;
 
@@ -1140,9 +1077,7 @@ async function supprimerParametre(
             .delete();
 
 
-        alert(
-            "تم حذف البيانات بنجاح"
-        );
+        alert("تم حذف البيانات بنجاح");
 
     }
 
@@ -1152,7 +1087,6 @@ async function supprimerParametre(
             "Erreur suppression :",
             error
         );
-
 
         alert(
             "حدث خطأ أثناء الحذف :\n" +
@@ -1170,10 +1104,7 @@ async function supprimerParametre(
 
 async function chargerEtablissement() {
 
-    if (
-        typeof etablissementRef ===
-        "undefined"
-    ) {
+    if (typeof etablissementRef === "undefined") {
 
         console.error(
             "etablissementRef non défini"
@@ -1239,34 +1170,27 @@ async function chargerEtablissement() {
 
 
         if (nom)
-            nom.value =
-                data.nom || "";
+            nom.value = data.nom || "";
 
 
         if (universite)
-            universite.value =
-                data.universite || "";
+            universite.value = data.universite || "";
 
 
         if (code)
-            code.value =
-                data.code || "";
+            code.value = data.code || "";
 
 
         if (adresse)
-            adresse.value =
-                data.adresse || "";
+            adresse.value = data.adresse || "";
 
 
         if (tel)
-            tel.value =
-                data.tel || "";
+            tel.value = data.tel || "";
 
 
         if (email)
-            email.value =
-                data.email || "";
-
+            email.value = data.email || "";
 
     }
 
@@ -1276,7 +1200,6 @@ async function chargerEtablissement() {
             "Erreur chargement établissement :",
             error
         );
-
 
         alert(
             "حدث خطأ أثناء تحميل معلومات المؤسسة :\n" +
@@ -1292,9 +1215,7 @@ async function chargerEtablissement() {
 // ETABLISSEMENT - ENREGISTREMENT
 // ============================================================
 
-async function enregistrerEtablissement(
-    event
-) {
+async function enregistrerEtablissement(event) {
 
     event.preventDefault();
 
@@ -1350,6 +1271,21 @@ async function enregistrerEtablissement(
     }
 
 
+    if (typeof etablissementRef === "undefined") {
+
+        alert(
+            "مرجع معلومات المؤسسة غير موجود"
+        );
+
+        console.error(
+            "etablissementRef non défini"
+        );
+
+        return;
+
+    }
+
+
     // --------------------------------------------------------
     // DONNEES
     // --------------------------------------------------------
@@ -1369,30 +1305,16 @@ async function enregistrerEtablissement(
         email: email,
 
         updatedAt:
-            firebase.firestore.FieldValue
-                .serverTimestamp()
+            firebase.firestore.FieldValue.serverTimestamp()
 
     };
 
 
+    // --------------------------------------------------------
+    // ENREGISTREMENT
+    // --------------------------------------------------------
+
     try {
-
-        if (
-            typeof etablissementRef ===
-            "undefined"
-        ) {
-
-            throw new Error(
-                "etablissementRef غير موجود"
-            );
-
-        }
-
-
-        // ----------------------------------------------------
-        // IMPORTANT :
-        // Toujours utiliser le document "principal"
-        // ----------------------------------------------------
 
         await etablissementRef
             .doc("principal")
@@ -1408,7 +1330,6 @@ async function enregistrerEtablissement(
             "تم حفظ معلومات المؤسسة بنجاح"
         );
 
-
     }
 
     catch (error) {
@@ -1417,7 +1338,6 @@ async function enregistrerEtablissement(
             "Erreur Firebase établissement :",
             error
         );
-
 
         alert(
             "حدث خطأ أثناء حفظ معلومات المؤسسة :\n" +
@@ -1438,7 +1358,6 @@ function fermerModal(id) {
     const modal =
         document.getElementById(id);
 
-
     if (modal) {
 
         modal.classList.add("hidden");
@@ -1457,17 +1376,13 @@ document.addEventListener(
     function (event) {
 
         const bouton =
-            event.target.closest(
-                ".close-modal"
-            );
-
+            event.target.closest(".close-modal");
 
         if (!bouton) return;
 
 
         const modalId =
             bouton.dataset.modal;
-
 
         if (modalId) {
 
@@ -1487,30 +1402,15 @@ function echapperHTML(value) {
 
     return String(value)
 
-        .replace(
-            /&/g,
-            "&amp;"
-        )
+        .replace(/&/g, "&amp;")
 
-        .replace(
-            /</g,
-            "&lt;"
-        )
+        .replace(/</g, "&lt;")
 
-        .replace(
-            />/g,
-            "&gt;"
-        )
+        .replace(/>/g, "&gt;")
 
-        .replace(
-            /"/g,
-            "&quot;"
-        )
+        .replace(/"/g, "&quot;")
 
-        .replace(
-            /'/g,
-            "&#039;"
-        );
+        .replace(/'/g, "&#039;");
 
 }
 
@@ -1541,7 +1441,7 @@ function getAnneesData() {
 
 
 // ============================================================
-// RECUPERER L'ANNEE COURANTE
+// ANNEE COURANTE
 // ============================================================
 
 function getAnneeCourante() {
@@ -1549,8 +1449,10 @@ function getAnneeCourante() {
     return parametresData.annees.find(
         function (item) {
 
-            return item.current === true &&
-                   item.actif !== false;
+            return (
+                item.current === true &&
+                item.actif !== false
+            );
 
         }
     ) || null;
