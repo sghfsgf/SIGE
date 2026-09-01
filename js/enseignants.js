@@ -27,7 +27,11 @@ function renderEnseignantsTable(list) {
     const grade = gradesList.find(g => g.id === e.gradeId)?.nom || '-';
     const specialite = specialitesList.find(s => s.id === e.specialiteId)?.nom || '-';
     const departement = departementsList.find(d => d.id === e.departementId)?.nom || '-';
-    const statutText = { titulaire: 'مرسم', contractuel: 'متعاقد', vacataire: 'عرضي' }[e.statut] || e.statut;
+   const sifahText = {
+  titulaire: 'مرسم',
+  contractuel: 'متعاقد',
+  vacataire: 'عرضي'
+  }[e.sifah] || e.sifah || '';
     const genreText = e.genre === 'homme' ? 'ذكر' : 'أنثى';
 
     const tr = document.createElement('tr');
@@ -39,7 +43,7 @@ function renderEnseignantsTable(list) {
       <td>${grade}</td>
       <td>${specialite}</td>
       <td>${departement}</td>
-      <td>${statutText}</td>
+      <td>${sifahText}</td>
       <td>${genreText}</td>
       <td>
         <button class="btn-sm btn-edit" onclick="editEnseignant('${e.id}')">تعديل</button>
