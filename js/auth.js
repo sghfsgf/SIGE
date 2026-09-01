@@ -1,18 +1,47 @@
-// =========================================================
-// AUTHENTIFICATION FIREBASE - SIGE
-// =========================================================
+// ============================================================
+// SIGE - AUTHENTIFICATION FIREBASE
+// ============================================================
 
-// Récupération des éléments HTML
+
+// ============================================================
+// ÉLÉMENTS HTML
+// ============================================================
+
 const loginPage = document.getElementById("login-page");
+
 const appPage = document.getElementById("app");
+
 const loginForm = document.getElementById("login-form");
-const logoutBtn = document.getElementById("logout-btn");
+
+const loginEmail = document.getElementById("login-email");
+
+const loginPassword = document.getElementById("login-password");
+
 const loginError = document.getElementById("login-error");
 
+const logoutBtn = document.getElementById("logout-btn");
 
-// =========================================================
-// AFFICHER LA PAGE DE CONNEXION
-// =========================================================
+
+// ============================================================
+// VÉRIFICATION DES ÉLÉMENTS
+// ============================================================
+
+if (!loginPage) {
+    console.error("Erreur : #login-page introuvable");
+}
+
+if (!appPage) {
+    console.error("Erreur : #app introuvable");
+}
+
+if (!loginForm) {
+    console.error("Erreur : #login-form introuvable");
+}
+
+
+// ============================================================
+// AFFICHAGE LOGIN
+// ============================================================
 
 function afficherLogin() {
 
@@ -23,9 +52,9 @@ function afficherLogin() {
 }
 
 
-// =========================================================
-// AFFICHER L'APPLICATION
-// =========================================================
+// ============================================================
+// AFFICHAGE APPLICATION
+// ============================================================
 
 function afficherApplication() {
 
@@ -36,34 +65,47 @@ function afficherApplication() {
 }
 
 
-// =========================================================
-// VÉRIFICATION DE L'ÉTAT DE CONNEXION
-// =========================================================
+// ============================================================
+// MESSAGE D'ERREUR
+// ============================================================
 
-auth.onAuthStateChanged(function(user) {
+function afficherErreur(message) {
+
+    if (loginError) {
+        loginError.textContent = message;
+    }
+
+}
+
+
+// ============================================================
+// NETTOYER ERREUR
+// ============================================================
+
+function nettoyerErreur() {
+
+    if (loginError) {
+        loginError.textContent = "";
+    }
+
+}
+
+
+// ============================================================
+// VÉRIFICATION DE LA SESSION FIREBASE
+// ============================================================
+
+auth.onAuthStateChanged((user) => {
 
     if (user) {
 
-        // =============================================
-        // UTILISATEUR CONNECTÉ
-        // =============================================
-
-        console.log(
-            "Utilisateur connecté :",
-            user.email
-        );
+        console.log("Utilisateur connecté :", user.email);
 
         afficherApplication();
 
     } else {
 
-        // =============================================
-        // AUCUN UTILISATEUR CONNECTÉ
-        // =============================================
-
-        console.log(
-            "Aucun utilisateur connecté"
-        );
+        console.log("Aucun utilisateur connecté");
 
         afficherLogin();
 
@@ -72,90 +114,127 @@ auth.onAuthStateChanged(function(user) {
 });
 
 
-// =========================================================
+// ============================================================
 // CONNEXION
-// البريد الإلكتروني + كلمة المرور
-// =========================================================
+// ============================================================
 
-loginForm.addEventListener("submit", async function(e) {
+loginForm?.addEventListener("submit", async (e) => {
 
     e.preventDefault();
 
-    const email =
-        document.getElementById("login-email").value.trim();
+    nettoyerErreur();
 
-    const password =
-        document.getElementById("login-password").value;
 
-    // Effacer l'ancien message
-    loginError.textContent = "";
+    const email = loginEmail.value.trim();
+
+    const password = loginPassword.value;
+
+
+    if (!email || !password) {
+
+        afficherErreur(
+            "يرجى إدخال البريد الإلكتروني وكلمة المرور"
+        );
+
+        return;
+    }
+
+
+    // Désactiver le bouton pendant la connexion
+
+    const bouton = loginForm.querySelector(
+        'button[type="submit"]'
+    );
+
+    if (bouton) {
+        bouton.disabled = true;
+        bouton.textContent = "جاري تسجيل الدخول...";
+    }
+
 
     try {
 
-        // Connexion Firebase
         await auth.signInWithEmailAndPassword(
             email,
             password
         );
 
         console.log(
-            "Connexion réussie"
+            "Connexion Firebase réussie"
         );
+
 
     } catch (error) {
 
         console.error(
-            "Erreur de connexion Firebase :",
+            "Erreur Firebase Authentication :",
             error
         );
 
-        // Messages en arabe
+
         switch (error.code) {
 
             case "auth/invalid-email":
 
-                loginError.textContent =
-                    "البريد الإلكتروني غير صالح";
+                afficherErreur(
+                    "البريد الإلكتروني غير صالح"
+                );
 
                 break;
 
 
             case "auth/user-not-found":
 
-                loginError.textContent =
-                    "هذا المستخدم غير موجود";
+                afficherErreur(
+                    "البريد الإلكتروني غير موجود"
+                );
 
                 break;
 
 
             case "auth/wrong-password":
 
-                loginError.textContent =
-                    "كلمة المرور غير صحيحة";
+                afficherErreur(
+                    "كلمة المرور غير صحيحة"
+                );
 
                 break;
 
 
             case "auth/invalid-credential":
 
-                loginError.textContent =
-                    "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+                afficherErreur(
+                    "البريد الإلكتروني أو كلمة المرور غير صحيحة"
+                );
 
                 break;
 
 
             case "auth/too-many-requests":
 
-                loginError.textContent =
-                    "تم تجاوز عدد محاولات الدخول. حاول لاحقاً";
+                afficherErreur(
+                    "تم تعطيل تسجيل الدخول مؤقتًا بسبب كثرة المحاولات"
+                );
 
                 break;
 
 
             default:
 
-                loginError.textContent =
-                    "تعذر تسجيل الدخول. حاول مرة أخرى";
+                afficherErreur(
+                    "حدث خطأ أثناء تسجيل الدخول"
+                );
+
+                break;
+        }
+
+    } finally {
+
+        if (bouton) {
+
+            bouton.disabled = false;
+
+            bouton.textContent = "تسجيل الدخول";
 
         }
 
@@ -164,34 +243,31 @@ loginForm.addEventListener("submit", async function(e) {
 });
 
 
-// =========================================================
+// ============================================================
 // DÉCONNEXION
-// تسجيل الخروج
-// =========================================================
+// ============================================================
 
-if (logoutBtn) {
+logoutBtn?.addEventListener("click", async (e) => {
 
-    logoutBtn.addEventListener("click", async function(e) {
+    e.preventDefault();
 
-        e.preventDefault();
 
-        try {
+    try {
 
-            await auth.signOut();
+        await auth.signOut();
 
-            console.log(
-                "Utilisateur déconnecté"
-            );
+        console.log(
+            "Utilisateur déconnecté"
+        );
 
-        } catch (error) {
 
-            console.error(
-                "Erreur lors de la déconnexion :",
-                error
-            );
+    } catch (error) {
 
-        }
+        console.error(
+            "Erreur lors de la déconnexion :",
+            error
+        );
 
-    });
+    }
 
-}
+});
