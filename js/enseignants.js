@@ -120,7 +120,7 @@ document.getElementById('enseignant-form')?.addEventListener('submit', async (e)
     tel1: document.getElementById('tel1').value.trim(),
     tel2: document.getElementById('tel2').value.trim() || null,
     email: document.getElementById('email').value.trim(),
-    statut: document.getElementById('statut').value,
+   sifah: document.getElementById('sifah').value,
     genre: document.getElementById('genre').value,
     dateNaissance: document.getElementById('dateNaissance').value,
     dateRecrutement: document.getElementById('dateRecrutement').value,
