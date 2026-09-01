@@ -1,17 +1,28 @@
 // ============================================================
 // SIGE - PARAMÈTRES
 // ============================================================
-// Gestion de :
+// Gestion complète de :
 // 1. الصفة
 // 2. الوضعية
 // 3. السنوات الجامعية
 // 4. معلومات المؤسسة
 // ============================================================
 
+
+// ============================================================
+// VARIABLES
+// ============================================================
+
 let parametresData = {
+
     sifah: [],
+
     wadhia: [],
-    annees: []
+
+    annees: [],
+
+    etablissement: {}
+
 };
 
 
@@ -20,7 +31,9 @@ let parametresData = {
 // ============================================================
 
 document.addEventListener("DOMContentLoaded", function () {
+
     initialiserParametres();
+
 });
 
 
@@ -34,24 +47,27 @@ function initialiserParametres() {
     // ONGLET PARAMÈTRES
     // --------------------------------------------------------
 
-    document.querySelectorAll(".param-tab-btn").forEach(function (button) {
+    document
+        .querySelectorAll(".param-tab-btn")
+        .forEach(function (button) {
 
-        button.addEventListener("click", function () {
+            button.addEventListener("click", function () {
 
-            const type = this.dataset.paramTab;
+                const tab = this.dataset.paramTab;
 
-            afficherParametreTab(type);
+                afficherParametreTab(tab);
+
+            });
 
         });
-
-    });
 
 
     // --------------------------------------------------------
     // BOUTON AJOUTER SIFAH
     // --------------------------------------------------------
 
-    const btnSifah = document.getElementById("btn-add-sifah");
+    const btnSifah =
+        document.getElementById("btn-add-sifah");
 
     if (btnSifah) {
 
@@ -68,7 +84,8 @@ function initialiserParametres() {
     // BOUTON AJOUTER WADHIA
     // --------------------------------------------------------
 
-    const btnWadhia = document.getElementById("btn-add-wadhia");
+    const btnWadhia =
+        document.getElementById("btn-add-wadhia");
 
     if (btnWadhia) {
 
@@ -85,7 +102,8 @@ function initialiserParametres() {
     // BOUTON AJOUTER ANNÉE
     // --------------------------------------------------------
 
-    const btnAnnee = document.getElementById("btn-add-annee");
+    const btnAnnee =
+        document.getElementById("btn-add-annee");
 
     if (btnAnnee) {
 
@@ -102,12 +120,12 @@ function initialiserParametres() {
     // FORMULAIRE PARAMÈTRE
     // --------------------------------------------------------
 
-    const formParametre =
+    const parametreForm =
         document.getElementById("parametre-form");
 
-    if (formParametre) {
+    if (parametreForm) {
 
-        formParametre.addEventListener(
+        parametreForm.addEventListener(
             "submit",
             enregistrerParametre
         );
@@ -119,12 +137,12 @@ function initialiserParametres() {
     // FORMULAIRE ÉTABLISSEMENT
     // --------------------------------------------------------
 
-    const formEtablissement =
+    const etablissementForm =
         document.getElementById("etablissement-form");
 
-    if (formEtablissement) {
+    if (etablissementForm) {
 
-        formEtablissement.addEventListener(
+        etablissementForm.addEventListener(
             "submit",
             enregistrerEtablissement
         );
@@ -133,24 +151,30 @@ function initialiserParametres() {
 
 
     // --------------------------------------------------------
-    // CHARGEMENT FIRESTORE
+    // CHARGEMENT FIREBASE
     // --------------------------------------------------------
 
     chargerSifah();
+
     chargerWadhia();
+
     chargerAnnees();
+
     chargerEtablissement();
 
 }
 
 
 // ============================================================
-// ONGLET
+// AFFICHER ONGLET
 // ============================================================
 
 function afficherParametreTab(type) {
 
-    document.querySelectorAll(".param-tab-btn")
+    // Boutons
+
+    document
+        .querySelectorAll(".param-tab-btn")
         .forEach(function (button) {
 
             button.classList.remove("active");
@@ -171,7 +195,10 @@ function afficherParametreTab(type) {
     }
 
 
-    document.querySelectorAll(".param-tab-content")
+    // Contenus
+
+    document
+        .querySelectorAll(".param-tab-content")
         .forEach(function (content) {
 
             content.classList.add("hidden");
@@ -180,7 +207,9 @@ function afficherParametreTab(type) {
 
 
     const contenu =
-        document.getElementById("param-tab-" + type);
+        document.getElementById(
+            "param-tab-" + type
+        );
 
 
     if (contenu) {
@@ -193,7 +222,7 @@ function afficherParametreTab(type) {
 
 
 // ============================================================
-// SIFAH - CHARGEMENT
+// SIFAH - CHARGER
 // ============================================================
 
 function chargerSifah() {
@@ -209,11 +238,15 @@ function chargerSifah() {
                 snapshot.forEach(function (doc) {
 
                     parametresData.sifah.push({
+
                         id: doc.id,
+
                         ...doc.data()
+
                     });
 
                 });
+
 
                 afficherSifah();
 
@@ -234,7 +267,7 @@ function chargerSifah() {
 
 
 // ============================================================
-// SIFAH - AFFICHAGE
+// SIFAH - AFFICHER
 // ============================================================
 
 function afficherSifah() {
@@ -244,25 +277,48 @@ function afficherSifah() {
 
     if (!tbody) return;
 
+
     tbody.innerHTML = "";
+
+
+    if (parametresData.sifah.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    لا توجد بيانات
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
 
 
     parametresData.sifah.forEach(function (item) {
 
-        const tr = document.createElement("tr");
+        const tr =
+            document.createElement("tr");
 
 
         tr.innerHTML = `
 
-            <td>${item.ordre ?? ""}</td>
+            <td>
+                ${item.ordre ?? ""}
+            </td>
 
-            <td>${echapperHTML(item.code ?? "")}</td>
+            <td>
+                ${echapperHTML(item.code ?? "")}
+            </td>
 
-            <td>${echapperHTML(item.nom ?? "")}</td>
+            <td>
+                ${echapperHTML(item.nom ?? "")}
+            </td>
 
             <td>
                 ${
-                    item.actif !== false
+                    item.actif
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
@@ -297,7 +353,7 @@ function afficherSifah() {
 
 
 // ============================================================
-// WADHIA - CHARGEMENT
+// WADHIA - CHARGER
 // ============================================================
 
 function chargerWadhia() {
@@ -313,11 +369,15 @@ function chargerWadhia() {
                 snapshot.forEach(function (doc) {
 
                     parametresData.wadhia.push({
+
                         id: doc.id,
+
                         ...doc.data()
+
                     });
 
                 });
+
 
                 afficherWadhia();
 
@@ -338,7 +398,7 @@ function chargerWadhia() {
 
 
 // ============================================================
-// WADHIA - AFFICHAGE
+// WADHIA - AFFICHER
 // ============================================================
 
 function afficherWadhia() {
@@ -348,25 +408,48 @@ function afficherWadhia() {
 
     if (!tbody) return;
 
+
     tbody.innerHTML = "";
+
+
+    if (parametresData.wadhia.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    لا توجد بيانات
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
 
 
     parametresData.wadhia.forEach(function (item) {
 
-        const tr = document.createElement("tr");
+        const tr =
+            document.createElement("tr");
 
 
         tr.innerHTML = `
 
-            <td>${item.ordre ?? ""}</td>
+            <td>
+                ${item.ordre ?? ""}
+            </td>
 
-            <td>${echapperHTML(item.code ?? "")}</td>
+            <td>
+                ${echapperHTML(item.code ?? "")}
+            </td>
 
-            <td>${echapperHTML(item.nom ?? "")}</td>
+            <td>
+                ${echapperHTML(item.nom ?? "")}
+            </td>
 
             <td>
                 ${
-                    item.actif !== false
+                    item.actif
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
@@ -401,7 +484,7 @@ function afficherWadhia() {
 
 
 // ============================================================
-// ANNÉES - CHARGEMENT
+// ANNÉES UNIVERSITAIRES - CHARGER
 // ============================================================
 
 function chargerAnnees() {
@@ -417,11 +500,15 @@ function chargerAnnees() {
                 snapshot.forEach(function (doc) {
 
                     parametresData.annees.push({
+
                         id: doc.id,
+
                         ...doc.data()
+
                     });
 
                 });
+
 
                 afficherAnnees();
 
@@ -442,7 +529,7 @@ function chargerAnnees() {
 
 
 // ============================================================
-// ANNÉES - AFFICHAGE
+// ANNÉES UNIVERSITAIRES - AFFICHER
 // ============================================================
 
 function afficherAnnees() {
@@ -452,17 +539,36 @@ function afficherAnnees() {
 
     if (!tbody) return;
 
+
     tbody.innerHTML = "";
+
+
+    if (parametresData.annees.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="5">
+                    لا توجد سنوات جامعية
+                </td>
+            </tr>
+        `;
+
+        return;
+
+    }
 
 
     parametresData.annees.forEach(function (item) {
 
-        const tr = document.createElement("tr");
+        const tr =
+            document.createElement("tr");
 
 
         tr.innerHTML = `
 
-            <td>${item.ordre ?? ""}</td>
+            <td>
+                ${item.ordre ?? ""}
+            </td>
 
             <td>
                 ${echapperHTML(item.nom ?? "")}
@@ -478,7 +584,7 @@ function afficherAnnees() {
 
             <td>
                 ${
-                    item.actif !== false
+                    item.actif
                         ? '<span class="status-active">نشط</span>'
                         : '<span class="status-inactive">غير نشط</span>'
                 }
@@ -513,7 +619,7 @@ function afficherAnnees() {
 
 
 // ============================================================
-// OUVRIR MODAL
+// OUVRIR MODAL PARAMÈTRE
 // ============================================================
 
 function ouvrirModalParametre(type, id = null) {
@@ -524,10 +630,10 @@ function ouvrirModalParametre(type, id = null) {
     if (!modal) return;
 
 
-    const inputId =
+    const idInput =
         document.getElementById("parametre-id");
 
-    const inputType =
+    const typeInput =
         document.getElementById("parametre-type");
 
     const code =
@@ -543,19 +649,28 @@ function ouvrirModalParametre(type, id = null) {
         document.getElementById("parametre-current");
 
     const currentGroup =
-        document.getElementById("parametre-current-group");
+        document.getElementById(
+            "parametre-current-group"
+        );
 
     const actif =
         document.getElementById("parametre-actif");
 
 
-    inputId.value = id || "";
-    inputType.value = type;
+    // Valeurs initiales
+
+    idInput.value = id || "";
+
+    typeInput.value = type;
 
     code.value = "";
+
     nom.value = "";
+
     ordre.value = "1";
+
     current.checked = false;
+
     actif.checked = true;
 
 
@@ -569,13 +684,40 @@ function ouvrirModalParametre(type, id = null) {
 
         currentGroup.style.display = "block";
 
+        nom.placeholder =
+            "مثال: 2026-2027";
+
     }
+
+    // --------------------------------------------------------
+    // SIFAH / WADHIA
+    // --------------------------------------------------------
 
     else {
 
         code.parentElement.style.display = "block";
 
         currentGroup.style.display = "none";
+
+        if (type === "sifah") {
+
+            code.placeholder =
+                "مثال: TIT";
+
+            nom.placeholder =
+                "مثال: مرسم";
+
+        }
+
+        if (type === "wadhia") {
+
+            code.placeholder =
+                "مثال: ACT";
+
+            nom.placeholder =
+                "مثال: مباشر";
+
+        }
 
     }
 
@@ -590,33 +732,45 @@ function ouvrirModalParametre(type, id = null) {
 
 
         if (type === "sifah") {
-            collection = parametresData.sifah;
+
+            collection =
+                parametresData.sifah;
+
         }
 
         else if (type === "wadhia") {
-            collection = parametresData.wadhia;
+
+            collection =
+                parametresData.wadhia;
+
         }
 
         else if (type === "annee") {
-            collection = parametresData.annees;
+
+            collection =
+                parametresData.annees;
+
         }
 
 
         const item =
-            collection.find(function (element) {
+            collection.find(function (x) {
 
-                return element.id === id;
+                return x.id === id;
 
             });
 
 
         if (item) {
 
-            code.value = item.code || "";
+            code.value =
+                item.code || "";
 
-            nom.value = item.nom || "";
+            nom.value =
+                item.nom || "";
 
-            ordre.value = item.ordre || 1;
+            ordre.value =
+                item.ordre || 1;
 
             current.checked =
                 item.current === true;
@@ -629,10 +783,15 @@ function ouvrirModalParametre(type, id = null) {
     }
 
 
+    // --------------------------------------------------------
+    // TITRE
+    // --------------------------------------------------------
+
     document.getElementById(
         "modal-parametre-title"
-    ).textContent =
-        id ? "تعديل" : "إضافة";
+    ).textContent = id
+        ? "تعديل"
+        : "إضافة";
 
 
     modal.classList.remove("hidden");
@@ -661,28 +820,34 @@ async function enregistrerParametre(event) {
 
 
     const id =
-        document.getElementById("parametre-id").value;
+        document.getElementById(
+            "parametre-id"
+        ).value;
 
 
     const type =
-        document.getElementById("parametre-type").value;
+        document.getElementById(
+            "parametre-type"
+        ).value;
 
 
     const code =
-        document.getElementById("parametre-code")
-            .value
-            .trim();
+        document.getElementById(
+            "parametre-code"
+        ).value.trim();
 
 
     const nom =
-        document.getElementById("parametre-nom")
-            .value
-            .trim();
+        document.getElementById(
+            "parametre-nom"
+        ).value.trim();
 
 
     const ordre =
         Number(
-            document.getElementById("parametre-ordre").value
+            document.getElementById(
+                "parametre-ordre"
+            ).value
         );
 
 
@@ -698,6 +863,10 @@ async function enregistrerParametre(event) {
         ).checked;
 
 
+    // --------------------------------------------------------
+    // VALIDATION
+    // --------------------------------------------------------
+
     if (!nom) {
 
         alert("يرجى إدخال الاسم");
@@ -707,7 +876,19 @@ async function enregistrerParametre(event) {
     }
 
 
-    if (type !== "annee" && !code) {
+    if (!Number.isFinite(ordre) || ordre < 1) {
+
+        alert("يرجى إدخال ترتيب صحيح");
+
+        return;
+
+    }
+
+
+    if (
+        type !== "annee" &&
+        !code
+    ) {
 
         alert("يرجى إدخال الرمز");
 
@@ -715,6 +896,10 @@ async function enregistrerParametre(event) {
 
     }
 
+
+    // --------------------------------------------------------
+    // COLLECTION FIREBASE
+    // --------------------------------------------------------
 
     let collection;
 
@@ -746,6 +931,10 @@ async function enregistrerParametre(event) {
     }
 
 
+    // --------------------------------------------------------
+    // DATA
+    // --------------------------------------------------------
+
     const data = {
 
         nom: nom,
@@ -755,7 +944,8 @@ async function enregistrerParametre(event) {
         actif: actif,
 
         updatedAt:
-            firebase.firestore.FieldValue.serverTimestamp()
+            firebase.firestore.FieldValue
+                .serverTimestamp()
 
     };
 
@@ -774,10 +964,11 @@ async function enregistrerParametre(event) {
     }
 
 
+    // --------------------------------------------------------
+    // FIREBASE
+    // --------------------------------------------------------
+
     try {
-
-        let docId = id;
-
 
         // ----------------------------------------------------
         // MODIFICATION
@@ -798,24 +989,40 @@ async function enregistrerParametre(event) {
         else {
 
             data.createdAt =
-                firebase.firestore.FieldValue.serverTimestamp();
+                firebase.firestore.FieldValue
+                    .serverTimestamp();
 
 
             const docRef =
                 await collection.add(data);
 
-            docId = docRef.id;
+
+            // Si cette année est définie comme actuelle
+
+            if (
+                type === "annee" &&
+                current
+            ) {
+
+                await rendreAnneesNonCourantes(
+                    docRef.id
+                );
+
+            }
 
         }
 
 
         // ----------------------------------------------------
-        // ANNÉE COURANTE
+        // SI MODIFICATION D'UNE ANNÉE COURANTE
         // ----------------------------------------------------
 
-        if (type === "annee" && current) {
+        if (
+            type === "annee" &&
+            current
+        ) {
 
-            await rendreAnneesNonCourantes(docId);
+            await rendreAnneesNonCourantes(id);
 
         }
 
@@ -823,9 +1030,7 @@ async function enregistrerParametre(event) {
         fermerModal("modal-parametre");
 
 
-        document.getElementById(
-            "parametre-form"
-        ).reset();
+        event.target.reset();
 
 
     }
@@ -837,9 +1042,9 @@ async function enregistrerParametre(event) {
             error
         );
 
+
         alert(
-            "حدث خطأ أثناء حفظ البيانات : " +
-            error.message
+            "حدث خطأ أثناء حفظ البيانات"
         );
 
     }
@@ -851,50 +1056,71 @@ async function enregistrerParametre(event) {
 // UNE SEULE ANNÉE COURANTE
 // ============================================================
 
-async function rendreAnneesNonCourantes(idCourante) {
+async function rendreAnneesNonCourantes(
+    idCourante
+) {
 
-    const snapshot =
-        await anneesRef.get();
-
-
-    const batch =
-        db.batch();
+    if (!idCourante) return;
 
 
-    snapshot.forEach(function (doc) {
+    try {
 
-        if (doc.id !== idCourante) {
-
-            batch.update(
-                doc.ref,
-                {
-                    current: false
-                }
-            );
-
-        }
-
-    });
+        const snapshot =
+            await anneesRef.get();
 
 
-    await batch.commit();
+        const batch =
+            db.batch();
+
+
+        snapshot.forEach(function (doc) {
+
+            if (doc.id !== idCourante) {
+
+                batch.update(
+                    doc.ref,
+                    {
+                        current: false
+                    }
+                );
+
+            }
+
+        });
+
+
+        await batch.commit();
+
+    }
+
+    catch (error) {
+
+        console.error(
+            "Erreur mise à jour année courante :",
+            error
+        );
+
+    }
 
 }
 
 
 // ============================================================
-// SUPPRIMER
+// SUPPRIMER PARAMÈTRE
 // ============================================================
 
-async function supprimerParametre(type, id) {
+async function supprimerParametre(
+    type,
+    id
+) {
 
-    if (!confirm(
-        "هل أنت متأكد من حذف هذا العنصر ؟"
-    )) {
+    const confirmation =
+        confirm(
+            "هل أنت متأكد من حذف هذا العنصر ؟"
+        );
 
-        return;
 
-    }
+    if (!confirmation) return;
 
 
     let collection;
@@ -940,9 +1166,9 @@ async function supprimerParametre(type, id) {
             error
         );
 
+
         alert(
-            "حدث خطأ أثناء الحذف : " +
-            error.message
+            "حدث خطأ أثناء الحذف"
         );
 
     }
@@ -951,7 +1177,7 @@ async function supprimerParametre(type, id) {
 
 
 // ============================================================
-// ÉTABLISSEMENT - CHARGEMENT
+// ETABLISSEMENT - CHARGER
 // ============================================================
 
 async function chargerEtablissement() {
@@ -966,6 +1192,10 @@ async function chargerEtablissement() {
 
         if (!snapshot.exists) {
 
+            console.log(
+                "Aucune information établissement"
+            );
+
             return;
 
         }
@@ -975,34 +1205,110 @@ async function chargerEtablissement() {
             snapshot.data();
 
 
-        document.getElementById(
-            "etablissement-nom"
-        ).value = data.nom || "";
+        parametresData.etablissement =
+            data;
 
 
-        document.getElementById(
-            "etablissement-universite"
-        ).value = data.universite || "";
+        // ----------------------------------------------------
+        // NOM
+        // ----------------------------------------------------
+
+        const nom =
+            document.getElementById(
+                "etablissement-nom"
+            );
+
+        if (nom) {
+
+            nom.value =
+                data.nom || "";
+
+        }
 
 
-        document.getElementById(
-            "etablissement-code"
-        ).value = data.code || "";
+        // ----------------------------------------------------
+        // UNIVERSITÉ
+        // ----------------------------------------------------
+
+        const universite =
+            document.getElementById(
+                "etablissement-universite"
+            );
+
+        if (universite) {
+
+            universite.value =
+                data.universite || "";
+
+        }
 
 
-        document.getElementById(
-            "etablissement-adresse"
-        ).value = data.adresse || "";
+        // ----------------------------------------------------
+        // CODE
+        // ----------------------------------------------------
+
+        const code =
+            document.getElementById(
+                "etablissement-code"
+            );
+
+        if (code) {
+
+            code.value =
+                data.code || "";
+
+        }
 
 
-        document.getElementById(
-            "etablissement-tel"
-        ).value = data.tel || "";
+        // ----------------------------------------------------
+        // ADRESSE
+        // ----------------------------------------------------
+
+        const adresse =
+            document.getElementById(
+                "etablissement-adresse"
+            );
+
+        if (adresse) {
+
+            adresse.value =
+                data.adresse || "";
+
+        }
 
 
-        document.getElementById(
-            "etablissement-email"
-        ).value = data.email || "";
+        // ----------------------------------------------------
+        // TÉLÉPHONE
+        // ----------------------------------------------------
+
+        const tel =
+            document.getElementById(
+                "etablissement-tel"
+            );
+
+        if (tel) {
+
+            tel.value =
+                data.tel || "";
+
+        }
+
+
+        // ----------------------------------------------------
+        // EMAIL
+        // ----------------------------------------------------
+
+        const email =
+            document.getElementById(
+                "etablissement-email"
+            );
+
+        if (email) {
+
+            email.value =
+                data.email || "";
+
+        }
 
     }
 
@@ -1019,7 +1325,7 @@ async function chargerEtablissement() {
 
 
 // ============================================================
-// ÉTABLISSEMENT - ENREGISTRER
+// ETABLISSEMENT - ENREGISTRER
 // ============================================================
 
 async function enregistrerEtablissement(event) {
@@ -1027,43 +1333,85 @@ async function enregistrerEtablissement(event) {
     event.preventDefault();
 
 
+    const nom =
+        document.getElementById(
+            "etablissement-nom"
+        ).value.trim();
+
+
+    const universite =
+        document.getElementById(
+            "etablissement-universite"
+        ).value.trim();
+
+
+    const code =
+        document.getElementById(
+            "etablissement-code"
+        ).value.trim();
+
+
+    const adresse =
+        document.getElementById(
+            "etablissement-adresse"
+        ).value.trim();
+
+
+    const tel =
+        document.getElementById(
+            "etablissement-tel"
+        ).value.trim();
+
+
+    const email =
+        document.getElementById(
+            "etablissement-email"
+        ).value.trim();
+
+
+    // --------------------------------------------------------
+    // VALIDATION
+    // --------------------------------------------------------
+
+    if (!nom) {
+
+        alert(
+            "يرجى إدخال اسم المؤسسة"
+        );
+
+        return;
+
+    }
+
+
+    // --------------------------------------------------------
+    // DATA
+    // --------------------------------------------------------
+
     const data = {
 
-        nom:
-            document.getElementById(
-                "etablissement-nom"
-            ).value.trim(),
+        nom: nom,
 
-        universite:
-            document.getElementById(
-                "etablissement-universite"
-            ).value.trim(),
+        universite: universite,
 
-        code:
-            document.getElementById(
-                "etablissement-code"
-            ).value.trim(),
+        code: code,
 
-        adresse:
-            document.getElementById(
-                "etablissement-adresse"
-            ).value.trim(),
+        adresse: adresse,
 
-        tel:
-            document.getElementById(
-                "etablissement-tel"
-            ).value.trim(),
+        tel: tel,
 
-        email:
-            document.getElementById(
-                "etablissement-email"
-            ).value.trim(),
+        email: email,
 
         updatedAt:
-            firebase.firestore.FieldValue.serverTimestamp()
+            firebase.firestore.FieldValue
+                .serverTimestamp()
 
     };
 
+
+    // --------------------------------------------------------
+    // FIREBASE
+    // --------------------------------------------------------
 
     try {
 
@@ -1075,6 +1423,10 @@ async function enregistrerEtablissement(event) {
                     merge: true
                 }
             );
+
+
+        parametresData.etablissement =
+            data;
 
 
         alert(
@@ -1090,9 +1442,9 @@ async function enregistrerEtablissement(event) {
             error
         );
 
+
         alert(
-            "حدث خطأ أثناء حفظ معلومات المؤسسة : " +
-            error.message
+            "حدث خطأ أثناء حفظ معلومات المؤسسة"
         );
 
     }
@@ -1109,6 +1461,7 @@ function fermerModal(id) {
     const modal =
         document.getElementById(id);
 
+
     if (modal) {
 
         modal.classList.add("hidden");
@@ -1118,18 +1471,26 @@ function fermerModal(id) {
 }
 
 
+// ============================================================
+// BOUTONS FERMER
+// ============================================================
+
 document.addEventListener(
     "click",
     function (event) {
 
         const bouton =
-            event.target.closest(".close-modal");
+            event.target.closest(
+                ".close-modal"
+            );
+
 
         if (!bouton) return;
 
 
         const modalId =
             bouton.dataset.modal;
+
 
         if (modalId) {
 
@@ -1149,21 +1510,37 @@ function echapperHTML(value) {
 
     return String(value)
 
-        .replace(/&/g, "&amp;")
+        .replace(
+            /&/g,
+            "&amp;"
+        )
 
-        .replace(/</g, "&lt;")
+        .replace(
+            /</g,
+            "&lt;"
+        )
 
-        .replace(/>/g, "&gt;")
+        .replace(
+            />/g,
+            "&gt;"
+        )
 
-        .replace(/"/g, "&quot;")
+        .replace(
+            /"/g,
+            "&quot;"
+        )
 
-        .replace(/'/g, "&#039;");
+        .replace(
+            /'/g,
+            "&#039;"
+        );
 
 }
 
 
 // ============================================================
-// API POUR ENSEIGNANTS.JS
+// FONCTIONS PUBLIQUES
+// UTILISÉES PAR enseignants.js
 // ============================================================
 
 function getSifahData() {
@@ -1187,6 +1564,17 @@ function getAnneesData() {
 }
 
 
+function getEtablissementData() {
+
+    return parametresData.etablissement;
+
+}
+
+
+// ============================================================
+// FIN
+// ============================================================
+
 console.log(
-    "SIGE - parametres.js chargé"
+    "SIGE - parametres.js chargé complètement"
 );
