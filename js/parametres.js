@@ -1,308 +1,293 @@
-```javascript
 // ============================================================
-// SIGE - GESTION DES PARAMÈTRES
-// Version locale temporaire
-// Les données seront migrées vers Firebase ultérieurement
+// SIGE - PARAMÈTRES
 // ============================================================
 
+// Gestion de :
+// 1. الصفة
+// 2. الوضعية
+// 3. السنوات الجامعية
+// 4. معلومات المؤسسة
+// ============================================================
+
 
 // ============================================================
-// DONNÉES PAR DÉFAUT
+// VARIABLES
 // ============================================================
 
-const PARAMETRES_DEFAUT = {
+let parametresData = {
 
-  sifah: [
-    {
-      id: 'titulaire',
-      code: 'titulaire',
-      nom: 'مرسم',
-      ordre: 1,
-      actif: true
-    },
-    {
-      id: 'contractuel',
-      code: 'contractuel',
-      nom: 'متعاقد',
-      ordre: 2,
-      actif: true
-    },
-    {
-      id: 'vacataire',
-      code: 'vacataire',
-      nom: 'عرضي',
-      ordre: 3,
-      actif: true
-    }
-  ],
+  sifah: [],
 
+  wadhia: [],
 
-  wadhia: [
-    {
-      id: 'moubachira',
-      code: 'moubachira',
-      nom: 'مباشرة',
-      ordre: 1,
-      actif: true
-    },
-    {
-      id: 'ilhaq',
-      code: 'ilhaq',
-      nom: 'إلحاق',
-      ordre: 2,
-      actif: true
-    },
-    {
-      id: 'non_moubachira',
-      code: 'non_moubachira',
-      nom: 'عدم مباشرة',
-      ordre: 3,
-      actif: true
-    }
-  ],
-
-
-  annees: [
-    {
-      id: '2025-2026',
-      code: '2025-2026',
-      nom: '2025-2026',
-      ordre: 1,
-      current: true,
-      actif: true
-    }
-  ],
-
-
-  etablissement: {
-
-    nom: '',
-    universite: '',
-    code: '',
-    adresse: '',
-    tel: '',
-    email: ''
-
-  }
+  annees: []
 
 };
-
-
-// ============================================================
-// CHARGEMENT DES PARAMÈTRES
-// ============================================================
-
-function getParametres() {
-
-  const saved =
-    localStorage.getItem('SIGE_PARAMETRES');
-
-
-  if (!saved) {
-
-    localStorage.setItem(
-      'SIGE_PARAMETRES',
-      JSON.stringify(PARAMETRES_DEFAUT)
-    );
-
-    return JSON.parse(
-      JSON.stringify(PARAMETRES_DEFAUT)
-    );
-  }
-
-
-  try {
-
-    return JSON.parse(saved);
-
-  } catch (error) {
-
-    console.error(
-      'Erreur lecture paramètres :',
-      error
-    );
-
-    return JSON.parse(
-      JSON.stringify(PARAMETRES_DEFAUT)
-    );
-  }
-}
-
-
-// ============================================================
-// SAUVEGARDE
-// ============================================================
-
-function saveParametres(data) {
-
-  localStorage.setItem(
-    'SIGE_PARAMETRES',
-    JSON.stringify(data)
-  );
-}
-
-
-// ============================================================
-// VARIABLE GLOBALE
-// ============================================================
-
-let parametres = getParametres();
 
 
 // ============================================================
 // INITIALISATION
 // ============================================================
 
-function initParametres() {
+document.addEventListener("DOMContentLoaded", function () {
 
-  renderSifah();
+  initialiserParametres();
 
-  renderWadhia();
-
-  renderAnnees();
-
-  loadEtablissement();
-
-  initParamTabs();
-
-  updateTeacherSelects();
-
-}
+});
 
 
 // ============================================================
-// ONGLET PARAMÈTRES
+// INITIALISATION PARAMÈTRES
 // ============================================================
 
-function initParamTabs() {
+function initialiserParametres() {
+
+  // Onglets paramètres
 
   document
-    .querySelectorAll('.param-tab-btn')
-    .forEach(button => {
+    .querySelectorAll(".param-tab-btn")
+    .forEach(function (button) {
 
-      button.addEventListener(
-        'click',
-        () => {
+      button.addEventListener("click", function () {
 
-          const tab =
-            button.dataset.paramTab;
+        const tab = this.dataset.paramTab;
 
+        afficherParametreTab(tab);
 
-          document
-            .querySelectorAll('.param-tab-btn')
-            .forEach(btn =>
-              btn.classList.remove('active')
-            );
-
-
-          document
-            .querySelectorAll('.param-tab-content')
-            .forEach(content =>
-              content.classList.add('hidden')
-            );
-
-
-          button.classList.add('active');
-
-
-          document
-            .getElementById(
-              'param-tab-' + tab
-            )
-            ?.classList.remove('hidden');
-
-        }
-      );
+      });
 
     });
 
+
+  // Boutons Ajouter
+
+  const btnSifah = document.getElementById("btn-add-sifah");
+
+  if (btnSifah) {
+
+    btnSifah.addEventListener("click", function () {
+
+      ouvrirModalParametre("sifah");
+
+    });
+
+  }
+
+
+  const btnWadhia = document.getElementById("btn-add-wadhia");
+
+  if (btnWadhia) {
+
+    btnWadhia.addEventListener("click", function () {
+
+      ouvrirModalParametre("wadhia");
+
+    });
+
+  }
+
+
+  const btnAnnee = document.getElementById("btn-add-annee");
+
+  if (btnAnnee) {
+
+    btnAnnee.addEventListener("click", function () {
+
+      ouvrirModalParametre("annee");
+
+    });
+
+  }
+
+
+  // Formulaire paramètre
+
+  const parametreForm =
+    document.getElementById("parametre-form");
+
+  if (parametreForm) {
+
+    parametreForm.addEventListener(
+      "submit",
+      enregistrerParametre
+    );
+
+  }
+
+
+  // Formulaire établissement
+
+  const etablissementForm =
+    document.getElementById("etablissement-form");
+
+  if (etablissementForm) {
+
+    etablissementForm.addEventListener(
+      "submit",
+      enregistrerEtablissement
+    );
+
+  }
+
+
+  // Chargement initial
+
+  chargerSifah();
+
+  chargerWadhia();
+
+  chargerAnnees();
+
+  chargerEtablissement();
+
 }
 
 
 // ============================================================
-// AFFICHAGE SIFAH
+// AFFICHER ONGLET PARAMÈTRE
 // ============================================================
 
-function renderSifah() {
+function afficherParametreTab(type) {
+
+  document
+    .querySelectorAll(".param-tab-btn")
+    .forEach(function (button) {
+
+      button.classList.remove("active");
+
+    });
+
+
+  const boutonActif =
+    document.querySelector(
+      `.param-tab-btn[data-param-tab="${type}"]`
+    );
+
+
+  if (boutonActif) {
+
+    boutonActif.classList.add("active");
+
+  }
+
+
+  document
+    .querySelectorAll(".param-tab-content")
+    .forEach(function (content) {
+
+      content.classList.add("hidden");
+
+    });
+
+
+  const contenu =
+    document.getElementById(
+      "param-tab-" + type
+    );
+
+
+  if (contenu) {
+
+    contenu.classList.remove("hidden");
+
+  }
+
+}
+
+
+// ============================================================
+// SIFAH
+// ============================================================
+
+function chargerSifah() {
+
+  sifahRef
+    .orderBy("ordre", "asc")
+    .onSnapshot(
+
+      function (snapshot) {
+
+        parametresData.sifah = [];
+
+        snapshot.forEach(function (doc) {
+
+          parametresData.sifah.push({
+
+            id: doc.id,
+
+            ...doc.data()
+
+          });
+
+        });
+
+
+        afficherSifah();
+
+      },
+
+      function (error) {
+
+        console.error(
+          "Erreur chargement sifah :",
+          error
+        );
+
+      }
+
+    );
+
+}
+
+
+// ============================================================
+// AFFICHER SIFAH
+// ============================================================
+
+function afficherSifah() {
 
   const tbody =
-    document.getElementById('sifah-body');
+    document.getElementById("sifah-body");
 
   if (!tbody) return;
 
 
-  tbody.innerHTML = '';
+  tbody.innerHTML = "";
 
 
-  const list =
-    [...parametres.sifah]
-      .sort((a, b) => a.ordre - b.ordre);
+  parametresData.sifah.forEach(function (item) {
 
-
-  if (list.length === 0) {
-
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center">
-          لا توجد بيانات
-        </td>
-      </tr>
-    `;
-
-    return;
-  }
-
-
-  list.forEach(item => {
-
-    const tr =
-      document.createElement('tr');
+    const tr = document.createElement("tr");
 
 
     tr.innerHTML = `
 
-      <td>
-        ${item.ordre}
-      </td>
+      <td>${item.ordre ?? ""}</td>
+
+      <td>${echapperHTML(item.code ?? "")}</td>
+
+      <td>${echapperHTML(item.nom ?? "")}</td>
 
       <td>
-        ${escapeHTML(item.code)}
-      </td>
-
-      <td>
-        ${escapeHTML(item.nom)}
-      </td>
-
-      <td>
-
-        <span class="badge ${
+        ${
           item.actif
-            ? 'badge-success'
-            : 'badge-danger'
-        }">
-
-          ${
-            item.actif
-              ? 'نشط'
-              : 'غير نشط'
-          }
-
-        </span>
-
+            ? '<span class="status-active">نشط</span>'
+            : '<span class="status-inactive">غير نشط</span>'
+        }
       </td>
 
       <td>
 
         <button
-          class="btn-sm btn-edit"
-          onclick="editParametre('${item.id}', 'sifah')"
+          class="btn-secondary"
+          onclick="modifierParametre('sifah','${item.id}')"
         >
           تعديل
         </button>
 
         <button
-          class="btn-sm btn-delete"
-          onclick="deleteParametre('${item.id}', 'sifah')"
+          class="btn-danger"
+          onclick="supprimerParametre('sifah','${item.id}')"
         >
           حذف
         </button>
@@ -320,89 +305,98 @@ function renderSifah() {
 
 
 // ============================================================
-// AFFICHAGE WADHIA
+// WADHIA
 // ============================================================
 
-function renderWadhia() {
+function chargerWadhia() {
+
+  wadhiaRef
+    .orderBy("ordre", "asc")
+    .onSnapshot(
+
+      function (snapshot) {
+
+        parametresData.wadhia = [];
+
+        snapshot.forEach(function (doc) {
+
+          parametresData.wadhia.push({
+
+            id: doc.id,
+
+            ...doc.data()
+
+          });
+
+        });
+
+
+        afficherWadhia();
+
+      },
+
+      function (error) {
+
+        console.error(
+          "Erreur chargement wadhia :",
+          error
+        );
+
+      }
+
+    );
+
+}
+
+
+// ============================================================
+// AFFICHER WADHIA
+// ============================================================
+
+function afficherWadhia() {
 
   const tbody =
-    document.getElementById('wadhia-body');
+    document.getElementById("wadhia-body");
 
   if (!tbody) return;
 
 
-  tbody.innerHTML = '';
+  tbody.innerHTML = "";
 
 
-  const list =
-    [...parametres.wadhia]
-      .sort((a, b) => a.ordre - b.ordre);
+  parametresData.wadhia.forEach(function (item) {
 
-
-  if (list.length === 0) {
-
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center">
-          لا توجد بيانات
-        </td>
-      </tr>
-    `;
-
-    return;
-  }
-
-
-  list.forEach(item => {
-
-    const tr =
-      document.createElement('tr');
+    const tr = document.createElement("tr");
 
 
     tr.innerHTML = `
 
-      <td>
-        ${item.ordre}
-      </td>
+      <td>${item.ordre ?? ""}</td>
+
+      <td>${echapperHTML(item.code ?? "")}</td>
+
+      <td>${echapperHTML(item.nom ?? "")}</td>
 
       <td>
-        ${escapeHTML(item.code)}
-      </td>
-
-      <td>
-        ${escapeHTML(item.nom)}
-      </td>
-
-      <td>
-
-        <span class="badge ${
+        ${
           item.actif
-            ? 'badge-success'
-            : 'badge-danger'
-        }">
-
-          ${
-            item.actif
-              ? 'نشط'
-              : 'غير نشط'
-          }
-
-        </span>
-
+            ? '<span class="status-active">نشط</span>'
+            : '<span class="status-inactive">غير نشط</span>'
+        }
       </td>
 
       <td>
 
         <button
-          class="btn-sm btn-edit"
-          onclick="editParametre('${item.id}', 'wadhia')"
+          class="btn-secondary"
+          onclick="modifierParametre('wadhia','${item.id}')"
         >
           تعديل
         </button>
 
         <button
-          class="btn-sm btn-delete"
-          onclick="deleteParametre('${item.id}', 'wadhia')"
+          class="btn-danger"
+          onclick="supprimerParametre('wadhia','${item.id}')"
         >
           حذف
         </button>
@@ -420,95 +414,110 @@ function renderWadhia() {
 
 
 // ============================================================
-// AFFICHAGE ANNEES
+// ANNÉES UNIVERSITAIRES
 // ============================================================
 
-function renderAnnees() {
+function chargerAnnees() {
+
+  anneesRef
+    .orderBy("ordre", "asc")
+    .onSnapshot(
+
+      function (snapshot) {
+
+        parametresData.annees = [];
+
+        snapshot.forEach(function (doc) {
+
+          parametresData.annees.push({
+
+            id: doc.id,
+
+            ...doc.data()
+
+          });
+
+        });
+
+
+        afficherAnnees();
+
+      },
+
+      function (error) {
+
+        console.error(
+          "Erreur chargement années :",
+          error
+        );
+
+      }
+
+    );
+
+}
+
+
+// ============================================================
+// AFFICHER ANNÉES
+// ============================================================
+
+function afficherAnnees() {
 
   const tbody =
-    document.getElementById('annees-body');
+    document.getElementById("annees-body");
 
   if (!tbody) return;
 
 
-  tbody.innerHTML = '';
+  tbody.innerHTML = "";
 
 
-  const list =
-    [...parametres.annees]
-      .sort((a, b) => a.ordre - b.ordre);
+  parametresData.annees.forEach(function (item) {
 
-
-  if (list.length === 0) {
-
-    tbody.innerHTML = `
-      <tr>
-        <td colspan="5" style="text-align:center">
-          لا توجد بيانات
-        </td>
-      </tr>
-    `;
-
-    return;
-  }
-
-
-  list.forEach(item => {
-
-    const tr =
-      document.createElement('tr');
+    const tr = document.createElement("tr");
 
 
     tr.innerHTML = `
 
-      <td>
-        ${item.ordre}
-      </td>
+      <td>${item.ordre ?? ""}</td>
 
       <td>
-        ${escapeHTML(item.nom)}
+        ${echapperHTML(item.nom ?? "")}
       </td>
 
       <td>
 
         ${
           item.current
-            ? '<span class="badge badge-success">نعم</span>'
-            : '<span class="badge badge-danger">لا</span>'
+            ? '<span class="status-active">نعم</span>'
+            : '<span class="status-inactive">لا</span>'
         }
 
       </td>
 
       <td>
 
-        <span class="badge ${
+        ${
           item.actif
-            ? 'badge-success'
-            : 'badge-danger'
-        }">
-
-          ${
-            item.actif
-              ? 'نشط'
-              : 'غير نشط'
-          }
-
-        </span>
+            ? '<span class="status-active">نشط</span>'
+            : '<span class="status-inactive">غير نشط</span>'
+        }
 
       </td>
 
       <td>
 
         <button
-          class="btn-sm btn-edit"
-          onclick="editParametre('${item.id}', 'annees')"
+          class="btn-secondary"
+          onclick="modifierParametre('annee','${item.id}')"
         >
           تعديل
         </button>
 
         <button
-          class="btn-sm btn-delete"
-          onclick="deleteParametre('${item.id}', 'annees')"
+          class="btn-danger"
+          onclick="supprimerParametre('annee','${item.id}')"
         >
           حذف
         </button>
@@ -526,701 +535,593 @@ function renderAnnees() {
 
 
 // ============================================================
-// AJOUTER SIFAH
+// OUVRIR MODAL PARAMÈTRE
 // ============================================================
 
-document
-  .getElementById('btn-add-sifah')
-  ?.addEventListener(
-    'click',
-    () => openParametreModal('sifah')
-  );
+function ouvrirModalParametre(type, id = null) {
+
+  const modal =
+    document.getElementById("modal-parametre");
+
+  if (!modal) return;
 
 
-// ============================================================
-// AJOUTER WADHIA
-// ============================================================
-
-document
-  .getElementById('btn-add-wadhia')
-  ?.addEventListener(
-    'click',
-    () => openParametreModal('wadhia')
-  );
+  document.getElementById("parametre-id").value =
+    id || "";
 
 
-// ============================================================
-// AJOUTER ANNEE
-// ============================================================
-
-document
-  .getElementById('btn-add-annee')
-  ?.addEventListener(
-    'click',
-    () => openParametreModal('annees')
-  );
-
-
-// ============================================================
-// OUVRIR MODAL
-// ============================================================
-
-function openParametreModal(
-  type,
-  item = null
-) {
-
-  document.getElementById(
-    'parametre-id'
-  ).value =
-    item ? item.id : '';
-
-
-  document.getElementById(
-    'parametre-type'
-  ).value =
+  document.getElementById("parametre-type").value =
     type;
 
 
-  document.getElementById(
-    'parametre-code'
-  ).value =
-    item ? item.code : '';
+  const code =
+    document.getElementById("parametre-code");
 
+  const nom =
+    document.getElementById("parametre-nom");
 
-  document.getElementById(
-    'parametre-nom'
-  ).value =
-    item ? item.nom : '';
+  const ordre =
+    document.getElementById("parametre-ordre");
 
-
-  document.getElementById(
-    'parametre-ordre'
-  ).value =
-    item ? item.ordre : 1;
-
-
-  document.getElementById(
-    'parametre-actif'
-  ).checked =
-    item ? item.actif : true;
-
-
-  document.getElementById(
-    'parametre-current'
-  ).checked =
-    item ? !!item.current : false;
-
+  const current =
+    document.getElementById("parametre-current");
 
   const currentGroup =
-    document.getElementById(
-      'parametre-current-group'
-    );
+    document.getElementById("parametre-current-group");
+
+  const actif =
+    document.getElementById("parametre-actif");
 
 
-  currentGroup.style.display =
-    type === 'annees'
-      ? 'block'
-      : 'none';
+  code.value = "";
+
+  nom.value = "";
+
+  ordre.value = "1";
+
+  current.checked = false;
+
+  actif.checked = true;
 
 
-  const titles = {
+  // Pour année universitaire
 
-    sifah: 'صفة',
+  if (type === "annee") {
 
-    wadhia: 'وضعية',
+    code.parentElement.style.display = "none";
 
-    annees: 'سنة جامعية'
+    currentGroup.style.display = "block";
 
-  };
+  }
 
+  else {
 
-  document.getElementById(
-    'modal-parametre-title'
-  ).textContent =
-    item
-      ? `تعديل ${titles[type]}`
-      : `إضافة ${titles[type]}`;
+    code.parentElement.style.display = "block";
 
+    currentGroup.style.display = "none";
 
-  openModal('modal-parametre');
-
-}
+  }
 
 
-// ============================================================
-// EDITER PARAMETRE
-// ============================================================
+  // Modification
 
-window.editParametre =
-  function(id, type) {
+  if (id) {
 
-    const list =
-      parametres[type];
+    let collection;
+
+
+    if (type === "sifah") {
+
+      collection = parametresData.sifah;
+
+    }
+
+    else if (type === "wadhia") {
+
+      collection = parametresData.wadhia;
+
+    }
+
+    else if (type === "annee") {
+
+      collection = parametresData.annees;
+
+    }
 
 
     const item =
-      list.find(
-        x => x.id === id
-      );
+      collection.find(function (x) {
+
+        return x.id === id;
+
+      });
 
 
     if (item) {
 
-      openParametreModal(
-        type,
-        item
-      );
+      code.value = item.code || "";
+
+      nom.value = item.nom || "";
+
+      ordre.value = item.ordre || 1;
+
+      current.checked = item.current || false;
+
+      actif.checked =
+        item.actif !== false;
 
     }
+
+  }
+
+
+  document.getElementById(
+    "modal-parametre-title"
+  ).textContent = id
+    ? "تعديل"
+    : "إضافة";
+
+
+  modal.classList.remove("hidden");
+
+}
+
+
+// ============================================================
+// MODIFIER PARAMÈTRE
+// ============================================================
+
+function modifierParametre(type, id) {
+
+  ouvrirModalParametre(type, id);
+
+}
+
+
+// ============================================================
+// ENREGISTRER PARAMÈTRE
+// ============================================================
+
+async function enregistrerParametre(event) {
+
+  event.preventDefault();
+
+
+  const id =
+    document.getElementById("parametre-id").value;
+
+
+  const type =
+    document.getElementById("parametre-type").value;
+
+
+  const code =
+    document.getElementById("parametre-code").value.trim();
+
+
+  const nom =
+    document.getElementById("parametre-nom").value.trim();
+
+
+  const ordre =
+    Number(
+      document.getElementById("parametre-ordre").value
+    );
+
+
+  const current =
+    document.getElementById("parametre-current").checked;
+
+
+  const actif =
+    document.getElementById("parametre-actif").checked;
+
+
+  if (!nom) {
+
+    alert("يرجى إدخال الاسم");
+
+    return;
+
+  }
+
+
+  if (type !== "annee" && !code) {
+
+    alert("يرجى إدخال الرمز");
+
+    return;
+
+  }
+
+
+  let collection;
+
+
+  if (type === "sifah") {
+
+    collection = sifahRef;
+
+  }
+
+  else if (type === "wadhia") {
+
+    collection = wadhiaRef;
+
+  }
+
+  else if (type === "annee") {
+
+    collection = anneesRef;
+
+  }
+
+  else {
+
+    alert("نوع المعلمة غير معروف");
+
+    return;
+
+  }
+
+
+  const data = {
+
+    nom: nom,
+
+    ordre: ordre,
+
+    actif: actif,
+
+    updatedAt:
+      firebase.firestore.FieldValue.serverTimestamp()
 
   };
 
 
-// ============================================================
-// SUPPRIMER PARAMETRE
-// ============================================================
+  if (type !== "annee") {
 
-window.deleteParametre =
-  function(id, type) {
+    data.code = code;
 
-    if (
-      !confirm(
-        'هل أنت متأكد من الحذف؟'
-      )
-    ) {
-      return;
+  }
+
+
+  if (type === "annee") {
+
+    data.current = current;
+
+  }
+
+
+  try {
+
+    // --------------------------------------------------------
+    // MODIFICATION
+    // --------------------------------------------------------
+
+    if (id) {
+
+      await collection
+        .doc(id)
+        .update(data);
+
+
+      // إذا كانت السنة الحالية
+      if (type === "annee" && current) {
+
+        await rendreAnneesNonCourantes(id);
+
+      }
+
+    }
+
+    // --------------------------------------------------------
+    // AJOUT
+    // --------------------------------------------------------
+
+    else {
+
+      data.createdAt =
+        firebase.firestore.FieldValue.serverTimestamp();
+
+
+      const docRef =
+        await collection.add(data);
+
+
+      // السنة الجديدة هي الحالية
+
+      if (type === "annee" && current) {
+
+        await rendreAnneesNonCourantes(
+          docRef.id
+        );
+
+      }
+
     }
 
 
-    const list =
-      parametres[type];
+    fermerModal("modal-parametre");
+
+    event.target.reset();
 
 
-    const index =
-      list.findIndex(
-        x => x.id === id
+  }
+
+  catch (error) {
+
+    console.error(
+      "Erreur enregistrement paramètre :",
+      error
+    );
+
+    alert(
+      "حدث خطأ أثناء حفظ البيانات"
+    );
+
+  }
+
+}
+
+
+// ============================================================
+// UNE SEULE ANNÉE COURANTE
+// ============================================================
+
+async function rendreAnneesNonCourantes(idCourante) {
+
+  const snapshot =
+    await anneesRef.get();
+
+
+  const batch =
+    db.batch();
+
+
+  snapshot.forEach(function (doc) {
+
+    if (doc.id !== idCourante) {
+
+      batch.update(
+        doc.ref,
+        {
+          current: false
+        }
       );
 
+    }
 
-    if (index === -1) return;
-
-
-    list.splice(index, 1);
+  });
 
 
-    saveParametres(parametres);
+  await batch.commit();
+
+}
 
 
-    renderAllParametres();
+// ============================================================
+// SUPPRIMER PARAMÈTRE
+// ============================================================
+
+async function supprimerParametre(type, id) {
+
+  const confirmation =
+    confirm(
+      "هل أنت متأكد من حذف هذا العنصر ؟"
+    );
 
 
-    updateTeacherSelects();
+  if (!confirmation) return;
+
+
+  let collection;
+
+
+  if (type === "sifah") {
+
+    collection = sifahRef;
+
+  }
+
+  else if (type === "wadhia") {
+
+    collection = wadhiaRef;
+
+  }
+
+  else if (type === "annee") {
+
+    collection = anneesRef;
+
+  }
+
+  else {
+
+    return;
+
+  }
+
+
+  try {
+
+    await collection
+      .doc(id)
+      .delete();
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Erreur suppression :",
+      error
+    );
+
+    alert(
+      "حدث خطأ أثناء الحذف"
+    );
+
+  }
+
+}
+
+
+// ============================================================
+// ETABLISSEMENT
+// ============================================================
+
+async function chargerEtablissement() {
+
+  try {
+
+    const snapshot =
+      await etablissementRef
+        .doc("principal")
+        .get();
+
+
+    if (!snapshot.exists) {
+
+      return;
+
+    }
+
+
+    const data =
+      snapshot.data();
+
+
+    document.getElementById(
+      "etablissement-nom"
+    ).value =
+      data.nom || "";
+
+
+    document.getElementById(
+      "etablissement-universite"
+    ).value =
+      data.universite || "";
+
+
+    document.getElementById(
+      "etablissement-code"
+    ).value =
+      data.code || "";
+
+
+    document.getElementById(
+      "etablissement-adresse"
+    ).value =
+      data.adresse || "";
+
+
+    document.getElementById(
+      "etablissement-tel"
+    ).value =
+      data.tel || "";
+
+
+    document.getElementById(
+      "etablissement-email"
+    ).value =
+      data.email || "";
+
+  }
+
+  catch (error) {
+
+    console.error(
+      "Erreur chargement établissement :",
+      error
+    );
+
+  }
+
+}
+
+
+// ============================================================
+// ENREGISTRER ETABLISSEMENT
+// ============================================================
+
+async function enregistrerEtablissement(event) {
+
+  event.preventDefault();
+
+
+  const data = {
+
+    nom:
+      document.getElementById(
+        "etablissement-nom"
+      ).value.trim(),
+
+
+    universite:
+      document.getElementById(
+        "etablissement-universite"
+      ).value.trim(),
+
+
+    code:
+      document.getElementById(
+        "etablissement-code"
+      ).value.trim(),
+
+
+    adresse:
+      document.getElementById(
+        "etablissement-adresse"
+      ).value.trim(),
+
+
+    tel:
+      document.getElementById(
+        "etablissement-tel"
+      ).value.trim(),
+
+
+    email:
+      document.getElementById(
+        "etablissement-email"
+      ).value.trim(),
+
+
+    updatedAt:
+      firebase.firestore.FieldValue.serverTimestamp()
+
+  };
+
+
+  try {
+
+    await etablissementRef
+      .doc("principal")
+      .set(
+        data,
+        {
+          merge: true
+        }
+      );
 
 
     alert(
-      'تم الحذف بنجاح'
+      "تم حفظ معلومات المؤسسة بنجاح"
     );
-
-  };
-
-
-// ============================================================
-// FORMULAIRE PARAMETRE
-// ============================================================
-
-document
-  .getElementById('parametre-form')
-  ?.addEventListener(
-    'submit',
-    function(e) {
-
-      e.preventDefault();
-
-
-      const id =
-        document.getElementById(
-          'parametre-id'
-        ).value;
-
-
-      const type =
-        document.getElementById(
-          'parametre-type'
-        ).value;
-
-
-      const code =
-        document.getElementById(
-          'parametre-code'
-        ).value
-        .trim();
-
-
-      const nom =
-        document.getElementById(
-          'parametre-nom'
-        ).value
-        .trim();
-
-
-      const ordre =
-        Number(
-          document.getElementById(
-            'parametre-ordre'
-          ).value
-        );
-
-
-      const actif =
-        document.getElementById(
-          'parametre-actif'
-        ).checked;
-
-
-      const current =
-        document.getElementById(
-          'parametre-current'
-        ).checked;
-
-
-      if (!code || !nom) {
-
-        alert(
-          'الرجاء إدخال جميع البيانات'
-        );
-
-        return;
-      }
-
-
-      const list =
-        parametres[type];
-
-
-      // ================= EDIT =================
-
-      if (id) {
-
-        const item =
-          list.find(
-            x => x.id === id
-          );
-
-
-        if (item) {
-
-          item.code = code;
-
-          item.nom = nom;
-
-          item.ordre = ordre;
-
-          item.actif = actif;
-
-
-          if (type === 'annees') {
-
-            item.current = current;
-
-            if (current) {
-
-              list.forEach(
-                x => {
-
-                  if (x.id !== id) {
-                    x.current = false;
-                  }
-
-                }
-              );
-
-            }
-
-          }
-
-        }
-
-      }
-
-
-      // ================= AJOUT =================
-
-      else {
-
-        const newItem = {
-
-          id:
-            generateId(),
-
-          code:
-            code,
-
-          nom:
-            nom,
-
-          ordre:
-            ordre,
-
-          actif:
-            actif
-
-        };
-
-
-        if (type === 'annees') {
-
-          newItem.current =
-            current;
-
-
-          if (current) {
-
-            list.forEach(
-              x => {
-                x.current = false;
-              }
-            );
-
-          }
-
-        }
-
-
-        list.push(newItem);
-
-      }
-
-
-      saveParametres(
-        parametres
-      );
-
-
-      closeModal(
-        'modal-parametre'
-      );
-
-
-      renderAllParametres();
-
-
-      updateTeacherSelects();
-
-
-      alert(
-        'تم الحفظ بنجاح'
-      );
-
-    }
-  );
-
-
-// ============================================================
-// AFFICHER TOUS LES PARAMETRES
-// ============================================================
-
-function renderAllParametres() {
-
-  renderSifah();
-
-  renderWadhia();
-
-  renderAnnees();
-
-}
-
-
-// ============================================================
-// INFORMATIONS ETABLISSEMENT
-// ============================================================
-
-function loadEtablissement() {
-
-  const e =
-    parametres.etablissement;
-
-
-  document.getElementById(
-    'etablissement-nom'
-  ).value =
-    e.nom || '';
-
-
-  document.getElementById(
-    'etablissement-universite'
-  ).value =
-    e.universite || '';
-
-
-  document.getElementById(
-    'etablissement-code'
-  ).value =
-    e.code || '';
-
-
-  document.getElementById(
-    'etablissement-adresse'
-  ).value =
-    e.adresse || '';
-
-
-  document.getElementById(
-    'etablissement-tel'
-  ).value =
-    e.tel || '';
-
-
-  document.getElementById(
-    'etablissement-email'
-  ).value =
-    e.email || '';
-
-}
-
-
-// ============================================================
-// SAUVEGARDE ETABLISSEMENT
-// ============================================================
-
-document
-  .getElementById(
-    'etablissement-form'
-  )
-  ?.addEventListener(
-    'submit',
-    function(e) {
-
-      e.preventDefault();
-
-
-      parametres.etablissement = {
-
-        nom:
-          document.getElementById(
-            'etablissement-nom'
-          ).value.trim(),
-
-        universite:
-          document.getElementById(
-            'etablissement-universite'
-          ).value.trim(),
-
-        code:
-          document.getElementById(
-            'etablissement-code'
-          ).value.trim(),
-
-        adresse:
-          document.getElementById(
-            'etablissement-adresse'
-          ).value.trim(),
-
-        tel:
-          document.getElementById(
-            'etablissement-tel'
-          ).value.trim(),
-
-        email:
-          document.getElementById(
-            'etablissement-email'
-          ).value.trim()
-
-      };
-
-
-      saveParametres(
-        parametres
-      );
-
-
-      alert(
-        'تم حفظ معلومات المؤسسة بنجاح'
-      );
-
-    }
-  );
-
-
-// ============================================================
-// ACTUALISER LES SELECTS DES ENSEIGNANTS
-// ============================================================
-
-function updateTeacherSelects() {
-
-  // ================= SIFAH =================
-
-  const sifahSelect =
-    document.getElementById(
-      'sifah'
-    );
-
-
-  if (sifahSelect) {
-
-    const current =
-      sifahSelect.value;
-
-
-    sifahSelect.innerHTML =
-      '';
-
-
-    parametres.sifah
-      .filter(
-        x => x.actif
-      )
-      .sort(
-        (a, b) =>
-          a.ordre - b.ordre
-      )
-      .forEach(
-        item => {
-
-          const option =
-            document.createElement(
-              'option'
-            );
-
-
-          option.value =
-            item.code;
-
-
-          option.textContent =
-            item.nom;
-
-
-          sifahSelect.appendChild(
-            option
-          );
-
-        }
-      );
-
-
-    if (current) {
-      sifahSelect.value =
-        current;
-    }
 
   }
 
+  catch (error) {
 
-  // ================= WADHIA =================
-
-  const wadhiaSelect =
-    document.getElementById(
-      'wadhia'
+    console.error(
+      "Erreur établissement :",
+      error
     );
 
-
-  if (wadhiaSelect) {
-
-    const current =
-      wadhiaSelect.value;
-
-
-    wadhiaSelect.innerHTML =
-      '';
-
-
-    parametres.wadhia
-      .filter(
-        x => x.actif
-      )
-      .sort(
-        (a, b) =>
-          a.ordre - b.ordre
-      )
-      .forEach(
-        item => {
-
-          const option =
-            document.createElement(
-              'option'
-            );
-
-
-          option.value =
-            item.code;
-
-
-          option.textContent =
-            item.nom;
-
-
-          wadhiaSelect.appendChild(
-            option
-          );
-
-        }
-      );
-
-
-    if (current) {
-      wadhiaSelect.value =
-        current;
-    }
-
-  }
-
-
-  // ================= ANNEE =================
-
-  const anneeSelect =
-    document.getElementById(
-      'anneeUniversitaire'
+    alert(
+      "حدث خطأ أثناء حفظ معلومات المؤسسة"
     );
-
-
-  if (anneeSelect) {
-
-    const current =
-      anneeSelect.value;
-
-
-    anneeSelect.innerHTML =
-      '';
-
-
-    parametres.annees
-      .filter(
-        x => x.actif
-      )
-      .sort(
-        (a, b) =>
-          a.ordre - b.ordre
-      )
-      .forEach(
-        item => {
-
-          const option =
-            document.createElement(
-              'option'
-            );
-
-
-          option.value =
-            item.code;
-
-
-          option.textContent =
-            item.nom;
-
-
-          anneeSelect.appendChild(
-            option
-          );
-
-        }
-      );
-
-
-    if (current) {
-      anneeSelect.value =
-        current;
-    }
 
   }
 
@@ -1228,73 +1129,104 @@ function updateTeacherSelects() {
 
 
 // ============================================================
-// OUTILS
+// FERMER MODAL
 // ============================================================
 
-function generateId() {
+function fermerModal(id) {
 
-  return Date.now().toString(36)
-    + Math.random()
-      .toString(36)
-      .substring(2, 8);
+  const modal =
+    document.getElementById(id);
 
-}
+  if (modal) {
 
-
-// ============================================================
-// PROTECTION HTML
-// ============================================================
-
-function escapeHTML(value) {
-
-  if (value === null ||
-      value === undefined) {
-
-    return '';
+    modal.classList.add("hidden");
 
   }
 
-
-  return String(value)
-
-    .replace(
-      /&/g,
-      '&amp;'
-    )
-
-    .replace(
-      /</g,
-      '&lt;'
-    )
-
-    .replace(
-      />/g,
-      '&gt;'
-    )
-
-    .replace(
-      /"/g,
-      '&quot;'
-    )
-
-    .replace(
-      /'/g,
-      '&#039;'
-    );
-
 }
 
 
 // ============================================================
-// INITIALISATION
+// GESTION DES BOUTONS FERMER
 // ============================================================
 
 document.addEventListener(
-  'DOMContentLoaded',
-  () => {
+  "click",
+  function (event) {
 
-    initParametres();
+    const bouton =
+      event.target.closest(".close-modal");
+
+
+    if (!bouton) return;
+
+
+    const modalId =
+      bouton.dataset.modal;
+
+
+    if (modalId) {
+
+      fermerModal(modalId);
+
+    }
 
   }
 );
-```
+
+
+// ============================================================
+// SÉCURITÉ AFFICHAGE HTML
+// ============================================================
+
+function echapperHTML(value) {
+
+  return String(value)
+
+    .replace(/&/g, "&amp;")
+
+    .replace(/</g, "&lt;")
+
+    .replace(/>/g, "&gt;")
+
+    .replace(/"/g, "&quot;")
+
+    .replace(/'/g, "&#039;");
+
+}
+
+
+// ============================================================
+// FONCTIONS PUBLIQUES
+// ============================================================
+
+// Ces fonctions pourront être utilisées par enseignants.js
+
+function getSifahData() {
+
+  return parametresData.sifah;
+
+}
+
+
+function getWadhiaData() {
+
+  return parametresData.wadhia;
+
+}
+
+
+function getAnneesData() {
+
+  return parametresData.annees;
+
+}
+
+
+// ============================================================
+// FIN
+// ============================================================
+
+console.log(
+  "SIGE - parametres.js chargé"
+);
