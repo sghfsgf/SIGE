@@ -326,3 +326,63 @@ tr:hover { background: #f8fafc; }
     flex-direction: column;
   }
 }
+/* =========================================================
+PIED DE PAGE SIGE
+========================================================= */
+
+.footer-sige {
+margin-top: 35px;
+padding: 16px 20px;
+text-align: center;
+background: linear-gradient(
+90deg,
+#f97316,
+#7dd3fc
+);
+color: white;
+border-radius: 12px 12px 0 0;
+box-shadow: 0 -2px 8px rgba(0, 0, 0, 0.08);
+direction: rtl;
+}
+
+.footer-title {
+font-size: 15px;
+font-weight: 600;
+}
+
+.footer-title strong {
+font-size: 16px;
+font-weight: 700;
+}
+
+.footer-info {
+margin-top: 5px;
+font-size: 12px;
+opacity: 0.9;
+}
+
+/* ==================== MOBILE ==================== */
+
+@media (max-width: 950px) {
+
+```
+.footer-sige {
+    margin-top: 25px;
+    padding: 14px 10px;
+    border-radius: 10px 10px 0 0;
+}
+
+.footer-title {
+    font-size: 13px;
+}
+
+.footer-title strong {
+    font-size: 14px;
+}
+
+.footer-info {
+    font-size: 11px;
+}
+```
+
+}
