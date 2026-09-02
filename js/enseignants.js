@@ -1,20 +1,22 @@
 // ============================================================
 // SIGE - ENSEIGNANTS
 // ============================================================
-// Gestion complète des enseignants + Recherche + Pagination
-// + Liste filtrée disponible pour l'export Excel
+// Gestion complète des enseignants
+// Recherche + Filtres + Pagination + CRUD + Dashboard
+// Compatible avec app.js
 // ============================================================
 
 let enseignantsData = [];
-
-// Liste complète après application des filtres/recherche
 let enseignantsFiltres = [];
+let currentPage = 1;
 
-// Liste filtrée accessible depuis export.js
+const itemsPerPage = 15;
+
+// Liste actuellement filtrée, accessible par export.js
 window.enseignantsFiltresActuels = [];
 
-let currentPage = 1;
-const itemsPerPage = 15;
+// Indique si Firestore est déjà surveillé
+let enseignantsListenerActif = false;
 
 
 // ============================================================
@@ -28,32 +30,33 @@ document.addEventListener("DOMContentLoaded", function () {
 });
 
 
+// ============================================================
+// INITIALISER ENSEIGNANTS
+// ============================================================
+
 function initialiserEnseignants() {
 
-    // ========================================================
+    // --------------------------------------------------------
     // Bouton Ajouter
-    // ========================================================
+    // --------------------------------------------------------
 
     const btnAjouter =
         document.getElementById("btn-add-enseignant");
 
     if (btnAjouter) {
 
-        btnAjouter.addEventListener(
-            "click",
-            function () {
+        btnAjouter.addEventListener("click", function () {
 
-                ouvrirModalEnseignant();
+            ouvrirModalEnseignant();
 
-            }
-        );
+        });
 
     }
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // Formulaire
-    // ========================================================
+    // --------------------------------------------------------
 
     const form =
         document.getElementById("enseignant-form");
@@ -68,9 +71,9 @@ function initialiserEnseignants() {
     }
 
 
-    // ========================================================
-    // RECHERCHE
-    // ========================================================
+    // --------------------------------------------------------
+    // Recherche
+    // --------------------------------------------------------
 
     const searchInput =
         document.getElementById("search-enseignants");
@@ -88,93 +91,72 @@ function initialiserEnseignants() {
             }
         );
 
-        searchInput.addEventListener(
-            "keyup",
-            function () {
-
-                currentPage = 1;
-
-                appliquerFiltres();
-
-            }
-        );
-
     }
     else {
 
-        console.error(
+        console.warn(
             "Champ #search-enseignants introuvable"
         );
 
     }
 
 
-    // ========================================================
-    // FILTRES
-    // ========================================================
+    // --------------------------------------------------------
+    // Filtres
+    // --------------------------------------------------------
 
     const filtres = [
 
         "filter-matricule",
-
         "filter-grade",
-
         "filter-specialite",
-
         "filter-departement",
-
         "filter-sifah",
-
         "filter-wadhia",
-
         "filter-anneeUniversitaire",
-
         "filter-genre"
 
     ];
 
 
-    filtres.forEach(
-        function (id) {
+    filtres.forEach(function (id) {
 
-            const element =
-                document.getElementById(id);
+        const element =
+            document.getElementById(id);
 
+        if (element) {
 
-            if (element) {
+            element.addEventListener(
+                "input",
+                function () {
 
-                element.addEventListener(
-                    "input",
-                    function () {
+                    currentPage = 1;
 
-                        currentPage = 1;
+                    appliquerFiltres();
 
-                        appliquerFiltres();
-
-                    }
-                );
+                }
+            );
 
 
-                element.addEventListener(
-                    "change",
-                    function () {
+            element.addEventListener(
+                "change",
+                function () {
 
-                        currentPage = 1;
+                    currentPage = 1;
 
-                        appliquerFiltres();
+                    appliquerFiltres();
 
-                    }
-                );
-
-            }
+                }
+            );
 
         }
-    );
+
+    });
 
 
-    // ========================================================
-    // RESET
-    // ========================================================
+    // --------------------------------------------------------
+    // Reset
+    // --------------------------------------------------------
 
     const btnReset =
         document.getElementById(
@@ -192,9 +174,9 @@ function initialiserEnseignants() {
     }
 
 
-    // ========================================================
-    // CHARGER LES DONNÉES
-    // ========================================================
+    // --------------------------------------------------------
+    // Charger les enseignants
+    // --------------------------------------------------------
 
     chargerEnseignants();
 
@@ -202,10 +184,57 @@ function initialiserEnseignants() {
 
 
 // ============================================================
-// CHARGER ENSEIGNANTS
+// COMPATIBILITÉ AVEC app.js
+// ============================================================
+//
+// app.js appelle :
+//
+// loadEnseignants();
+//
+// Cette fonction existe donc ici.
+//
+// IMPORTANT : elle ne recrée pas un nouvel onSnapshot().
+// ============================================================
+
+function loadEnseignants() {
+
+    // Si les données existent déjà,
+    // on applique simplement les filtres.
+
+    if (
+        Array.isArray(enseignantsData) &&
+        enseignantsData.length > 0
+    ) {
+
+        appliquerFiltres();
+
+        return;
+
+    }
+
+
+    // Si les données ne sont pas encore chargées,
+    // lancer le chargement.
+
+    chargerEnseignants();
+
+}
+
+
+// ============================================================
+// CHARGER ENSEIGNANTS DEPUIS FIRESTORE
 // ============================================================
 
 function chargerEnseignants() {
+
+    // Éviter plusieurs listeners Firestore
+
+    if (enseignantsListenerActif) {
+
+        return;
+
+    }
+
 
     if (
         typeof enseignantsRef === "undefined" ||
@@ -213,7 +242,7 @@ function chargerEnseignants() {
     ) {
 
         console.error(
-            "enseignantsRef est introuvable."
+            "enseignantsRef n'est pas défini."
         );
 
         return;
@@ -221,13 +250,11 @@ function chargerEnseignants() {
     }
 
 
+    enseignantsListenerActif = true;
+
+
     enseignantsRef
-
-        .orderBy(
-            "numero",
-            "asc"
-        )
-
+        .orderBy("numero", "asc")
         .onSnapshot(
 
             function (snapshot) {
@@ -235,31 +262,36 @@ function chargerEnseignants() {
                 enseignantsData = [];
 
 
-                snapshot.forEach(
-                    function (doc) {
+                snapshot.forEach(function (doc) {
 
-                        enseignantsData.push({
+                    enseignantsData.push({
 
-                            id: doc.id,
+                        id: doc.id,
 
-                            ...doc.data()
+                        ...doc.data()
 
-                        });
+                    });
 
-                    }
+                });
+
+
+                console.log(
+                    "Nombre d'enseignants chargés :",
+                    enseignantsData.length
                 );
 
 
-                // Au chargement :
-                // aucun filtre = tous les enseignants
-
-                currentPage = 1;
+                // Appliquer les filtres
 
                 appliquerFiltres();
 
 
+                // Mettre à jour les listes de filtres
+
                 mettreAJourFiltres();
 
+
+                // Dashboard
 
                 mettreAJourDashboard();
 
@@ -268,14 +300,11 @@ function chargerEnseignants() {
 
             function (error) {
 
+                enseignantsListenerActif = false;
+
                 console.error(
                     "Erreur chargement enseignants :",
                     error
-                );
-
-                alert(
-                    "حدث خطأ أثناء تحميل بيانات الأساتذة : " +
-                    error.message
                 );
 
             }
@@ -297,21 +326,23 @@ function afficherEnseignants(liste) {
         );
 
 
-    if (!tbody) return;
+    if (!tbody) {
+
+        return;
+
+    }
 
 
     tbody.innerHTML = "";
 
 
     if (
-        !liste ||
+        !Array.isArray(liste) ||
         liste.length === 0
     ) {
 
         tbody.innerHTML = `
-
             <tr>
-
                 <td
                     colspan="12"
                     style="
@@ -319,13 +350,9 @@ function afficherEnseignants(liste) {
                         padding:20px;
                     "
                 >
-
                     لا توجد نتائج
-
                 </td>
-
             </tr>
-
         `;
 
         return;
@@ -333,148 +360,148 @@ function afficherEnseignants(liste) {
     }
 
 
-    liste.forEach(
-        function (item) {
+    liste.forEach(function (item) {
 
-            const grade =
-                trouverNomGrade(
-                    item.gradeId
-                );
-
-
-            const specialite =
-                trouverNomSpecialite(
-                    item.specialiteId
-                );
+        const grade =
+            trouverNomGrade(
+                item.gradeId
+            );
 
 
-            const departement =
-                trouverNomDepartement(
-                    item.departementId
-                );
+        const specialite =
+            trouverNomSpecialite(
+                item.specialiteId
+            );
 
 
-            const sifah =
-                trouverNomSifah(
-                    item.sifah
-                );
+        const departement =
+            trouverNomDepartement(
+                item.departementId
+            );
 
 
-            const wadhia =
-                trouverNomWadhia(
-                    item.wadhia
-                );
+        const sifah =
+            trouverNomSifah(
+                item.sifah
+            );
 
 
-            const annee =
-                trouverNomAnnee(
-                    item.anneeUniversitaire
-                );
+        const wadhia =
+            trouverNomWadhia(
+                item.wadhia
+            );
 
 
-            const peutSupprimer =
-                window.currentUserRole === "admin";
+        const annee =
+            trouverNomAnnee(
+                item.anneeUniversitaire
+            );
 
 
-            const tr =
-                document.createElement("tr");
+        const peutSupprimer =
+            window.currentUserRole === "admin";
 
 
-            tr.innerHTML = `
-
-                <td>
-                    ${item.numero ?? ""}
-                </td>
-
-                <td>
-                    ${echapperHTML(
-                        item.matriculeCNRPS ?? ""
-                    )}
-                </td>
-
-                <td>
-                    ${echapperHTML(
-                        item.nom ?? ""
-                    )}
-                </td>
-
-                <td>
-                    ${echapperHTML(
-                        item.prenom ?? ""
-                    )}
-                </td>
-
-                <td>
-                    ${echapperHTML(grade)}
-                </td>
-
-                <td>
-                    ${echapperHTML(specialite)}
-                </td>
-
-                <td>
-                    ${echapperHTML(departement)}
-                </td>
-
-                <td>
-                    ${echapperHTML(sifah)}
-                </td>
-
-                <td>
-                    ${echapperHTML(wadhia)}
-                </td>
-
-                <td>
-                    ${echapperHTML(annee)}
-                </td>
-
-                <td>
-                    ${
-                        item.genre === "femme"
-                            ? "أنثى"
-                            : "ذكر"
-                    }
-                </td>
-
-                <td>
-
-                    <button
-                        class="btn-secondary"
-                        onclick="
-                            modifierEnseignant(
-                                '${item.id}'
-                            )
-                        "
-                    >
-                        تعديل
-                    </button>
-
-                    ${
-                        peutSupprimer
-                            ? `
-                                <button
-                                    class="btn-danger"
-                                    onclick="
-                                        supprimerEnseignant(
-                                            '${item.id}'
-                                        )
-                                    "
-                                >
-                                    حذف
-                                </button>
-                              `
-                            : ""
-                    }
-
-                </td>
-
-            `;
+        const tr =
+            document.createElement("tr");
 
 
-            tbody.appendChild(tr);
+        tr.innerHTML = `
 
-        }
-    );
+            <td>
+                ${item.numero ?? ""}
+            </td>
+
+            <td>
+                ${echapperHTML(
+                    item.matriculeCNRPS ?? ""
+                )}
+            </td>
+
+            <td>
+                ${echapperHTML(
+                    item.nom ?? ""
+                )}
+            </td>
+
+            <td>
+                ${echapperHTML(
+                    item.prenom ?? ""
+                )}
+            </td>
+
+            <td>
+                ${echapperHTML(grade)}
+            </td>
+
+            <td>
+                ${echapperHTML(specialite)}
+            </td>
+
+            <td>
+                ${echapperHTML(departement)}
+            </td>
+
+            <td>
+                ${echapperHTML(sifah)}
+            </td>
+
+            <td>
+                ${echapperHTML(wadhia)}
+            </td>
+
+            <td>
+                ${echapperHTML(annee)}
+            </td>
+
+            <td>
+                ${
+                    item.genre === "femme"
+                        ? "أنثى"
+                        : "ذكر"
+                }
+            </td>
+
+            <td>
+
+                <button
+                    class="btn-secondary"
+                    onclick="
+                        modifierEnseignant(
+                            '${item.id}'
+                        )
+                    "
+                >
+                    تعديل
+                </button>
+
+                ${
+                    peutSupprimer
+
+                        ? `
+                            <button
+                                class="btn-danger"
+                                onclick="
+                                    supprimerEnseignant(
+                                        '${item.id}'
+                                    )
+                                "
+                            >
+                                حذف
+                            </button>
+                          `
+
+                        : ""
+                }
+
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
 
 }
 
@@ -487,14 +514,12 @@ function afficherAvecPagination(liste) {
 
     const totalPages =
         Math.ceil(
-            liste.length /
-            itemsPerPage
+            liste.length / itemsPerPage
         ) || 1;
 
 
     if (
-        currentPage >
-        totalPages
+        currentPage > totalPages
     ) {
 
         currentPage = 1;
@@ -514,10 +539,6 @@ function afficherAvecPagination(liste) {
         );
 
 
-    // IMPORTANT :
-    // pageData sert uniquement à l'affichage.
-    // L'export utilise enseignantsFiltresActuels.
-
     afficherEnseignants(
         pageData
     );
@@ -532,7 +553,7 @@ function afficherAvecPagination(liste) {
 
 
 // ============================================================
-// PAGINATION - AFFICHAGE
+// PAGINATION CONTROLS
 // ============================================================
 
 function renderPagination(
@@ -546,7 +567,11 @@ function renderPagination(
         );
 
 
-    if (!container) return;
+    if (!container) {
+
+        return;
+
+    }
 
 
     container.innerHTML = `
@@ -564,9 +589,7 @@ function renderPagination(
                 )
             "
         >
-
             السابق
-
         </button>
 
 
@@ -578,17 +601,11 @@ function renderPagination(
                 font-weight:600;
             "
         >
-
-            صفحة
-            ${currentPage}
-            من
-            ${totalPages}
-
+            صفحة ${currentPage}
+            من ${totalPages}
             —
-
             ${totalItems}
             أستاذ
-
         </span>
 
 
@@ -605,9 +622,7 @@ function renderPagination(
                 )
             "
         >
-
             التالي
-
         </button>
 
     `;
@@ -615,11 +630,14 @@ function renderPagination(
 }
 
 
-// ============================================================
-// CHANGER PAGE
-// ============================================================
-
 function changePage(page) {
+
+    if (page < 1) {
+
+        return;
+
+    }
+
 
     currentPage = page;
 
@@ -746,9 +764,9 @@ function appliquerFiltres() {
             : "";
 
 
-    // ========================================================
-    // APPLICATION DES FILTRES
-    // ========================================================
+    // --------------------------------------------------------
+    // Filtrage
+    // --------------------------------------------------------
 
     const resultat =
         enseignantsData.filter(
@@ -778,12 +796,9 @@ function appliquerFiltres() {
                     );
 
 
-                // ------------------------------------------------
-                // RECHERCHE
-                // ------------------------------------------------
+                // Recherche générale
 
                 const matchSearch =
-
                     !search ||
 
                     nom.includes(search) ||
@@ -795,12 +810,9 @@ function appliquerFiltres() {
                     numero.includes(search);
 
 
-                // ------------------------------------------------
-                // FILTRES
-                // ------------------------------------------------
+                // Filtres
 
                 const matchMatricule =
-
                     !matricule ||
 
                     matriculeItem.includes(
@@ -809,52 +821,43 @@ function appliquerFiltres() {
 
 
                 const matchGrade =
-
                     !grade ||
 
                     item.gradeId === grade;
 
 
                 const matchSpecialite =
-
                     !specialite ||
 
-                    item.specialiteId ===
-                    specialite;
+                    item.specialiteId === specialite;
 
 
                 const matchDepartement =
-
                     !departement ||
 
-                    item.departementId ===
-                    departement;
+                    item.departementId === departement;
 
 
                 const matchSifah =
-
                     !sifah ||
 
                     item.sifah === sifah;
 
 
                 const matchWadhia =
-
                     !wadhia ||
 
                     item.wadhia === wadhia;
 
 
                 const matchAnnee =
-
                     !annee ||
 
                     item.anneeUniversitaire ===
-                    annee;
+                        annee;
 
 
                 const matchGenre =
-
                     !genre ||
 
                     item.genre === genre;
@@ -886,21 +889,25 @@ function appliquerFiltres() {
         );
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // IMPORTANT POUR EXPORT.JS
-    // ========================================================
+    // --------------------------------------------------------
 
     enseignantsFiltres =
-        resultat;
+        [...resultat];
 
 
     window.enseignantsFiltresActuels =
         [...resultat];
 
 
-    // ========================================================
-    // AFFICHAGE
-    // ========================================================
+    console.log(
+        "Enseignants filtrés :",
+        enseignantsFiltres.length
+    );
+
+
+    // Affichage avec pagination
 
     afficherAvecPagination(
         enseignantsFiltres
@@ -918,52 +925,38 @@ function reinitialiserFiltres() {
     const ids = [
 
         "search-enseignants",
-
         "filter-matricule",
-
         "filter-grade",
-
         "filter-specialite",
-
         "filter-departement",
-
         "filter-sifah",
-
         "filter-wadhia",
-
         "filter-anneeUniversitaire",
-
         "filter-genre"
 
     ];
 
 
-    ids.forEach(
-        function (id) {
+    ids.forEach(function (id) {
 
-            const element =
-                document.getElementById(id);
+        const element =
+            document.getElementById(id);
 
 
-            if (element) {
+        if (element) {
 
-                element.value = "";
-
-            }
+            element.value = "";
 
         }
-    );
+
+    });
 
 
     currentPage = 1;
 
 
-    enseignantsFiltres =
-        [...enseignantsData];
-
-
     window.enseignantsFiltresActuels =
-        [...enseignantsData];
+        [];
 
 
     appliquerFiltres();
@@ -985,7 +978,11 @@ function ouvrirModalEnseignant(
         );
 
 
-    if (!modal) return;
+    if (!modal) {
+
+        return;
+
+    }
 
 
     const form =
@@ -1020,15 +1017,15 @@ function ouvrirModalEnseignant(
 
     if (!id) {
 
-        const titre =
+        const title =
             document.getElementById(
                 "modal-enseignant-title"
             );
 
 
-        if (titre) {
+        if (title) {
 
-            titre.textContent =
+            title.textContent =
                 "إضافة أستاذ جديد";
 
         }
@@ -1076,15 +1073,15 @@ function ouvrirModalEnseignant(
     );
 
 
-    const titre =
+    const title =
         document.getElementById(
             "modal-enseignant-title"
         );
 
 
-    if (titre) {
+    if (title) {
 
-        titre.textContent =
+        title.textContent =
             "تعديل بيانات الأستاذ";
 
     }
@@ -1256,10 +1253,6 @@ function remplirSelectsEnseignant() {
 }
 
 
-// ============================================================
-// GRADE
-// ============================================================
-
 function remplirSelectGradesEnseignant() {
 
     const select =
@@ -1268,7 +1261,11 @@ function remplirSelectGradesEnseignant() {
         );
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -1334,10 +1331,6 @@ function remplirSelectGradesEnseignant() {
 }
 
 
-// ============================================================
-// SPECIALITE
-// ============================================================
-
 function remplirSelectSpecialitesEnseignant() {
 
     const select =
@@ -1346,7 +1339,11 @@ function remplirSelectSpecialitesEnseignant() {
         );
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -1412,10 +1409,6 @@ function remplirSelectSpecialitesEnseignant() {
 }
 
 
-// ============================================================
-// DEPARTEMENT
-// ============================================================
-
 function remplirSelectDepartementsEnseignant() {
 
     const select =
@@ -1424,7 +1417,11 @@ function remplirSelectDepartementsEnseignant() {
         );
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -1490,10 +1487,6 @@ function remplirSelectDepartementsEnseignant() {
 }
 
 
-// ============================================================
-// SIFAH
-// ============================================================
-
 function remplirSelectSifahEnseignant() {
 
     const select =
@@ -1502,7 +1495,11 @@ function remplirSelectSifahEnseignant() {
         );
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -1568,10 +1565,6 @@ function remplirSelectSifahEnseignant() {
 }
 
 
-// ============================================================
-// WADHIA
-// ============================================================
-
 function remplirSelectWadhiaEnseignant() {
 
     const select =
@@ -1580,7 +1573,11 @@ function remplirSelectWadhiaEnseignant() {
         );
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -1646,10 +1643,6 @@ function remplirSelectWadhiaEnseignant() {
 }
 
 
-// ============================================================
-// ANNÉE UNIVERSITAIRE
-// ============================================================
-
 function remplirSelectAnneesEnseignant() {
 
     const select =
@@ -1658,7 +1651,11 @@ function remplirSelectAnneesEnseignant() {
         );
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -1735,16 +1732,10 @@ async function enregistrerEnseignant(
     event.preventDefault();
 
 
-    const idElement =
+    const id =
         document.getElementById(
             "enseignant-id"
-        );
-
-
-    const id =
-        idElement
-            ? idElement.value
-            : "";
+        )?.value || "";
 
 
     const data = {
@@ -1753,117 +1744,116 @@ async function enregistrerEnseignant(
             Number(
                 document.getElementById(
                     "numero"
-                ).value
+                )?.value || 0
             ),
 
 
         matriculeCNRPS:
             document.getElementById(
                 "matriculeCNRPS"
-            ).value.trim(),
+            )?.value.trim() || "",
 
 
         nom:
             document.getElementById(
                 "nom"
-            ).value.trim(),
+            )?.value.trim() || "",
 
 
         prenom:
             document.getElementById(
                 "prenom"
-            ).value.trim(),
+            )?.value.trim() || "",
 
 
         gradeId:
             document.getElementById(
                 "gradeId"
-            ).value,
+            )?.value || "",
 
 
         specialiteId:
             document.getElementById(
                 "specialiteId"
-            ).value,
+            )?.value || "",
 
 
         departementId:
             document.getElementById(
                 "departementId"
-            ).value,
+            )?.value || "",
 
 
         tel1:
             document.getElementById(
                 "tel1"
-            ).value.trim(),
+            )?.value.trim() || "",
 
 
         tel2:
             document.getElementById(
                 "tel2"
-            ).value.trim(),
+            )?.value.trim() || "",
 
 
         email:
             document.getElementById(
                 "email"
-            ).value.trim(),
+            )?.value.trim() || "",
 
 
         sifah:
             document.getElementById(
                 "sifah"
-            ).value,
+            )?.value || "",
 
 
         wadhia:
             document.getElementById(
                 "wadhia"
-            ).value,
+            )?.value || "",
 
 
         anneeUniversitaire:
             document.getElementById(
                 "anneeUniversitaire"
-            ).value,
+            )?.value || "",
 
 
         genre:
             document.getElementById(
                 "genre"
-            ).value,
+            )?.value || "homme",
 
 
         dateNaissance:
             document.getElementById(
                 "dateNaissance"
-            ).value,
+            )?.value || "",
 
 
         dateRecrutement:
             document.getElementById(
                 "dateRecrutement"
-            ).value,
+            )?.value || "",
 
 
         dateDernierGrade:
             document.getElementById(
                 "dateDernierGrade"
-            ).value,
+            )?.value || "",
 
 
         updatedAt:
-            firebase.firestore
-                .FieldValue
+            firebase.firestore.FieldValue
                 .serverTimestamp()
 
     };
 
 
-    // ========================================================
-    // VALIDATION
-    // ========================================================
+    // --------------------------------------------------------
+    // Vérifications
+    // --------------------------------------------------------
 
     if (!data.nom) {
 
@@ -1898,9 +1888,9 @@ async function enregistrerEnseignant(
     }
 
 
-    // ========================================================
-    // SAUVEGARDE
-    // ========================================================
+    // --------------------------------------------------------
+    // Enregistrer
+    // --------------------------------------------------------
 
     try {
 
@@ -2051,7 +2041,7 @@ function fermerModalEnseignant() {
 
 
 // ============================================================
-// REMPLIR LES FILTRES
+// FILTRES
 // ============================================================
 
 function mettreAJourFiltres() {
@@ -2096,10 +2086,6 @@ function mettreAJourFiltres() {
 }
 
 
-// ============================================================
-// FILTRE NORMAL
-// ============================================================
-
 function remplirFiltre(
     id,
     data,
@@ -2110,7 +2096,11 @@ function remplirFiltre(
         document.getElementById(id);
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -2120,10 +2110,14 @@ function remplirFiltre(
     select.innerHTML =
         `<option value="">
             ${texteDefaut}
-         </option>`;
+        </option>`;
 
 
-    if (!data) return;
+    if (!data) {
+
+        return;
+
+    }
 
 
     data
@@ -2171,10 +2165,6 @@ function remplirFiltre(
 }
 
 
-// ============================================================
-// FILTRE PAR CODE
-// ============================================================
-
 function remplirFiltreCodes(
     id,
     data,
@@ -2185,7 +2175,11 @@ function remplirFiltreCodes(
         document.getElementById(id);
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -2195,10 +2189,14 @@ function remplirFiltreCodes(
     select.innerHTML =
         `<option value="">
             ${texteDefaut}
-         </option>`;
+        </option>`;
 
 
-    if (!data) return;
+    if (!data) {
+
+        return;
+
+    }
 
 
     data
@@ -2246,10 +2244,6 @@ function remplirFiltreCodes(
 }
 
 
-// ============================================================
-// FILTRE ANNÉES
-// ============================================================
-
 function remplirFiltreAnnees() {
 
     const select =
@@ -2258,7 +2252,11 @@ function remplirFiltreAnnees() {
         );
 
 
-    if (!select) return;
+    if (!select) {
+
+        return;
+
+    }
 
 
     const valeur =
@@ -2481,7 +2479,7 @@ function trouverNomAnnee(nom) {
 
 
 // ============================================================
-// DASHBOARD COMPLET
+// DASHBOARD
 // ============================================================
 
 function mettreAJourDashboard() {
@@ -2489,10 +2487,6 @@ function mettreAJourDashboard() {
     const total =
         enseignantsData.length;
 
-
-    // ========================================================
-    // TOTAL
-    // ========================================================
 
     definirTexte(
         "dash-total",
@@ -2506,47 +2500,58 @@ function mettreAJourDashboard() {
     );
 
 
-    // ========================================================
-    // KPI SIAD
-    // ========================================================
-
     const titulaire =
         enseignantsData.filter(
-            item =>
-                item.sifah ===
-                "titulaire"
+            function (item) {
+
+                return item.sifah ===
+                    "titulaire";
+
+            }
         ).length;
 
 
     const contractuel =
         enseignantsData.filter(
-            item =>
-                item.sifah ===
-                "contractuel"
+            function (item) {
+
+                return item.sifah ===
+                    "contractuel";
+
+            }
         ).length;
 
 
     const vacataire =
         enseignantsData.filter(
-            item =>
-                item.sifah ===
-                "vacataire"
+            function (item) {
+
+                return item.sifah ===
+                    "vacataire";
+
+            }
         ).length;
 
 
     const homme =
         enseignantsData.filter(
-            item =>
-                item.genre ===
-                "homme"
+            function (item) {
+
+                return item.genre ===
+                    "homme";
+
+            }
         ).length;
 
 
     const femme =
         enseignantsData.filter(
-            item =>
-                item.genre ===
-                "femme"
+            function (item) {
+
+                return item.genre ===
+                    "femme";
+
+            }
         ).length;
 
 
@@ -2580,9 +2585,9 @@ function mettreAJourDashboard() {
     );
 
 
-    // ========================================================
-    // TABLEAUX DE RÉPARTITION
-    // ========================================================
+    // --------------------------------------------------------
+    // Tableaux
+    // --------------------------------------------------------
 
     remplirTableauRepartition(
         "dashboard-grade-body",
@@ -2630,9 +2635,9 @@ function mettreAJourDashboard() {
     remplirTableauAnnees();
 
 
-    // ========================================================
+    // --------------------------------------------------------
     // SIAD
-    // ========================================================
+    // --------------------------------------------------------
 
     if (
         typeof loadSIAD ===
@@ -2647,7 +2652,7 @@ function mettreAJourDashboard() {
 
 
 // ============================================================
-// TABLEAU RÉPARTITION
+// TABLEAU REPARTITION
 // ============================================================
 
 function remplirTableauRepartition(
@@ -2663,7 +2668,11 @@ function remplirTableauRepartition(
         );
 
 
-    if (!tbody) return;
+    if (!tbody) {
+
+        return;
+
+    }
 
 
     tbody.innerHTML = "";
@@ -2682,8 +2691,11 @@ function remplirTableauRepartition(
     const data =
         getDataFn()
             .filter(
-                item =>
-                    item.actif !== false
+                function (item) {
+
+                    return item.actif !== false;
+
+                }
             );
 
 
@@ -2691,64 +2703,65 @@ function remplirTableauRepartition(
         enseignantsData.length || 1;
 
 
-    data.forEach(
-        function (item) {
+    data.forEach(function (item) {
 
-            const key =
-                item[keyField];
-
-
-            const count =
-                enseignantsData.filter(
-                    e =>
-                        e[champ] === key
-                ).length;
+        const key =
+            item[keyField];
 
 
-            const percent =
-                total > 0
-                    ? (
-                        (count / total) *
-                        100
-                      ).toFixed(1)
-                    : 0;
+        const count =
+            enseignantsData.filter(
+                function (e) {
+
+                    return e[champ] === key;
+
+                }
+            ).length;
 
 
-            const tr =
-                document.createElement(
-                    "tr"
-                );
+        const percent =
+            total > 0
+                ? (
+                    (count / total) *
+                    100
+                  ).toFixed(1)
+                : 0;
 
 
-            tr.innerHTML = `
-
-                <td>
-                    ${echapperHTML(
-                        item.nom || key
-                    )}
-                </td>
-
-                <td>
-                    ${count}
-                </td>
-
-                <td>
-                    ${percent}%
-                </td>
-
-            `;
+        const tr =
+            document.createElement(
+                "tr"
+            );
 
 
-            tbody.appendChild(tr);
+        tr.innerHTML = `
 
-        }
-    );
+            <td>
+                ${echapperHTML(
+                    item.nom || key
+                )}
+            </td>
+
+            <td>
+                ${count}
+            </td>
+
+            <td>
+                ${percent}%
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
 
 }
 
 
 // ============================================================
-// RÉPARTITION PAR GENRE
+// REPARTITION GENRE
 // ============================================================
 
 function remplirTableauGenre() {
@@ -2759,7 +2772,11 @@ function remplirTableauGenre() {
         );
 
 
-    if (!tbody) return;
+    if (!tbody) {
+
+        return;
+
+    }
 
 
     tbody.innerHTML = "";
@@ -2784,57 +2801,58 @@ function remplirTableauGenre() {
     ];
 
 
-    genres.forEach(
-        function (g) {
+    genres.forEach(function (g) {
 
-            const count =
-                enseignantsData.filter(
-                    e =>
-                        e.genre ===
-                        g.key
-                ).length;
+        const count =
+            enseignantsData.filter(
+                function (e) {
 
+                    return e.genre ===
+                        g.key;
 
-            const percent =
-                (
-                    (count / total) *
-                    100
-                ).toFixed(1);
+                }
+            ).length;
 
 
-            const tr =
-                document.createElement(
-                    "tr"
-                );
+        const percent =
+            (
+                (count / total) *
+                100
+            ).toFixed(1);
 
 
-            tr.innerHTML = `
-
-                <td>
-                    ${g.nom}
-                </td>
-
-                <td>
-                    ${count}
-                </td>
-
-                <td>
-                    ${percent}%
-                </td>
-
-            `;
+        const tr =
+            document.createElement(
+                "tr"
+            );
 
 
-            tbody.appendChild(tr);
+        tr.innerHTML = `
 
-        }
-    );
+            <td>
+                ${g.nom}
+            </td>
+
+            <td>
+                ${count}
+            </td>
+
+            <td>
+                ${percent}%
+            </td>
+
+        `;
+
+
+        tbody.appendChild(tr);
+
+    });
 
 }
 
 
 // ============================================================
-// RÉPARTITION PAR ANNÉE UNIVERSITAIRE
+// REPARTITION ANNEES
 // ============================================================
 
 function remplirTableauAnnees() {
@@ -2845,7 +2863,11 @@ function remplirTableauAnnees() {
         );
 
 
-    if (!tbody) return;
+    if (!tbody) {
+
+        return;
+
+    }
 
 
     tbody.innerHTML = "";
@@ -2864,8 +2886,11 @@ function remplirTableauAnnees() {
     const data =
         getAnneesData()
             .filter(
-                item =>
-                    item.actif !== false
+                function (item) {
+
+                    return item.actif !== false;
+
+                }
             );
 
 
@@ -2873,59 +2898,62 @@ function remplirTableauAnnees() {
         enseignantsData.length || 1;
 
 
-    data.forEach(
-        function (item) {
+    data.forEach(function (item) {
 
-            const count =
-                enseignantsData.filter(
-                    e =>
+        const count =
+            enseignantsData.filter(
+                function (e) {
+
+                    return (
                         e.anneeUniversitaire ===
                         item.nom
-                ).length;
+                    );
+
+                }
+            ).length;
 
 
-            const percent =
-                (
-                    (count / total) *
-                    100
-                ).toFixed(1);
+        const percent =
+            (
+                (count / total) *
+                100
+            ).toFixed(1);
 
 
-            const tr =
-                document.createElement(
-                    "tr"
-                );
+        const tr =
+            document.createElement(
+                "tr"
+            );
 
 
-            tr.innerHTML = `
+        tr.innerHTML = `
 
-                <td>
-                    ${echapperHTML(
-                        item.nom
-                    )}
-                </td>
+            <td>
+                ${echapperHTML(
+                    item.nom
+                )}
+            </td>
 
-                <td>
-                    ${count}
-                </td>
+            <td>
+                ${count}
+            </td>
 
-                <td>
-                    ${percent}%
-                </td>
+            <td>
+                ${percent}%
+            </td>
 
-            `;
+        `;
 
 
-            tbody.appendChild(tr);
+        tbody.appendChild(tr);
 
-        }
-    );
+    });
 
 }
 
 
 // ============================================================
-// DEFINIR TEXTE
+// TEXTE
 // ============================================================
 
 function definirTexte(
@@ -2948,12 +2976,10 @@ function definirTexte(
 
 
 // ============================================================
-// PROTECTION HTML
+// SECURITE HTML
 // ============================================================
 
-function echapperHTML(
-    value
-) {
+function echapperHTML(value) {
 
     return String(value)
 
@@ -3014,5 +3040,5 @@ document.addEventListener(
 // ============================================================
 
 console.log(
-    "SIGE - enseignants.js chargé (recherche + pagination + export filtré)"
+    "SIGE - enseignants.js chargé correctement"
 );
