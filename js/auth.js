@@ -144,27 +144,43 @@ document.addEventListener("DOMContentLoaded", function () {
 // ============================================================
 // PERMISSIONS SELON LE RÔLE
 // ============================================================
+```javascript
 function appliquerPermissions() {
     const role = window.currentUserRole || "saisie";
 
     console.log("Application des permissions pour le rôle :", role);
 
-    // Menus
+    // ========================================================
+    // MENUS
+    // ========================================================
+
     const menuCategories = document.querySelector('.menu-item[data-page="categories"]');
+    const menuSIAD = document.querySelector('.menu-item[data-page="siad"]');
     const menuParametres = document.querySelector('.menu-item[data-page="parametres"]');
     const menuUsers = document.getElementById("menu-users");
 
     if (menuCategories) {
         menuCategories.style.display = (role === "admin") ? "block" : "none";
     }
+
+    // SIAD → ADMIN SEULEMENT
+    if (menuSIAD) {
+        menuSIAD.style.display = (role === "admin") ? "block" : "none";
+    }
+
     if (menuParametres) {
         menuParametres.style.display = (role === "admin") ? "block" : "none";
     }
+
     if (menuUsers) {
         menuUsers.style.display = "none";
     }
 
-    // Boutons d'ajout (classifications & paramètres) → admin seulement
+
+    // ========================================================
+    // BOUTONS D'AJOUT → ADMIN SEULEMENT
+    // ========================================================
+
     const boutonsAdmin = [
         "btn-add-grade",
         "btn-add-specialite",
@@ -176,14 +192,22 @@ function appliquerPermissions() {
 
     boutonsAdmin.forEach(function (id) {
         const el = document.getElementById(id);
+
         if (el) {
             el.style.display = (role === "admin") ? "" : "none";
         }
     });
 
-    // Bouton Ajouter Professeur → les deux rôles peuvent
+
+    // ========================================================
+    // BOUTON AJOUTER PROFESSEUR → ADMIN + SAISIE
+    // ========================================================
+
     const btnAddEnseignant = document.getElementById("btn-add-enseignant");
+
     if (btnAddEnseignant) {
         btnAddEnseignant.style.display = "";
     }
 }
+
+
