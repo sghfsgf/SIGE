@@ -1,127 +1,348 @@
-```javascript
-// ====================== SIAD ======================
+// ============================================================
+// SIGE - SIAD
+// ============================================================
+// Statistiques des enseignants
+// Compatible avec enseignants.js actuel
+// ============================================================
 
 async function loadSIAD() {
 
-  // Charger les enseignants si nécessaire
-  if (enseignants.length === 0) {
-    await loadEnseignants();
-  }
+    console.log("SIGE - Chargement SIAD...");
+
+    // ========================================================
+    // Vérification des données enseignants
+    // ========================================================
+
+    if (typeof enseignantsData === "undefined") {
+        console.error("Erreur SIAD : enseignantsData est introuvable.");
+        return;
+    }
+
+    const enseignants = enseignantsData;
 
 
-  // Charger les catégories si nécessaire
-  if (gradesList.length === 0) {
-    await loadCategories();
-  }
+    // ========================================================
+    // TOTAL
+    // ========================================================
+
+    definirKPI("kpi-total", enseignants.length);
 
 
-  const total = enseignants.length || 1;
+    // ========================================================
+    // الصفة
+    // ========================================================
+
+    definirKPI(
+        "kpi-titulaire",
+        enseignants.filter(e => e.sifah === "titulaire").length
+    );
+
+    definirKPI(
+        "kpi-contractuel",
+        enseignants.filter(e => e.sifah === "contractuel").length
+    );
+
+    definirKPI(
+        "kpi-vacataire",
+        enseignants.filter(e => e.sifah === "vacataire").length
+    );
 
 
-  // ====================== KPI ======================
+    // ========================================================
+    // الجنس
+    // ========================================================
 
-  document.getElementById('kpi-total').textContent =
-    enseignants.length;
+    definirKPI(
+        "kpi-homme",
+        enseignants.filter(e => e.genre === "homme").length
+    );
 
-
-  // ====================== الصفة ======================
-
-  document.getElementById('kpi-titulaire').textContent =
-    enseignants.filter(e =>
-      e.sifah === 'titulaire'
-    ).length;
-
-
-  document.getElementById('kpi-contractuel').textContent =
-    enseignants.filter(e =>
-      e.sifah === 'contractuel'
-    ).length;
+    definirKPI(
+        "kpi-femme",
+        enseignants.filter(e => e.genre === "femme").length
+    );
 
 
-  document.getElementById('kpi-vacataire').textContent =
-    enseignants.filter(e =>
-      e.sifah === 'vacataire'
-    ).length;
+    // ========================================================
+    // GRADES
+    // ========================================================
+
+    const grades =
+        typeof getGradesData === "function"
+            ? getGradesData().filter(item => item.actif !== false)
+            : [];
+
+    remplirTableauSIAD(
+        grades,
+        "gradeId",
+        "id",
+        "stats-grade-body",
+        enseignants
+    );
 
 
-  // ====================== الجنس ======================
+    // ========================================================
+    // DEPARTEMENTS
+    // ========================================================
 
-  document.getElementById('kpi-homme').textContent =
-    enseignants.filter(e =>
-      e.genre === 'homme'
-    ).length;
+    const departements =
+        typeof getDepartementsData === "function"
+            ? getDepartementsData().filter(item => item.actif !== false)
+            : [];
 
-
-  document.getElementById('kpi-femme').textContent =
-    enseignants.filter(e =>
-      e.genre === 'femme'
-    ).length;
-
-
-  // ====================== STATISTIQUES ======================
-
-  renderStatsTable(
-    gradesList,
-    'gradeId',
-    'stats-grade-body',
-    total
-  );
+    remplirTableauSIAD(
+        departements,
+        "departementId",
+        "id",
+        "stats-departement-body",
+        enseignants
+    );
 
 
-  renderStatsTable(
-    departementsList,
-    'departementId',
-    'stats-departement-body',
-    total
-  );
+    // ========================================================
+    // SPECIALITES
+    // ========================================================
+
+    const specialites =
+        typeof getSpecialitesData === "function"
+            ? getSpecialitesData().filter(item => item.actif !== false)
+            : [];
+
+    remplirTableauSIAD(
+        specialites,
+        "specialiteId",
+        "id",
+        "stats-specialite-body",
+        enseignants
+    );
 
 
-  renderStatsTable(
-    specialitesList,
-    'specialiteId',
-    'stats-specialite-body',
-    total
-  );
+    // ========================================================
+    // الصفة
+    // ========================================================
+
+    const sifah =
+        typeof getSifahData === "function"
+            ? getSifahData().filter(item => item.actif !== false)
+            : [];
+
+    remplirTableauSIAD(
+        sifah,
+        "sifah",
+        "code",
+        "stats-sifah-body",
+        enseignants
+    );
+
+
+    // ========================================================
+    // الوضعية
+    // ========================================================
+
+    const wadhia =
+        typeof getWadhiaData === "function"
+            ? getWadhiaData().filter(item => item.actif !== false)
+            : [];
+
+    remplirTableauSIAD(
+        wadhia,
+        "wadhia",
+        "code",
+        "stats-wadhia-body",
+        enseignants
+    );
+
+
+    // ========================================================
+    // ANNEE UNIVERSITAIRE
+    // ========================================================
+
+    const annees =
+        typeof getAnneesData === "function"
+            ? getAnneesData().filter(item => item.actif !== false)
+            : [];
+
+    remplirTableauSIAD(
+        annees,
+        "anneeUniversitaire",
+        "nom",
+        "stats-annee-body",
+        enseignants
+    );
+
+
+    // ========================================================
+    // GENRE
+    // ========================================================
+
+    remplirTableauGenreSIAD(enseignants);
+
+
+    console.log("SIGE - SIAD chargé avec succès.");
 }
 
 
-// ====================== TABLEAU STATISTIQUE ======================
+// ============================================================
+// KPI
+// ============================================================
 
-function renderStatsTable(
-  list,
-  field,
-  tbodyId,
-  total
+function definirKPI(id, valeur) {
+
+    const element = document.getElementById(id);
+
+    if (element) {
+        element.textContent = valeur;
+    }
+}
+
+
+// ============================================================
+// TABLEAUX SIAD
+// ============================================================
+
+function remplirTableauSIAD(
+    liste,
+    champ,
+    keyField,
+    tbodyId,
+    enseignants
 ) {
 
-  const tbody =
-    document.getElementById(tbodyId);
+    const tbody = document.getElementById(tbodyId);
 
-  if (!tbody) return;
+    if (!tbody) {
+        console.warn(
+            "Tableau SIAD introuvable : " + tbodyId
+        );
+        return;
+    }
 
-
-  tbody.innerHTML = '';
-
-
-  list.forEach(item => {
-
-    const count =
-      enseignants.filter(e =>
-        e[field] === item.id
-      ).length;
+    tbody.innerHTML = "";
 
 
-    const percent =
-      ((count / total) * 100).toFixed(1);
+    if (!Array.isArray(liste) || liste.length === 0) {
+
+        tbody.innerHTML = `
+            <tr>
+                <td colspan="3" style="text-align:center;">
+                    لا توجد بيانات
+                </td>
+            </tr>
+        `;
+
+        return;
+    }
 
 
-    tbody.innerHTML += `
-      <tr>
-        <td>${item.nom}</td>
-        <td>${count}</td>
-        <td>${percent}%</td>
-      </tr>
-    `;
-  });
+    const total = enseignants.length;
+
+
+    liste.forEach(function (item) {
+
+        const key = item[keyField];
+
+        const count =
+            enseignants.filter(function (enseignant) {
+
+                return enseignant[champ] === key;
+
+            }).length;
+
+
+        const percent =
+            total > 0
+                ? ((count / total) * 100).toFixed(1)
+                : "0.0";
+
+
+        const tr = document.createElement("tr");
+
+
+        tr.innerHTML = `
+            <td>${echapperHTML(item.nom || key || "")}</td>
+            <td>${count}</td>
+            <td>${percent}%</td>
+        `;
+
+
+        tbody.appendChild(tr);
+    });
 }
-```
+
+
+// ============================================================
+// GENRE
+// ============================================================
+
+function remplirTableauGenreSIAD(enseignants) {
+
+    const tbody =
+        document.getElementById("stats-genre-body");
+
+    if (!tbody) {
+        return;
+    }
+
+
+    tbody.innerHTML = "";
+
+
+    const total = enseignants.length;
+
+
+    const genres = [
+        {
+            key: "homme",
+            nom: "ذكر"
+        },
+        {
+            key: "femme",
+            nom: "أنثى"
+        }
+    ];
+
+
+    genres.forEach(function (genre) {
+
+        const count =
+            enseignants.filter(function (enseignant) {
+
+                return enseignant.genre === genre.key;
+
+            }).length;
+
+
+        const percent =
+            total > 0
+                ? ((count / total) * 100).toFixed(1)
+                : "0.0";
+
+
+        const tr = document.createElement("tr");
+
+
+        tr.innerHTML = `
+            <td>${genre.nom}</td>
+            <td>${count}</td>
+            <td>${percent}%</td>
+        `;
+
+
+        tbody.appendChild(tr);
+    });
+}
+
+
+// ============================================================
+// PROTECTION HTML
+// ============================================================
+
+function echapperHTMLSIAD(value) {
+
+    return String(value ?? "")
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "&lt;")
+        .replace(/>/g, "&gt;")
+        .replace(/"/g, "&quot;")
+        .replace(/'/g, "&#039;");
+}
