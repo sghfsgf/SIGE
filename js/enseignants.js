@@ -236,7 +236,8 @@ function appliquerFiltres() {
 
     window.enseignantsFiltresActuels = [...resultat];
 
-    afficherAvecPagination(resultat);
+  enseignantsFiltres = resultat;
+afficherAvecPagination(enseignantsFiltres);
 }
 
 // ============================================================
