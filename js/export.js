@@ -10,9 +10,16 @@ document.getElementById("btn-export")?.addEventListener("click", function () {
 
     let dataToExport = [];
 
-    if (typeof enseignantsFiltresActuels !== "undefined" && enseignantsFiltresActuels.length > 0) {
-        dataToExport = enseignantsFiltresActuels;
-    } else if (typeof enseignantsData !== "undefined" && Array.isArray(enseignantsData)) {
+    // Priorité aux données actuellement filtrées et affichées
+    if (typeof window.enseignantsFiltresActuels !== "undefined" && 
+        Array.isArray(window.enseignantsFiltresActuels) && 
+        window.enseignantsFiltresActuels.length > 0) {
+        
+        dataToExport = window.enseignantsFiltresActuels;
+        
+    } 
+    // Sinon on prend toutes les données (comportement d'origine)
+    else if (typeof enseignantsData !== "undefined" && Array.isArray(enseignantsData)) {
         dataToExport = enseignantsData;
     }
 
@@ -60,11 +67,13 @@ function exportEnseignants(list) {
 
     const rows = list.map(function (e) {
 
-        let gradeNom = trouverNomGrade ? trouverNomGrade(e.gradeId) : "";
-        let specialiteNom = trouverNomSpecialite ? trouverNomSpecialite(e.specialiteId) : "";
-        let departementNom = trouverNomDepartement ? trouverNomDepartement(e.departementId) : "";
-        let sifahNom = trouverNomSifah ? trouverNomSifah(e.sifah) : (e.sifah || "");
-        let wadhiaNom = trouverNomWadhia ? trouverNomWadhia(e.wadhia) : (e.wadhia || "");
+        // Utilisation sécurisée des fonctions de enseignants.js
+        let gradeNom      = (typeof trouverNomGrade === "function")      ? trouverNomGrade(e.gradeId) : "";
+        let specialiteNom = (typeof trouverNomSpecialite === "function") ? trouverNomSpecialite(e.specialiteId) : "";
+        let departementNom= (typeof trouverNomDepartement === "function")? trouverNomDepartement(e.departementId) : "";
+        let sifahNom      = (typeof trouverNomSifah === "function")      ? trouverNomSifah(e.sifah) : (e.sifah || "");
+        let wadhiaNom     = (typeof trouverNomWadhia === "function")     ? trouverNomWadhia(e.wadhia) : (e.wadhia || "");
+        
         let genreNom = (e.genre === "femme") ? "أنثى" : "ذكر";
 
         return [
@@ -109,7 +118,7 @@ function exportEnseignants(list) {
 
 
 // ============================================================
-// EXPORT SIAD (gardé tel quel pour ne rien casser)
+// EXPORT SIAD (conservé presque tel quel)
 // ============================================================
 
 function exportSIAD() {
@@ -136,21 +145,3 @@ function exportSIAD() {
         ["عرضي", enseignantsData.filter(e => e.sifah === "vacataire").length],
         ["ذكور", enseignantsData.filter(e => e.genre === "homme").length],
         ["إناث", enseignantsData.filter(e => e.genre === "femme").length]
-    ];
-
-    const wb = XLSX.utils.book_new();
-    const ws = XLSX.utils.aoa_to_sheet(kpis);
-    ws["!cols"] = [{ wch: 30 }, { wch: 15 }];
-    XLSX.utils.book_append_sheet(wb, ws, "المؤشرات");
-
-    const date = new Date().toISOString().slice(0, 10);
-    const filename = "SIGE_SIAD_" + date + ".xlsx";
-
-    XLSX.writeFile(wb, filename);
-    console.log("Export SIAD effectué :", filename);
-}
-
-// ============================================================
-// FIN
-// ============================================================
-console.log("SIGE - export.js chargé correctement (export des enseignants affichés)");
