@@ -1,8 +1,3 @@
-
-Voici votre `auth.js` corrigé et prêt à remplacer entièrement l'ancien :
-
-:::writing{variant="standard" id="58321"}
-```javascript
 // ============================================================
 // SIGE - AUTHENTIFICATION FIREBASE + RÔLES
 // ============================================================
