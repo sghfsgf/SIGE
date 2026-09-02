@@ -233,7 +233,7 @@ function appliquerFiltres() {
                matchDepartement && matchSifah && matchWadhia && matchAnnee && matchGenre;
     });
 
-    enseignantsFiltresActuels = [...resultat];     // ← LIGNE AJOUTÉE (très important)
+  window.enseignantsFiltresActuels = [...resultat];   // ← Version globale
 
     afficherAvecPagination(resultat);
 }
