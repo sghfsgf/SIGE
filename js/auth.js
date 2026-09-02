@@ -19,8 +19,13 @@ document.addEventListener("DOMContentLoaded", function () {
     // ÉTAT INITIAL
     // ========================================================
 
-    loginPage.classList.remove("hidden");
-    appPage.classList.add("hidden");
+    if (loginPage) {
+        loginPage.classList.remove("hidden");
+    }
+
+    if (appPage) {
+        appPage.classList.add("hidden");
+    }
 
     // ========================================================
     // SURVEILLER L'ÉTAT DE CONNEXION FIREBASE
@@ -30,41 +35,40 @@ document.addEventListener("DOMContentLoaded", function () {
 
         if (user) {
 
-            console.log(
-                "Utilisateur connecté :",
-                user.email
-            );
+            console.log("Utilisateur connecté :", user.email);
 
-            loginPage.classList.add("hidden");
-            appPage.classList.remove("hidden");
+            if (loginPage) {
+                loginPage.classList.add("hidden");
+            }
+
+            if (appPage) {
+                appPage.classList.remove("hidden");
+            }
 
             // ==================================================
             // DÉTERMINER LE RÔLE SELON L'EMAIL
             // ==================================================
 
-            const email =
-                (user.email || "")
-                    .toLowerCase()
-                    .trim();
+            const email = (user.email || "").toLowerCase().trim();
 
             if (email === "fsgf@fsgf.tn") {
 
                 window.currentUserRole = "admin";
 
-            }
-            else if (email === "dep@dep.tn") {
+            } else if (email === "dep@dep.tn") {
 
                 window.currentUserRole = "saisie";
 
-            }
-            else {
+            } else {
 
+                // Tous les autres utilisateurs = saisie
                 window.currentUserRole = "saisie";
-
             }
 
             console.log(
-                "Rôle détecté :",
+                "Utilisateur :",
+                email,
+                "| Rôle :",
                 window.currentUserRole
             );
 
@@ -74,44 +78,36 @@ document.addEventListener("DOMContentLoaded", function () {
 
             appliquerPermissions();
 
-        }
-        else {
+        } else {
 
-            console.log(
-                "Aucun utilisateur connecté"
-            );
+            console.log("Aucun utilisateur connecté");
 
-            loginPage.classList.remove("hidden");
-            appPage.classList.add("hidden");
+            if (loginPage) {
+                loginPage.classList.remove("hidden");
+            }
+
+            if (appPage) {
+                appPage.classList.add("hidden");
+            }
 
             window.currentUserRole = null;
-
-            // Cacher SIAD lorsque personne n'est connecté
-            appliquerPermissions();
-
         }
-
     });
 
     // ========================================================
     // CONNEXION
     // ========================================================
 
-    loginForm.addEventListener(
-        "submit",
-        function (e) {
+    if (loginForm) {
+
+        loginForm.addEventListener("submit", function (e) {
 
             e.preventDefault();
 
-            console.log(
-                "Tentative de connexion..."
-            );
+            console.log("Tentative de connexion...");
 
-            const email =
-                loginEmail.value.trim();
-
-            const password =
-                loginPassword.value;
+            const email = loginEmail.value.trim();
+            const password = loginPassword.value;
 
             loginError.textContent = "";
 
@@ -121,125 +117,92 @@ document.addEventListener("DOMContentLoaded", function () {
                     "يرجى إدخال البريد الإلكتروني وكلمة المرور";
 
                 return;
-
             }
 
             const submitBtn =
-                loginForm.querySelector(
-                    "button[type='submit']"
-                );
+                loginForm.querySelector("button[type='submit']");
 
             if (submitBtn) {
 
                 submitBtn.disabled = true;
-
-                submitBtn.textContent =
-                    "جاري تسجيل الدخول...";
-
+                submitBtn.textContent = "جاري تسجيل الدخول...";
             }
 
-            auth.signInWithEmailAndPassword(
-                email,
-                password
-            )
-            .then(function (userCredential) {
+            auth.signInWithEmailAndPassword(email, password)
 
-                console.log(
-                    "Connexion réussie :",
-                    userCredential.user.email
-                );
+                .then(function (userCredential) {
 
-                loginError.textContent = "";
+                    console.log(
+                        "Connexion réussie :",
+                        userCredential.user.email
+                    );
 
-            })
-            .catch(function (error) {
+                    loginError.textContent = "";
+                })
 
-                console.error(
-                    "Erreur Firebase :",
-                    error
-                );
+                .catch(function (error) {
 
-                let message =
-                    "حدث خطأ أثناء تسجيل الدخول";
+                    console.error("Erreur Firebase :", error);
 
-                switch (error.code) {
+                    let message =
+                        "حدث خطأ أثناء تسجيل الدخول";
 
-                    case "auth/invalid-email":
+                    switch (error.code) {
 
-                        message =
-                            "البريد الإلكتروني غير صالح";
+                        case "auth/invalid-email":
+                            message =
+                                "البريد الإلكتروني غير صالح";
+                            break;
 
-                        break;
+                        case "auth/user-not-found":
+                            message =
+                                "المستخدم غير موجود";
+                            break;
 
-                    case "auth/user-not-found":
+                        case "auth/wrong-password":
+                            message =
+                                "كلمة المرور غير صحيحة";
+                            break;
 
-                        message =
-                            "المستخدم غير موجود";
+                        case "auth/invalid-credential":
+                            message =
+                                "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+                            break;
 
-                        break;
+                        case "auth/user-disabled":
+                            message =
+                                "تم تعطيل هذا المستخدم";
+                            break;
 
-                    case "auth/wrong-password":
+                        case "auth/api-key-not-valid":
+                            message =
+                                "مفتاح Firebase API غير صالح";
+                            break;
 
-                        message =
-                            "كلمة المرور غير صحيحة";
+                        case "auth/network-request-failed":
+                            message =
+                                "فشل الاتصال بالإنترنت";
+                            break;
 
-                        break;
+                        default:
+                            message =
+                                "حدث خطأ أثناء تسجيل الدخول: " +
+                                error.message;
+                    }
 
-                    case "auth/invalid-credential":
+                    loginError.textContent = message;
+                })
 
-                        message =
-                            "البريد الإلكتروني أو كلمة المرور غير صحيحة";
+                .finally(function () {
 
-                        break;
+                    if (submitBtn) {
 
-                    case "auth/user-disabled":
-
-                        message =
-                            "تم تعطيل هذا المستخدم";
-
-                        break;
-
-                    case "auth/api-key-not-valid":
-
-                        message =
-                            "مفتاح Firebase API غير صالح";
-
-                        break;
-
-                    case "auth/network-request-failed":
-
-                        message =
-                            "فشل الاتصال بالإنترنت";
-
-                        break;
-
-                    default:
-
-                        message =
-                            "حدث خطأ أثناء تسجيل الدخول: " +
-                            error.message;
-
-                }
-
-                loginError.textContent =
-                    message;
-
-            })
-            .finally(function () {
-
-                if (submitBtn) {
-
-                    submitBtn.disabled = false;
-
-                    submitBtn.textContent =
-                        "تسجيل الدخول";
-
-                }
-
-            });
-
-        }
-    );
+                        submitBtn.disabled = false;
+                        submitBtn.textContent = "تسجيل الدخول";
+                    }
+                });
+        });
+    }
 
     // ========================================================
     // DÉCONNEXION
@@ -247,35 +210,29 @@ document.addEventListener("DOMContentLoaded", function () {
 
     if (logoutBtn) {
 
-        logoutBtn.addEventListener(
-            "click",
-            function (e) {
+        logoutBtn.addEventListener("click", function (e) {
 
-                e.preventDefault();
+            e.preventDefault();
 
-                auth.signOut()
-                    .then(function () {
+            auth.signOut()
 
-                        console.log(
-                            "Utilisateur déconnecté"
-                        );
+                .then(function () {
 
-                    })
-                    .catch(function (error) {
+                    console.log("Utilisateur déconnecté");
 
-                        console.error(
-                            "Erreur de déconnexion :",
-                            error
-                        );
+                })
 
-                    });
+                .catch(function (error) {
 
-            }
-        );
-
+                    console.error(
+                        "Erreur de déconnexion :",
+                        error
+                    );
+                });
+        });
     }
-
 });
+
 
 // ============================================================
 // PERMISSIONS SELON LE RÔLE
@@ -283,8 +240,7 @@ document.addEventListener("DOMContentLoaded", function () {
 
 function appliquerPermissions() {
 
-    const role =
-        window.currentUserRole || "saisie";
+    const role = window.currentUserRole || "saisie";
 
     console.log(
         "Application des permissions pour le rôle :",
@@ -301,8 +257,8 @@ function appliquerPermissions() {
         );
 
     const menuSIAD =
-        document.getElementById(
-            "menu-siad"
+        document.querySelector(
+            '.menu-item[data-page="siad"]'
         );
 
     const menuParametres =
@@ -311,114 +267,76 @@ function appliquerPermissions() {
         );
 
     const menuUsers =
-        document.getElementById(
-            "menu-users"
-        );
+        document.getElementById("menu-users");
+
 
     // ========================================================
-    // CATÉGORIES
+    // CATÉGORIES → ADMIN SEULEMENT
     // ========================================================
 
     if (menuCategories) {
 
         menuCategories.style.display =
-            (role === "admin")
-                ? "block"
-                : "none";
-
+            (role === "admin") ? "block" : "none";
     }
 
+
     // ========================================================
-    // SIAD
-    // ADMIN SEULEMENT
+    // SIAD → ADMIN SEULEMENT
     // ========================================================
 
     if (menuSIAD) {
 
         menuSIAD.style.display =
-            (role === "admin")
-                ? "block"
-                : "none";
-
+            (role === "admin") ? "block" : "none";
     }
 
+    // La page SIAD reste inaccessible aux utilisateurs
+    // non administrateurs.
+
+    const pageSIAD =
+        document.getElementById("siad-page");
+
+    if (pageSIAD && role !== "admin") {
+
+        pageSIAD.classList.add("hidden");
+    }
+
+
     // ========================================================
-    // PARAMÈTRES
+    // BOUTON EXPORT SIAD → ADMIN SEULEMENT
+    // ========================================================
+
+    const btnExportSIAD =
+        document.getElementById("btn-export-siad");
+
+    if (btnExportSIAD) {
+
+        btnExportSIAD.style.display =
+            (role === "admin") ? "" : "none";
+    }
+
+
+    // ========================================================
+    // PARAMÈTRES → ADMIN SEULEMENT
     // ========================================================
 
     if (menuParametres) {
 
         menuParametres.style.display =
-            (role === "admin")
-                ? "block"
-                : "none";
-
+            (role === "admin") ? "block" : "none";
     }
 
+
     // ========================================================
-    // UTILISATEURS
+    // UTILISATEURS → POUR LE MOMENT CACHÉ
     // ========================================================
 
     if (menuUsers) {
 
-        menuUsers.style.display =
-            "none";
-
+        menuUsers.style.display = "none";
     }
 
-    // ========================================================
-    // PAGE SIAD
-    // ADMIN SEULEMENT
-    // ========================================================
-
-    const pageSIAD =
-        document.getElementById(
-            "siad-page"
-        );
-
-    if (pageSIAD) {
-
-        if (role === "admin") {
-
-            // La page peut être affichée
-            // lorsque app.js la sélectionne
-
-            pageSIAD.dataset.access =
-                "allowed";
-
-        }
-        else {
-
-            // Empêcher l'affichage
-            pageSIAD.dataset.access =
-                "denied";
-
-            pageSIAD.classList.add(
-                "hidden"
-            );
-
-        }
-
-    }
-
-    // ========================================================
-    // BOUTON EXPORT SIAD
-    // ADMIN SEULEMENT
-    // ========================================================
-
-    const btnExportSIAD =
-        document.getElementById(
-            "btn-export-siad"
-        );
-
-    if (btnExportSIAD) {
-
-        btnExportSIAD.style.display =
-            (role === "admin")
-                ? ""
-                : "none";
-
-    }
 
     // ========================================================
     // BOUTONS ADMIN
@@ -432,56 +350,42 @@ function appliquerPermissions() {
         "btn-add-sifah",
         "btn-add-wadhia",
         "btn-add-annee"
-
     ];
 
-    boutonsAdmin.forEach(
-        function (id) {
 
-            const el =
-                document.getElementById(id);
+    boutonsAdmin.forEach(function (id) {
 
-            if (el) {
+        const el = document.getElementById(id);
 
-                el.style.display =
-                    (role === "admin")
-                        ? ""
-                        : "none";
+        if (el) {
 
-            }
-
+            el.style.display =
+                (role === "admin") ? "" : "none";
         }
-    );
+    });
+
 
     // ========================================================
-    // AJOUTER ENSEIGNANT
-    // LES DEUX RÔLES PEUVENT
+    // AJOUTER PROFESSEUR
+    // ADMIN + SAISIE
     // ========================================================
 
     const btnAddEnseignant =
-        document.getElementById(
-            "btn-add-enseignant"
-        );
+        document.getElementById("btn-add-enseignant");
 
     if (btnAddEnseignant) {
 
-        btnAddEnseignant.style.display =
-            "";
-
+        btnAddEnseignant.style.display = "";
     }
 
-}
 
-// ============================================================
-// VÉRIFICATION D'ACCÈS SIAD
-// ============================================================
+    // ========================================================
+    // FIN
+    // ========================================================
 
-function verifierAccesSIAD() {
-
-    return (
-        window.currentUserRole ===
-        "admin"
+    console.log(
+        "Permissions appliquées. Rôle :",
+        role
     );
-
 }
 ```
