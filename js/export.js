@@ -1,7 +1,6 @@
 // ============================================================
-// SIGE - EXPORT EXCEL
+// SIGE - EXPORT EXCEL (Export des enseignants affichés)
 // ============================================================
-
 
 // ============================================================
 // BOUTON EXPORT ENSEIGNANTS
@@ -13,18 +12,19 @@ document
 
         let dataToExport = [];
 
+        // Priorité aux données filtrées et affichées actuellement
         if (typeof window.enseignantsFiltresActuels !== "undefined" && 
             Array.isArray(window.enseignantsFiltresActuels) && 
             window.enseignantsFiltresActuels.length > 0) {
             
             dataToExport = window.enseignantsFiltresActuels;
-        }
-        else if (typeof enseignantsData !== "undefined" && 
-                 Array.isArray(enseignantsData)) {
+        } 
+        // Sinon on prend toutes les données (comportement d'origine)
+        else if (typeof enseignantsData !== "undefined" && Array.isArray(enseignantsData)) {
             dataToExport = enseignantsData;
         }
 
-        if (dataToExport.length === 0) {
+        if (!Array.isArray(dataToExport) || dataToExport.length === 0) {
             alert("لا توجد بيانات الأساتذة");
             return;
         }
@@ -64,23 +64,10 @@ function exportEnseignants(list) {
     }
 
     const headers = [
-        "الرقم",
-        "رقم التسجيل CNRPS",
-        "اللقب",
-        "الاسم",
-        "الرتبة",
-        "التخصص",
-        "القسم",
-        "الهاتف 1",
-        "الهاتف 2",
-        "البريد الإلكتروني",
-        "الصفة",
-        "الوضعية",
-        "السنة الجامعية",
-        "الجنس",
-        "تاريخ التوظيف",
-        "تاريخ الميلاد",
-        "تاريخ آخر رتبة"
+        "الرقم", "رقم التسجيل CNRPS", "اللقب", "الاسم", "الرتبة", "التخصص",
+        "القسم", "الهاتف 1", "الهاتف 2", "البريد الإلكتروني", "الصفة",
+        "الوضعية", "السنة الجامعية", "الجنس", "تاريخ التوظيف", 
+        "تاريخ الميلاد", "تاريخ آخر رتبة"
     ];
 
     const rows = list.map(function (e) {
@@ -90,24 +77,40 @@ function exportEnseignants(list) {
         let departementNom = "";
         let sifahNom = "";
         let wadhiaNom = "";
+        let genreNom = "";
 
-        if (typeof trouverNomGrade === "function") {
-            gradeNom = trouverNomGrade(e.gradeId);
-        }
-        if (typeof trouverNomSpecialite === "function") {
-            specialiteNom = trouverNomSpecialite(e.specialiteId);
-        }
-        if (typeof trouverNomDepartement === "function") {
-            departementNom = trouverNomDepartement(e.departementId);
-        }
-        if (typeof trouverNomSifah === "function") {
-            sifahNom = trouverNomSifah(e.sifah);
-        }
-        if (typeof trouverNomWadhia === "function") {
-            wadhiaNom = trouverNomWadhia(e.wadhia);
+        if (typeof getGradesData === "function") {
+            const grades = getGradesData();
+            const grade = grades.find(g => g.id === e.gradeId);
+            if (grade) gradeNom = grade.nom || "";
         }
 
-        let genreNom = (e.genre === "femme") ? "أنثى" : "ذكر";
+        if (typeof getSpecialitesData === "function") {
+            const specialites = getSpecialitesData();
+            const specialite = specialites.find(s => s.id === e.specialiteId);
+            if (specialite) specialiteNom = specialite.nom || "";
+        }
+
+        if (typeof getDepartementsData === "function") {
+            const departements = getDepartementsData();
+            const departement = departements.find(d => d.id === e.departementId);
+            if (departement) departementNom = departement.nom || "";
+        }
+
+        if (typeof getSifahData === "function") {
+            const sifahData = getSifahData();
+            const sifah = sifahData.find(s => s.code === e.sifah);
+            sifahNom = sifah ? (sifah.nom || "") : (e.sifah || "");
+        }
+
+        if (typeof getWadhiaData === "function") {
+            const wadhiaData = getWadhiaData();
+            const wadhia = wadhiaData.find(w => w.code === e.wadhia);
+            wadhiaNom = wadhia ? (wadhia.nom || "") : (e.wadhia || "");
+        }
+
+        if (e.genre === "homme") genreNom = "ذكر";
+        else if (e.genre === "femme") genreNom = "أنثى";
 
         return [
             e.numero ?? "",
@@ -133,7 +136,7 @@ function exportEnseignants(list) {
     const ws = XLSX.utils.aoa_to_sheet([headers, ...rows]);
 
     ws["!cols"] = [
-        { wch: 8 }, { wch: 18 }, { wch: 22 }, { wch: 22 }, { wch: 25 },
+        { wch: 8 }, { wch: 18 }, { wch: 20 }, { wch: 20 }, { wch: 25 },
         { wch: 25 }, { wch: 25 }, { wch: 15 }, { wch: 15 }, { wch: 30 },
         { wch: 20 }, { wch: 20 }, { wch: 18 }, { wch: 12 }, { wch: 18 },
         { wch: 18 }, { wch: 18 }
@@ -145,13 +148,18 @@ function exportEnseignants(list) {
     const date = new Date().toISOString().slice(0, 10);
     const filename = "SIGE_Enseignants_" + date + ".xlsx";
 
-    XLSX.writeFile(wb, filename);
-    console.log("Export Enseignants terminé :", filename);
+    try {
+        XLSX.writeFile(wb, filename);
+        console.log("Export Excel effectué :", filename);
+    } catch (error) {
+        console.error("Erreur export Excel :", error);
+        alert("حدث خطأ أثناء تصدير ملف Excel : " + error.message);
+    }
 }
 
 
 // ============================================================
-// EXPORT SIAD
+// EXPORT SIAD (identique à ton code original)
 // ============================================================
 
 function exportSIAD() {
@@ -174,11 +182,11 @@ function exportSIAD() {
     const kpis = [
         ["المؤشر", "القيمة"],
         ["إجمالي الأساتذة", enseignantsData.length],
-        ["مرسم", enseignantsData.filter(function (e) { return e.sifah === "titulaire"; }).length],
-        ["متعاقد", enseignantsData.filter(function (e) { return e.sifah === "contractuel"; }).length],
-        ["عرضي", enseignantsData.filter(function (e) { return e.sifah === "vacataire"; }).length],
-        ["ذكور", enseignantsData.filter(function (e) { return e.genre === "homme"; }).length],
-        ["إناث", enseignantsData.filter(function (e) { return e.genre === "femme"; }).length]
+        ["مرسم", enseignantsData.filter(e => e.sifah === "titulaire").length],
+        ["متعاقد", enseignantsData.filter(e => e.sifah === "contractuel").length],
+        ["عرضي", enseignantsData.filter(e => e.sifah === "vacataire").length],
+        ["ذكور", enseignantsData.filter(e => e.genre === "homme").length],
+        ["إناث", enseignantsData.filter(e => e.genre === "femme").length]
     ];
 
     const wb = XLSX.utils.book_new();
@@ -189,8 +197,13 @@ function exportSIAD() {
     const date = new Date().toISOString().slice(0, 10);
     const filename = "SIGE_SIAD_" + date + ".xlsx";
 
-    XLSX.writeFile(wb, filename);
-    console.log("Export SIAD effectué :", filename);
+    try {
+        XLSX.writeFile(wb, filename);
+        console.log("Export SIAD effectué :", filename);
+    } catch (error) {
+        console.error("Erreur export SIAD :", error);
+        alert("حدث خطأ أثناء تصدير إحصائيات SIAD : " + error.message);
+    }
 }
 
 
@@ -198,4 +211,4 @@ function exportSIAD() {
 // FIN
 // ============================================================
 
-console.log("SIGE - export.js chargé correctement (export des enseignants affichés)");
+console.log("SIGE - export.js chargé correctement (export des données affichées)");
