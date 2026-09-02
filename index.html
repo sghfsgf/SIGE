@@ -1,1865 +1,674 @@
 <!DOCTYPE html>
-
 <html lang="ar" dir="rtl">
-
 <head>
-
   <meta charset="UTF-8">
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-
   <title>SIGE - نظام تسيير الأساتذة</title>
-
   <link rel="stylesheet" href="css/style.css">
-
-  <link
-    href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap"
-    rel="stylesheet"
-  >
-
+  <link href="https://fonts.googleapis.com/css2?family=Cairo:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
-
 <body>
 
-<!-- ========================================================= -->
-
-<!-- LOGIN -->
-
-<!-- ========================================================= -->
-
-<div id="login-page" class="page">
-
-  <div class="login-box">
-
-```
-<h1>SIGE</h1>
-
-<p class="subtitle">
-  نظام تسيير الأساتذة
-</p>
-
-<form id="login-form">
-
-  <div class="form-group">
-
-    <label>
-      البريد الإلكتروني
-    </label>
-
-    <input
-      type="email"
-      id="login-email"
-      required
-      autocomplete="username"
-      placeholder="example@email.com"
-    >
-
-  </div>
-
-  <div class="form-group">
-
-    <label>
-      كلمة المرور
-    </label>
-
-    <input
-      type="password"
-      id="login-password"
-      required
-      autocomplete="current-password"
-      placeholder="••••••••"
-    >
-
-  </div>
-
-  <button
-    type="submit"
-    class="btn-primary btn-block"
-  >
-    تسجيل الدخول
-  </button>
-
-  <p
-    id="login-error"
-    class="error"
-  ></p>
-
-</form>
-```
-
-  </div>
-
-</div>
-
-<!-- ========================================================= -->
-
-<!-- APPLICATION -->
-
-<!-- ========================================================= -->
-
-<div id="app" class="page hidden">
-
-  <!-- ======================================================= -->
-
-  <!-- SIDEBAR -->
-
-  <!-- ======================================================= -->
-
-  <aside class="sidebar">
-
-```
-<div class="logo">
-
-  <h2>SIGE</h2>
-
-  <p>
-    نظام تسيير الأساتذة
-  </p>
-
-</div>
-
-
-<nav class="menu">
-
-  <a
-    href="#"
-    class="menu-item active"
-    data-page="dashboard"
-  >
-    لوحة التحكم
-  </a>
-
-  <a
-    href="#"
-    class="menu-item"
-    data-page="enseignants"
-  >
-    الأساتذة
-  </a>
-
-  <a
-    href="#"
-    class="menu-item"
-    data-page="categories"
-  >
-    التصنيفات
-  </a>
-
-  <a
-    href="#"
-    class="menu-item"
-    data-page="siad"
-  >
-    SIAD
-  </a>
-
-  <a
-    href="#"
-    class="menu-item"
-    data-page="parametres"
-  >
-    ⚙️ الإعدادات
-  </a>
-
-  <a
-    href="#"
-    class="menu-item logout"
-    id="logout-btn"
-  >
-    تسجيل الخروج
-  </a>
-
-</nav>
-```
-
-  </aside>
-
-  <!-- ======================================================= -->
-
-  <!-- MAIN -->
-
-  <!-- ======================================================= -->
-
-  <main class="content">
-
-```
-<!-- ===================================================== -->
-<!-- DASHBOARD -->
-<!-- ===================================================== -->
-
-```html
-<!-- ===================================================== -->
-<!-- DASHBOARD -->
-<!-- ===================================================== -->
-
-<section
-  id="dashboard-page"
-  class="page-section"
->
-
-  <div class="page-header">
-
-    <div>
-      <h2>
-        لوحة التحكم
-      </h2>
-
-      <p>
-        إحصائيات الأساتذة
-      </p>
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- TOTAL -->
-  <!-- ================================================= -->
-
-  <div
-    class="kpi-grid"
-    id="dashboard-kpis"
-  >
-
-    <div class="kpi-card">
-
-      <h3 id="dash-total">
-        0
-      </h3>
-
-      <p>
-        إجمالي الأساتذة
-      </p>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- حسب الرتبة -->
-  <!-- ================================================= -->
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب الرتبة
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الرتبة</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="dashboard-grade-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- حسب الصفة -->
-  <!-- ================================================= -->
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب الصفة
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الصفة</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="dashboard-sifah-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- حسب الوضعية -->
-  <!-- ================================================= -->
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب الوضعية
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الوضعية</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="dashboard-wadhia-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- حسب الجنس -->
-  <!-- ================================================= -->
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب الجنس
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الجنس</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="dashboard-genre-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- حسب القسم -->
-  <!-- ================================================= -->
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب القسم
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>القسم</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="dashboard-departement-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- حسب التخصص -->
-  <!-- ================================================= -->
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب التخصص
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>التخصص</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="dashboard-specialite-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- حسب السنة الجامعية -->
-  <!-- ================================================= -->
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب السنة الجامعية
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>السنة الجامعية</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="dashboard-annee-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</section>
-```
-
-
-
-<!-- ===================================================== -->
-<!-- ENSEIGNANTS -->
-<!-- ===================================================== -->
-
-<section
-  id="enseignants-page"
-  class="page-section hidden"
->
-
-  <div class="page-header">
-
-    <h2>
-      قائمة الأساتذة
-    </h2>
-
-    <div class="actions">
-
-      <button
-        id="btn-add-enseignant"
-        class="btn-primary"
-      >
-        + إضافة أستاذ
-      </button>
-
-      <button
-        id="btn-export"
-        class="btn-secondary"
-      >
-        تصدير Excel
-      </button>
-
-    </div>
-
-  </div>
-
-
-  <!-- FILTRES -->
-
-  <div class="filters">
-
-    <input
-      type="text"
-      id="filter-matricule"
-      placeholder="رقم التسجيل CNRPS"
-    >
-
-    <select id="filter-grade">
-
-      <option value="">
-        كل الرتب
-      </option>
-
-    </select>
-
-
-    <select id="filter-specialite">
-
-      <option value="">
-        كل التخصصات
-      </option>
-
-    </select>
-
-
-    <select id="filter-departement">
-
-      <option value="">
-        كل الأقسام
-      </option>
-
-    </select>
-
-
-    <!-- SIFAH -->
-
-    <select id="filter-sifah">
-
-      <option value="">
-        كل الصفات
-      </option>
-
-    </select>
-
-
-    <!-- WADHIA -->
-
-    <select id="filter-wadhia">
-
-      <option value="">
-        كل الوضعيات
-      </option>
-
-    </select>
-
-
-    <!-- ANNEE -->
-
-    <select id="filter-anneeUniversitaire">
-
-      <option value="">
-        كل السنوات الجامعية
-      </option>
-
-    </select>
-
-
-    <!-- GENRE -->
-
-    <select id="filter-genre">
-
-      <option value="">
-        كل الأجناس
-      </option>
-
-      <option value="homme">
-        ذكر
-      </option>
-
-      <option value="femme">
-        أنثى
-      </option>
-
-    </select>
-
-
-    <button
-      id="btn-reset-filters"
-      class="btn-secondary"
-    >
-      إعادة تعيين
-    </button>
-
-  </div>
-
-
-  <!-- TABLE -->
-
-  <div class="table-container">
-
-    <table id="enseignants-table">
-
-      <thead>
-
-        <tr>
-
-          <th>الرقم</th>
-
-          <th>رقم التسجيل</th>
-
-          <th>اللقب</th>
-
-          <th>الاسم</th>
-
-          <th>الرتبة</th>
-
-          <th>التخصص</th>
-
-          <th>القسم</th>
-
-          <th>الصفة</th>
-
-          <th>الوضعية</th>
-
-          <th>السنة الجامعية</th>
-
-          <th>الجنس</th>
-
-          <th>إجراءات</th>
-
-        </tr>
-
-      </thead>
-
-      <tbody id="enseignants-body"></tbody>
-
-    </table>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================== -->
-<!-- CATEGORIES -->
-<!-- ===================================================== -->
-
-<section
-  id="categories-page"
-  class="page-section hidden"
->
-
-  <h2>
-    إدارة التصنيفات
-  </h2>
-
-  <div class="tabs">
-
-    <button
-      class="tab-btn active"
-      data-tab="grade"
-    >
-      الرتبة
-    </button>
-
-    <button
-      class="tab-btn"
-      data-tab="specialite"
-    >
-      التخصص
-    </button>
-
-    <button
-      class="tab-btn"
-      data-tab="departement"
-    >
-      القسم
-    </button>
-
-  </div>
-
-
-  <!-- GRADE -->
-
-  <div
-    id="tab-grade"
-    class="tab-content active"
-  >
-
-    <button
-      id="btn-add-grade"
-      class="btn-primary"
-      style="margin-bottom:15px"
-    >
-      + إضافة رتبة
-    </button>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الترتيب</th>
-            <th>اسم الرتبة</th>
-            <th>الحالة</th>
-            <th>إجراءات</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="grades-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- SPECIALITE -->
-
-  <div
-    id="tab-specialite"
-    class="tab-content hidden"
-  >
-
-    <button
-      id="btn-add-specialite"
-      class="btn-primary"
-      style="margin-bottom:15px"
-    >
-      + إضافة تخصص
-    </button>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الترتيب</th>
-            <th>اسم التخصص</th>
-            <th>الحالة</th>
-            <th>إجراءات</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="specialites-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- DEPARTEMENT -->
-
-  <div
-    id="tab-departement"
-    class="tab-content hidden"
-  >
-
-    <button
-      id="btn-add-departement"
-      class="btn-primary"
-      style="margin-bottom:15px"
-    >
-      + إضافة قسم
-    </button>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الترتيب</th>
-            <th>اسم القسم</th>
-            <th>الحالة</th>
-            <th>إجراءات</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="departements-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================== -->
-<!-- SIAD -->
-<!-- ===================================================== -->
-
-<section
-  id="siad-page"
-  class="page-section hidden"
->
-
-  <div class="page-header">
-
-    <h2>
-      SIAD - الإحصائيات والمؤشرات
-    </h2>
-
-    <button
-      id="btn-export-siad"
-      class="btn-secondary"
-    >
-      تصدير الإحصائيات Excel
-    </button>
-
-  </div>
-
-
-  <div class="kpi-grid">
-
-    <div class="kpi-card">
-      <h3 id="kpi-total">0</h3>
-      <p>إجمالي الأساتذة</p>
-    </div>
-
-    <div class="kpi-card">
-      <h3 id="kpi-titulaire">0</h3>
-      <p>مرسم</p>
-    </div>
-
-    <div class="kpi-card">
-      <h3 id="kpi-contractuel">0</h3>
-      <p>متعاقد</p>
-    </div>
-
-    <div class="kpi-card">
-      <h3 id="kpi-vacataire">0</h3>
-      <p>عرضي</p>
-    </div>
-
-    <div class="kpi-card">
-      <h3 id="kpi-homme">0</h3>
-      <p>ذكور</p>
-    </div>
-
-    <div class="kpi-card">
-      <h3 id="kpi-femme">0</h3>
-      <p>إناث</p>
-    </div>
-
-  </div>
-
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب الرتبة
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الرتبة</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="stats-grade-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب القسم
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>القسم</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="stats-departement-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <div class="stats-section">
-
-    <h3>
-      التوزيع حسب التخصص
-    </h3>
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>التخصص</th>
-            <th>العدد</th>
-            <th>النسبة</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="stats-specialite-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-</section>
-
-
-<!-- ===================================================== -->
-<!-- PARAMETRES -->
-<!-- ===================================================== -->
-
-<section
-  id="parametres-page"
-  class="page-section hidden"
->
-
-  <div class="page-header">
-
-    <h2>
-      ⚙️ الإعدادات
-    </h2>
-
-  </div>
-
-
-  <!-- PARAMETRE TABS -->
-
-  <div class="tabs">
-
-    <button
-      class="param-tab-btn tab-btn active"
-      data-param-tab="sifah"
-    >
-      الصفة
-    </button>
-
-    <button
-      class="param-tab-btn tab-btn"
-      data-param-tab="wadhia"
-    >
-      الوضعية
-    </button>
-
-    <button
-      class="param-tab-btn tab-btn"
-      data-param-tab="annee"
-    >
-      السنوات الجامعية
-    </button>
-
-    <button
-      class="param-tab-btn tab-btn"
-      data-param-tab="etablissement"
-    >
-      معلومات المؤسسة
-    </button>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- SIFAH -->
-  <!-- ================================================= -->
-
-  <div
-    id="param-tab-sifah"
-    class="param-tab-content"
-  >
-
-    <div class="page-header">
-
-      <div>
-
-        <h3>
-          إدارة الصفات
-        </h3>
-
-        <p>
-          الصفات المهنية للأساتذة
-        </p>
-
-      </div>
-
-      <button
-        id="btn-add-sifah"
-        class="btn-primary"
-      >
-        + إضافة صفة
-      </button>
-
-    </div>
-
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الترتيب</th>
-            <th>الرمز</th>
-            <th>الصفة</th>
-            <th>الحالة</th>
-            <th>إجراءات</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="sifah-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- WADHIA -->
-  <!-- ================================================= -->
-
-  <div
-    id="param-tab-wadhia"
-    class="param-tab-content hidden"
-  >
-
-    <div class="page-header">
-
-      <div>
-
-        <h3>
-          إدارة الوضعيات
-        </h3>
-
-        <p>
-          الوضعية الإدارية الحالية للأستاذ
-        </p>
-
-      </div>
-
-      <button
-        id="btn-add-wadhia"
-        class="btn-primary"
-      >
-        + إضافة وضعية
-      </button>
-
-    </div>
-
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الترتيب</th>
-            <th>الرمز</th>
-            <th>الوضعية</th>
-            <th>الحالة</th>
-            <th>إجراءات</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="wadhia-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- ANNEE -->
-  <!-- ================================================= -->
-
-  <div
-    id="param-tab-annee"
-    class="param-tab-content hidden"
-  >
-
-    <div class="page-header">
-
-      <div>
-
-        <h3>
-          السنوات الجامعية
-        </h3>
-
-        <p>
-          إدارة السنوات الجامعية المعتمدة في النظام
-        </p>
-
-      </div>
-
-      <button
-        id="btn-add-annee"
-        class="btn-primary"
-      >
-        + إضافة سنة
-      </button>
-
-    </div>
-
-
-    <div class="table-container">
-
-      <table>
-
-        <thead>
-
-          <tr>
-            <th>الترتيب</th>
-            <th>السنة الجامعية</th>
-            <th>السنة الحالية</th>
-            <th>الحالة</th>
-            <th>إجراءات</th>
-          </tr>
-
-        </thead>
-
-        <tbody id="annees-body"></tbody>
-
-      </table>
-
-    </div>
-
-  </div>
-
-
-  <!-- ================================================= -->
-  <!-- ETABLISSEMENT -->
-  <!-- ================================================= -->
-
-  <div
-    id="param-tab-etablissement"
-    class="param-tab-content hidden"
-  >
-
-    <div class="settings-card">
-
-      <h3>
-        معلومات المؤسسة
-      </h3>
-
-      <form id="etablissement-form">
-
-        <div class="form-grid">
-
-          <div class="form-group">
-
-            <label>
-              اسم المؤسسة
-            </label>
-
-            <input
-              type="text"
-              id="etablissement-nom"
-              placeholder="اسم المؤسسة"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>
-              الجامعة
-            </label>
-
-            <input
-              type="text"
-              id="etablissement-universite"
-              placeholder="اسم الجامعة"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>
-              رمز المؤسسة
-            </label>
-
-            <input
-              type="text"
-              id="etablissement-code"
-              placeholder="رمز المؤسسة"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>
-              العنوان
-            </label>
-
-            <input
-              type="text"
-              id="etablissement-adresse"
-              placeholder="عنوان المؤسسة"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>
-              الهاتف
-            </label>
-
-            <input
-              type="text"
-              id="etablissement-tel"
-              placeholder="الهاتف"
-            >
-
-          </div>
-
-
-          <div class="form-group">
-
-            <label>
-              البريد الإلكتروني
-            </label>
-
-            <input
-              type="email"
-              id="etablissement-email"
-              placeholder="البريد الإلكتروني"
-            >
-
-          </div>
-
+  <!-- Bouton Menu Mobile -->
+  <button class="menu-toggle" id="menu-toggle">☰</button>
+  <div class="overlay" id="sidebar-overlay"></div>
+
+  <!-- ========================================================= -->
+  <!-- LOGIN -->
+  <!-- ========================================================= -->
+  <div id="login-page" class="page">
+    <div class="login-box">
+      <h1>SIGE</h1>
+      <p class="subtitle">نظام تسيير الأساتذة</p>
+      <form id="login-form">
+        <div class="form-group">
+          <label>البريد الإلكتروني</label>
+          <input type="email" id="login-email" required autocomplete="username" placeholder="example@email.com">
         </div>
-
-
-        <div class="form-actions">
-
-          <button
-            type="submit"
-            class="btn-primary"
-          >
-            حفظ معلومات المؤسسة
-          </button>
-
+        <div class="form-group">
+          <label>كلمة المرور</label>
+          <input type="password" id="login-password" required autocomplete="current-password" placeholder="••••••••">
         </div>
-
+        <button type="submit" class="btn-primary btn-block">تسجيل الدخول</button>
+        <p id="login-error" class="error"></p>
       </form>
-
     </div>
-
   </div>
 
-</section>
-```
-
-  </main>
-
-</div>
-
-<!-- ========================================================= -->
-
-<!-- MODAL ENSEIGNANT -->
-
-<!-- ========================================================= -->
-
-<div
-  id="modal-enseignant"
-  class="modal hidden"
->
-
-  <div class="modal-content large">
-
-```
-<span
-  class="close-modal"
-  data-modal="modal-enseignant"
->
-  &times;
-</span>
-
-<h3 id="modal-enseignant-title">
-  إضافة أستاذ جديد
-</h3>
-
-<form id="enseignant-form">
-
-  <input
-    type="hidden"
-    id="enseignant-id"
-  >
-
-  <div class="form-grid">
-
-    <div class="form-group">
-      <label>الرقم</label>
-      <input type="number" id="numero" required>
-    </div>
-
-    <div class="form-group">
-      <label>رقم التسجيل CNRPS</label>
-      <input type="text" id="matriculeCNRPS" required>
-    </div>
-
-    <div class="form-group">
-      <label>اللقب</label>
-      <input type="text" id="nom" required>
-    </div>
-
-    <div class="form-group">
-      <label>الاسم</label>
-      <input type="text" id="prenom" required>
-    </div>
-
-    <div class="form-group">
-      <label>الرتبة</label>
-      <select id="gradeId" required></select>
-    </div>
-
-    <div class="form-group">
-      <label>التخصص</label>
-      <select id="specialiteId" required></select>
-    </div>
-
-    <div class="form-group">
-      <label>القسم</label>
-      <select id="departementId" required></select>
-    </div>
-
-    <div class="form-group">
-      <label>الهاتف 1</label>
-      <input type="text" id="tel1" required>
-    </div>
-
-    <div class="form-group">
-      <label>الهاتف 2</label>
-      <input type="text" id="tel2">
-    </div>
-
-    <div class="form-group">
-      <label>البريد الإلكتروني</label>
-      <input type="email" id="email" required>
-    </div>
-
-
-    <!-- SIFAH -->
-
-    <div class="form-group">
-
-      <label>
-        الصفة
-      </label>
-
-      <select
-        id="sifah"
-        required
-      ></select>
-
-    </div>
-
-
-    <!-- WADHIA -->
-
-    <div class="form-group">
-
-      <label>
-        الوضعية
-      </label>
-
-      <select
-        id="wadhia"
-        required
-      ></select>
-
-    </div>
-
-
-    <!-- ANNEE -->
-
-    <div class="form-group">
-
-      <label>
-        السنة الجامعية
-      </label>
-
-      <select
-        id="anneeUniversitaire"
-        required
-      ></select>
-
-    </div>
-
-
-    <!-- GENRE -->
-
-    <div class="form-group">
-
-      <label>
-        الجنس
-      </label>
-
-      <select
-        id="genre"
-        required
-      >
-
-        <option value="homme">
-          ذكر
-        </option>
-
-        <option value="femme">
-          أنثى
-        </option>
-
-      </select>
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>
-        تاريخ الميلاد
-      </label>
-
-      <input
-        type="date"
-        id="dateNaissance"
-        required
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>
-        تاريخ التوظيف
-      </label>
-
-      <input
-        type="date"
-        id="dateRecrutement"
-        required
-      >
-
-    </div>
-
-
-    <div class="form-group">
-
-      <label>
-        تاريخ آخر رتبة
-      </label>
-
-      <input
-        type="date"
-        id="dateDernierGrade"
-        required
-      >
-
-    </div>
-
+  <!-- ========================================================= -->
+  <!-- APPLICATION -->
+  <!-- ========================================================= -->
+  <div id="app" class="page hidden">
+
+    <!-- SIDEBAR -->
+    <aside class="sidebar">
+      <div class="logo">
+        <h2>SIGE</h2>
+        <p>نظام تسيير الأساتذة</p>
+      </div>
+
+      <nav class="menu">
+        <a href="#" class="menu-item active" data-page="dashboard">لوحة التحكم</a>
+        <a href="#" class="menu-item" data-page="enseignants">الأساتذة</a>
+        <a href="#" class="menu-item" data-page="categories">التصنيفات</a>
+        <a href="#" class="menu-item" data-page="siad">SIAD</a>
+        <a href="#" class="menu-item" data-page="parametres">⚙️ الإعدادات</a>
+        <a href="#" class="menu-item" data-page="users" id="menu-users" style="display: none;">المستخدمون</a>
+        <a href="#" class="menu-item logout" id="logout-btn">تسجيل الخروج</a>
+      </nav>
+    </aside>
+
+    <!-- MAIN CONTENT -->
+    <main class="content">
+
+      <!-- ==================== DASHBOARD ==================== -->
+      <section id="dashboard-page" class="page-section">
+        <div class="page-header">
+          <div>
+            <h2>لوحة التحكم</h2>
+            <p>إحصائيات الأساتذة</p>
+          </div>
+        </div>
+
+        <div class="kpi-grid" id="dashboard-kpis">
+          <div class="kpi-card">
+            <h3 id="dash-total">0</h3>
+            <p>إجمالي الأساتذة</p>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب الرتبة</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الرتبة</th>
+                  <th>العدد</th>
+                  <th>النسبة</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-grade-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب الصفة</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الصفة</th>
+                  <th>العدد</th>
+                  <th>النسبة</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-sifah-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب الوضعية</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الوضعية</th>
+                  <th>العدد</th>
+                  <th>النسبة</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-wadhia-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب الجنس</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الجنس</th>
+                  <th>العدد</th>
+                  <th>النسبة</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-genre-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب القسم</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>القسم</th>
+                  <th>العدد</th>
+                  <th>النسبة</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-departement-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب التخصص</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>التخصص</th>
+                  <th>العدد</th>
+                  <th>النسبة</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-specialite-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب السنة الجامعية</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>السنة الجامعية</th>
+                  <th>العدد</th>
+                  <th>النسبة</th>
+                </tr>
+              </thead>
+              <tbody id="dashboard-annee-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== ENSEIGNANTS ==================== -->
+      <section id="enseignants-page" class="page-section hidden">
+        <div class="page-header">
+          <h2>قائمة الأساتذة</h2>
+          <div class="actions">
+            <button id="btn-add-enseignant" class="btn-primary">+ إضافة أستاذ</button>
+            <button id="btn-export" class="btn-secondary">تصدير Excel</button>
+          </div>
+        </div>
+
+        <!-- FILTRES + RECHERCHE -->
+        <div class="filters">
+          <input type="text" id="search-enseignants" placeholder="بحث بالاسم، اللقب أو رقم التسجيل..." style="min-width: 260px;">
+          <input type="text" id="filter-matricule" placeholder="رقم التسجيل CNRPS">
+          <select id="filter-grade"><option value="">كل الرتب</option></select>
+          <select id="filter-specialite"><option value="">كل التخصصات</option></select>
+          <select id="filter-departement"><option value="">كل الأقسام</option></select>
+          <select id="filter-sifah"><option value="">كل الصفات</option></select>
+          <select id="filter-wadhia"><option value="">كل الوضعيات</option></select>
+          <select id="filter-anneeUniversitaire"><option value="">كل السنوات الجامعية</option></select>
+          <select id="filter-genre">
+            <option value="">كل الأجناس</option>
+            <option value="homme">ذكر</option>
+            <option value="femme">أنثى</option>
+          </select>
+          <button id="btn-reset-filters" class="btn-secondary">إعادة تعيين</button>
+        </div>
+
+        <!-- TABLE -->
+        <div class="table-container">
+          <table id="enseignants-table">
+            <thead>
+              <tr>
+                <th>الرقم</th>
+                <th>رقم التسجيل</th>
+                <th>اللقب</th>
+                <th>الاسم</th>
+                <th>الرتبة</th>
+                <th>التخصص</th>
+                <th>القسم</th>
+                <th>الصفة</th>
+                <th>الوضعية</th>
+                <th>السنة الجامعية</th>
+                <th>الجنس</th>
+                <th>إجراءات</th>
+              </tr>
+            </thead>
+            <tbody id="enseignants-body"></tbody>
+          </table>
+        </div>
+
+        <!-- PAGINATION -->
+        <div id="pagination-container" style="display:flex; justify-content:center; gap:10px; margin-top:20px; flex-wrap:wrap; align-items:center;"></div>
+      </section>
+
+      <!-- ==================== CATEGORIES ==================== -->
+      <section id="categories-page" class="page-section hidden">
+        <h2>إدارة التصنيفات</h2>
+        <div class="tabs">
+          <button class="tab-btn active" data-tab="grade">الرتبة</button>
+          <button class="tab-btn" data-tab="specialite">التخصص</button>
+          <button class="tab-btn" data-tab="departement">القسم</button>
+        </div>
+
+        <div id="tab-grade" class="tab-content active">
+          <button id="btn-add-grade" class="btn-primary" style="margin-bottom:15px">+ إضافة رتبة</button>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الترتيب</th>
+                  <th>اسم الرتبة</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="grades-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-specialite" class="tab-content hidden">
+          <button id="btn-add-specialite" class="btn-primary" style="margin-bottom:15px">+ إضافة تخصص</button>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الترتيب</th>
+                  <th>اسم التخصص</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="specialites-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div id="tab-departement" class="tab-content hidden">
+          <button id="btn-add-departement" class="btn-primary" style="margin-bottom:15px">+ إضافة قسم</button>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الترتيب</th>
+                  <th>اسم القسم</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="departements-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== SIAD ==================== -->
+      <section id="siad-page" class="page-section hidden">
+        <div class="page-header">
+          <h2>SIAD - الإحصائيات والمؤشرات</h2>
+          <button id="btn-export-siad" class="btn-secondary">تصدير الإحصائيات Excel</button>
+        </div>
+
+        <div class="kpi-grid">
+          <div class="kpi-card"><h3 id="kpi-total">0</h3><p>إجمالي الأساتذة</p></div>
+          <div class="kpi-card"><h3 id="kpi-titulaire">0</h3><p>مرسم</p></div>
+          <div class="kpi-card"><h3 id="kpi-contractuel">0</h3><p>متعاقد</p></div>
+          <div class="kpi-card"><h3 id="kpi-vacataire">0</h3><p>عرضي</p></div>
+          <div class="kpi-card"><h3 id="kpi-homme">0</h3><p>ذكور</p></div>
+          <div class="kpi-card"><h3 id="kpi-femme">0</h3><p>إناث</p></div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب الرتبة</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>الرتبة</th><th>العدد</th><th>النسبة</th></tr>
+              </thead>
+              <tbody id="stats-grade-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب القسم</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>القسم</th><th>العدد</th><th>النسبة</th></tr>
+              </thead>
+              <tbody id="stats-departement-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <div class="stats-section">
+          <h3>التوزيع حسب التخصص</h3>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr><th>التخصص</th><th>العدد</th><th>النسبة</th></tr>
+              </thead>
+              <tbody id="stats-specialite-body"></tbody>
+            </table>
+          </div>
+        </div>
+      </section>
+
+      <!-- ==================== PARAMETRES ==================== -->
+      <section id="parametres-page" class="page-section hidden">
+        <div class="page-header">
+          <h2>⚙️ الإعدادات</h2>
+        </div>
+
+        <div class="tabs">
+          <button class="param-tab-btn tab-btn active" data-param-tab="sifah">الصفة</button>
+          <button class="param-tab-btn tab-btn" data-param-tab="wadhia">الوضعية</button>
+          <button class="param-tab-btn tab-btn" data-param-tab="annee">السنوات الجامعية</button>
+          <button class="param-tab-btn tab-btn" data-param-tab="etablissement">معلومات المؤسسة</button>
+        </div>
+
+        <!-- SIFAH -->
+        <div id="param-tab-sifah" class="param-tab-content">
+          <div class="page-header">
+            <div>
+              <h3>إدارة الصفات</h3>
+              <p>الصفات المهنية للأساتذة</p>
+            </div>
+            <button id="btn-add-sifah" class="btn-primary">+ إضافة صفة</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الترتيب</th>
+                  <th>الرمز</th>
+                  <th>الصفة</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="sifah-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- WADHIA -->
+        <div id="param-tab-wadhia" class="param-tab-content hidden">
+          <div class="page-header">
+            <div>
+              <h3>إدارة الوضعيات</h3>
+              <p>الوضعية الإدارية الحالية للأستاذ</p>
+            </div>
+            <button id="btn-add-wadhia" class="btn-primary">+ إضافة وضعية</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الترتيب</th>
+                  <th>الرمز</th>
+                  <th>الوضعية</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="wadhia-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ANNEE -->
+        <div id="param-tab-annee" class="param-tab-content hidden">
+          <div class="page-header">
+            <div>
+              <h3>السنوات الجامعية</h3>
+              <p>إدارة السنوات الجامعية المعتمدة في النظام</p>
+            </div>
+            <button id="btn-add-annee" class="btn-primary">+ إضافة سنة</button>
+          </div>
+          <div class="table-container">
+            <table>
+              <thead>
+                <tr>
+                  <th>الترتيب</th>
+                  <th>السنة الجامعية</th>
+                  <th>السنة الحالية</th>
+                  <th>الحالة</th>
+                  <th>إجراءات</th>
+                </tr>
+              </thead>
+              <tbody id="annees-body"></tbody>
+            </table>
+          </div>
+        </div>
+
+        <!-- ETABLISSEMENT -->
+        <div id="param-tab-etablissement" class="param-tab-content hidden">
+          <div class="settings-card">
+            <h3>معلومات المؤسسة</h3>
+            <form id="etablissement-form">
+              <div class="form-grid">
+                <div class="form-group">
+                  <label>اسم المؤسسة</label>
+                  <input type="text" id="etablissement-nom" placeholder="اسم المؤسسة">
+                </div>
+                <div class="form-group">
+                  <label>الجامعة</label>
+                  <input type="text" id="etablissement-universite" placeholder="اسم الجامعة">
+                </div>
+                <div class="form-group">
+                  <label>رمز المؤسسة</label>
+                  <input type="text" id="etablissement-code" placeholder="رمز المؤسسة">
+                </div>
+                <div class="form-group">
+                  <label>العنوان</label>
+                  <input type="text" id="etablissement-adresse" placeholder="عنوان المؤسسة">
+                </div>
+                <div class="form-group">
+                  <label>الهاتف</label>
+                  <input type="text" id="etablissement-tel" placeholder="الهاتف">
+                </div>
+                <div class="form-group">
+                  <label>البريد الإلكتروني</label>
+                  <input type="email" id="etablissement-email" placeholder="البريد الإلكتروني">
+                </div>
+              </div>
+              <div class="form-actions">
+                <button type="submit" class="btn-primary">حفظ معلومات المؤسسة</button>
+              </div>
+            </form>
+          </div>
+        </div>
+      </section>
+
+    </main>
   </div>
 
-
-  <div class="form-actions">
-
-    <button
-      type="submit"
-      class="btn-primary"
-    >
-      حفظ
-    </button>
-
-    <button
-      type="button"
-      class="btn-secondary close-modal"
-      data-modal="modal-enseignant"
-    >
-      إلغاء
-    </button>
-
+  <!-- ========================================================= -->
+  <!-- MODAL ENSEIGNANT -->
+  <!-- ========================================================= -->
+  <div id="modal-enseignant" class="modal hidden">
+    <div class="modal-content large">
+      <span class="close-modal" data-modal="modal-enseignant">&times;</span>
+      <h3 id="modal-enseignant-title">إضافة أستاذ جديد</h3>
+      <form id="enseignant-form">
+        <input type="hidden" id="enseignant-id">
+        <div class="form-grid">
+          <div class="form-group">
+            <label>الرقم</label>
+            <input type="number" id="numero" required>
+          </div>
+          <div class="form-group">
+            <label>رقم التسجيل CNRPS</label>
+            <input type="text" id="matriculeCNRPS" required>
+          </div>
+          <div class="form-group">
+            <label>اللقب</label>
+            <input type="text" id="nom" required>
+          </div>
+          <div class="form-group">
+            <label>الاسم</label>
+            <input type="text" id="prenom" required>
+          </div>
+          <div class="form-group">
+            <label>الرتبة</label>
+            <select id="gradeId" required></select>
+          </div>
+          <div class="form-group">
+            <label>التخصص</label>
+            <select id="specialiteId" required></select>
+          </div>
+          <div class="form-group">
+            <label>القسم</label>
+            <select id="departementId" required></select>
+          </div>
+          <div class="form-group">
+            <label>الهاتف 1</label>
+            <input type="text" id="tel1" required>
+          </div>
+          <div class="form-group">
+            <label>الهاتف 2</label>
+            <input type="text" id="tel2">
+          </div>
+          <div class="form-group">
+            <label>البريد الإلكتروني</label>
+            <input type="email" id="email" required>
+          </div>
+          <div class="form-group">
+            <label>الصفة</label>
+            <select id="sifah" required></select>
+          </div>
+          <div class="form-group">
+            <label>الوضعية</label>
+            <select id="wadhia" required></select>
+          </div>
+          <div class="form-group">
+            <label>السنة الجامعية</label>
+            <select id="anneeUniversitaire" required></select>
+          </div>
+          <div class="form-group">
+            <label>الجنس</label>
+            <select id="genre" required>
+              <option value="homme">ذكر</option>
+              <option value="femme">أنثى</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>تاريخ الميلاد</label>
+            <input type="date" id="dateNaissance" required>
+          </div>
+          <div class="form-group">
+            <label>تاريخ التوظيف</label>
+            <input type="date" id="dateRecrutement" required>
+          </div>
+          <div class="form-group">
+            <label>تاريخ آخر رتبة</label>
+            <input type="date" id="dateDernierGrade" required>
+          </div>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">حفظ</button>
+          <button type="button" class="btn-secondary close-modal" data-modal="modal-enseignant">إلغاء</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-</form>
-```
-
+  <!-- ========================================================= -->
+  <!-- MODAL CATEGORIE -->
+  <!-- ========================================================= -->
+  <div id="modal-categorie" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal" data-modal="modal-categorie">&times;</span>
+      <h3 id="modal-categorie-title">إضافة</h3>
+      <form id="categorie-form">
+        <input type="hidden" id="categorie-id">
+        <input type="hidden" id="categorie-type">
+        <div class="form-group">
+          <label>الاسم</label>
+          <input type="text" id="categorie-nom" required>
+        </div>
+        <div class="form-group">
+          <label>الترتيب</label>
+          <input type="number" id="categorie-ordre" value="1" min="1" required>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="categorie-actif" checked>
+            نشط
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">حفظ</button>
+          <button type="button" class="btn-secondary close-modal" data-modal="modal-categorie">إلغاء</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-</div>
-
-<!-- ========================================================= -->
-
-<!-- MODAL CATEGORIE -->
-
-<!-- ========================================================= -->
-
-<div
-  id="modal-categorie"
-  class="modal hidden"
->
-
-  <div class="modal-content">
-
-```
-<span
-  class="close-modal"
-  data-modal="modal-categorie"
->
-  &times;
-</span>
-
-<h3 id="modal-categorie-title">
-  إضافة
-</h3>
-
-<form id="categorie-form">
-
-  <input
-    type="hidden"
-    id="categorie-id"
-  >
-
-  <input
-    type="hidden"
-    id="categorie-type"
-  >
-
-  <div class="form-group">
-
-    <label>
-      الاسم
-    </label>
-
-    <input
-      type="text"
-      id="categorie-nom"
-      required
-    >
-
+  <!-- ========================================================= -->
+  <!-- MODAL PARAMETRE -->
+  <!-- ========================================================= -->
+  <div id="modal-parametre" class="modal hidden">
+    <div class="modal-content">
+      <span class="close-modal" data-modal="modal-parametre">&times;</span>
+      <h3 id="modal-parametre-title">إضافة</h3>
+      <form id="parametre-form">
+        <input type="hidden" id="parametre-id">
+        <input type="hidden" id="parametre-type">
+        <div class="form-group">
+          <label>الرمز</label>
+          <input type="text" id="parametre-code" required placeholder="مثال: titulaire">
+        </div>
+        <div class="form-group">
+          <label>الاسم</label>
+          <input type="text" id="parametre-nom" required placeholder="مثال: مرسم">
+        </div>
+        <div class="form-group">
+          <label>الترتيب</label>
+          <input type="number" id="parametre-ordre" min="1" value="1" required>
+        </div>
+        <div class="form-group" id="parametre-current-group">
+          <label>
+            <input type="checkbox" id="parametre-current">
+            القيمة الحالية
+          </label>
+        </div>
+        <div class="form-group">
+          <label>
+            <input type="checkbox" id="parametre-actif" checked>
+            نشط
+          </label>
+        </div>
+        <div class="form-actions">
+          <button type="submit" class="btn-primary">حفظ</button>
+          <button type="button" class="btn-secondary close-modal" data-modal="modal-parametre">إلغاء</button>
+        </div>
+      </form>
+    </div>
   </div>
 
-  <div class="form-group">
-
-    <label>
-      الترتيب
-    </label>
-
-    <input
-      type="number"
-      id="categorie-ordre"
-      value="1"
-      min="1"
-      required
-    >
-
-  </div>
-
-  <div class="form-group">
-
-    <label>
-
-      <input
-        type="checkbox"
-        id="categorie-actif"
-        checked
-      >
-
-      نشط
-
-    </label>
-
-  </div>
-
-  <div class="form-actions">
-
-    <button
-      type="submit"
-      class="btn-primary"
-    >
-      حفظ
-    </button>
-
-    <button
-      type="button"
-      class="btn-secondary close-modal"
-      data-modal="modal-categorie"
-    >
-      إلغاء
-    </button>
-
-  </div>
-
-</form>
-```
-
-  </div>
-
-</div>
-
-<!-- ========================================================= -->
-
-<!-- MODAL PARAMETRE -->
-
-<!-- ========================================================= -->
-
-<div
-  id="modal-parametre"
-  class="modal hidden"
->
-
-  <div class="modal-content">
-
-```
-<span
-  class="close-modal"
-  data-modal="modal-parametre"
->
-  &times;
-</span>
-
-<h3 id="modal-parametre-title">
-  إضافة
-</h3>
-
-<form id="parametre-form">
-
-  <input
-    type="hidden"
-    id="parametre-id"
-  >
-
-  <input
-    type="hidden"
-    id="parametre-type"
-  >
-
-  <div class="form-group">
-
-    <label>
-      الرمز
-    </label>
-
-    <input
-      type="text"
-      id="parametre-code"
-      required
-      placeholder="مثال: titulaire"
-    >
-
-  </div>
-
-  <div class="form-group">
-
-    <label>
-      الاسم
-    </label>
-
-    <input
-      type="text"
-      id="parametre-nom"
-      required
-      placeholder="مثال: مرسم"
-    >
-
-  </div>
-
-  <div class="form-group">
-
-    <label>
-      الترتيب
-    </label>
-
-    <input
-      type="number"
-      id="parametre-ordre"
-      min="1"
-      value="1"
-      required
-    >
-
-  </div>
-
-  <div
-    class="form-group"
-    id="parametre-current-group"
-  >
-
-    <label>
-
-      <input
-        type="checkbox"
-        id="parametre-current"
-      >
-
-      القيمة الحالية
-
-    </label>
-
-  </div>
-
-  <div class="form-group">
-
-    <label>
-
-      <input
-        type="checkbox"
-        id="parametre-actif"
-        checked
-      >
-
-      نشط
-
-    </label>
-
-  </div>
-
-  <div class="form-actions">
-
-    <button
-      type="submit"
-      class="btn-primary"
-    >
-      حفظ
-    </button>
-
-    <button
-      type="button"
-      class="btn-secondary close-modal"
-      data-modal="modal-parametre"
-    >
-      إلغاء
-    </button>
-
-  </div>
-
-</form>
-```
-
-  </div>
-
-</div>
-
-<!-- ========================================================= -->
-
-<!-- FIREBASE -->
-
-<!-- ========================================================= -->
-
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
-
-<script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
-
-<!-- ========================================================= -->
-
-<!-- EXCEL -->
-
-<!-- ========================================================= -->
-
-<script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
-
-<!-- ========================================================= -->
-
-<!-- CONFIGURATION FIREBASE -->
-
-<!-- ========================================================= -->
-
-<script src="js/firebase-config.js"></script>
-
-<!-- ========================================================= -->
-
-<!-- PARAMETRES -->
-
-<!-- ========================================================= -->
-
-<script src="js/parametres.js"></script>
-
-<!-- ========================================================= -->
-
-<!-- AUTRES JS -->
-
-<!-- ========================================================= -->
-
-<script src="js/auth.js"></script>
-
-<script src="js/categories.js"></script>
-
-<script src="js/enseignants.js"></script>
-
-<script src="js/siad.js"></script>
-
-<script src="js/export.js"></script>
-
-<script src="js/app.js"></script>
+  <!-- ========================================================= -->
+  <!-- SCRIPTS -->
+  <!-- ========================================================= -->
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-app-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-auth-compat.js"></script>
+  <script src="https://www.gstatic.com/firebasejs/10.14.0/firebase-firestore-compat.js"></script>
+  <script src="https://cdn.sheetjs.com/xlsx-0.20.3/package/dist/xlsx.full.min.js"></script>
+
+  <script src="js/firebase-config.js"></script>
+  <script src="js/parametres.js"></script>
+  <script src="js/auth.js"></script>
+  <script src="js/categories.js"></script>
+  <script src="js/enseignants.js"></script>
+  <script src="js/siad.js"></script>
+  <script src="js/export.js"></script>
+  <script src="js/app.js"></script>
 
 </body>
-
 </html>
