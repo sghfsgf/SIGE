@@ -2,8 +2,9 @@
 // ============================================================
 // SIGE - EXPORT EXCEL
 // ============================================================
-// Export des enseignants + Export SIAD
-// Compatible avec enseignants.js actuel
+// Export des enseignants + export SIAD
+// L'export des enseignants utilise les données actuellement
+// filtrées dans la page.
 // ============================================================
 
 
@@ -13,72 +14,25 @@
 
 document.addEventListener("DOMContentLoaded", function () {
 
+    console.log("SIGE - Initialisation export.js");
+
     // --------------------------------------------------------
-    // BOUTON EXPORT ENSEIGNANTS
+    // Bouton export enseignants
     // --------------------------------------------------------
 
     const btnExport = document.getElementById("btn-export");
 
     if (btnExport) {
 
+        console.log("Bouton #btn-export trouvé");
+
         btnExport.addEventListener("click", function (event) {
 
             event.preventDefault();
 
-            console.log("SIGE : bouton Export Excel cliqué");
+            console.log("Clic sur le bouton Export Enseignants");
 
-            // ------------------------------------------------
-            // Récupérer les données
-            // ------------------------------------------------
-
-            let liste = [];
-
-            // Priorité aux données filtrées
-            if (
-                Array.isArray(window.enseignantsFiltresActuels) &&
-                window.enseignantsFiltresActuels.length > 0
-            ) {
-
-                liste = window.enseignantsFiltresActuels;
-
-                console.log(
-                    "Export des données filtrées :",
-                    liste.length
-                );
-
-            }
-
-            // Sinon toutes les données
-            else if (
-                Array.isArray(window.enseignantsData) &&
-                window.enseignantsData.length > 0
-            ) {
-
-                liste = window.enseignantsData;
-
-                console.log(
-                    "Export de tous les enseignants :",
-                    liste.length
-                );
-
-            }
-
-            // ------------------------------------------------
-            // Vérification
-            // ------------------------------------------------
-
-            if (liste.length === 0) {
-
-                alert("لا توجد بيانات الأساتذة للتصدير");
-
-                return;
-            }
-
-            // ------------------------------------------------
-            // Export
-            // ------------------------------------------------
-
-            exportEnseignants(liste);
+            lancerExportEnseignants();
 
         });
 
@@ -86,20 +40,22 @@ document.addEventListener("DOMContentLoaded", function () {
     else {
 
         console.error(
-            "SIGE : bouton #btn-export introuvable"
+            "ERREUR : bouton #btn-export introuvable"
         );
 
     }
 
 
-    // ========================================================
-    // BOUTON EXPORT SIAD
-    // ========================================================
+    // --------------------------------------------------------
+    // Bouton export SIAD
+    // --------------------------------------------------------
 
     const btnExportSIAD =
         document.getElementById("btn-export-siad");
 
     if (btnExportSIAD) {
+
+        console.log("Bouton #btn-export-siad trouvé");
 
         btnExportSIAD.addEventListener(
             "click",
@@ -108,7 +64,7 @@ document.addEventListener("DOMContentLoaded", function () {
                 event.preventDefault();
 
                 console.log(
-                    "SIGE : bouton Export SIAD cliqué"
+                    "Clic sur le bouton Export SIAD"
                 );
 
                 exportSIAD();
@@ -120,7 +76,7 @@ document.addEventListener("DOMContentLoaded", function () {
     else {
 
         console.warn(
-            "SIGE : bouton #btn-export-siad introuvable"
+            "Bouton #btn-export-siad introuvable"
         );
 
     }
@@ -129,24 +85,14 @@ document.addEventListener("DOMContentLoaded", function () {
 
 
 // ============================================================
-// EXPORT LISTE DES ENSEIGNANTS
+// LANCER EXPORT ENSEIGNANTS
 // ============================================================
 
-function exportEnseignants(list) {
+function lancerExportEnseignants() {
 
-    // --------------------------------------------------------
-    // Vérification liste
-    // --------------------------------------------------------
-
-    if (
-        !Array.isArray(list) ||
-        list.length === 0
-    ) {
-
-        alert("لا توجد بيانات الأساتذة للتصدير");
-
-        return;
-    }
+    console.log(
+        "Début export enseignants..."
+    );
 
 
     // --------------------------------------------------------
@@ -160,7 +106,109 @@ function exportEnseignants(list) {
         );
 
         console.error(
-            "SIGE : XLSX / SheetJS n'est pas chargé."
+            "ERREUR : XLSX est undefined"
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // Récupérer la liste à exporter
+    // --------------------------------------------------------
+    //
+    // Priorité :
+    //
+    // 1. enseignantsFiltresActuels
+    // 2. enseignantsFiltres
+    // 3. enseignantsData
+    //
+    // Ainsi, si l'utilisateur applique des filtres,
+    // seuls les enseignants affichés seront exportés.
+    // --------------------------------------------------------
+
+    let liste = [];
+
+
+    // 1. Liste filtrée globale
+
+    if (
+        Array.isArray(window.enseignantsFiltresActuels)
+    ) {
+
+        liste =
+            window.enseignantsFiltresActuels;
+
+        console.log(
+            "Utilisation de enseignantsFiltresActuels :",
+            liste.length
+        );
+
+    }
+
+
+    // 2. Deuxième possibilité
+
+    else if (
+        typeof enseignantsFiltres !== "undefined" &&
+        Array.isArray(enseignantsFiltres)
+    ) {
+
+        liste =
+            enseignantsFiltres;
+
+        console.log(
+            "Utilisation de enseignantsFiltres :",
+            liste.length
+        );
+
+    }
+
+
+    // 3. Toutes les données
+
+    else if (
+        typeof enseignantsData !== "undefined" &&
+        Array.isArray(enseignantsData)
+    ) {
+
+        liste =
+            enseignantsData;
+
+        console.log(
+            "Utilisation de enseignantsData :",
+            liste.length
+        );
+
+    }
+
+
+    // --------------------------------------------------------
+    // Vérifier les données
+    // --------------------------------------------------------
+
+    if (!Array.isArray(liste)) {
+
+        alert(
+            "لا توجد بيانات الأساتذة"
+        );
+
+        console.error(
+            "Aucune liste d'enseignants disponible"
+        );
+
+        return;
+    }
+
+
+    if (liste.length === 0) {
+
+        alert(
+            "لا توجد بيانات الأساتذة للتصدير"
+        );
+
+        console.warn(
+            "La liste à exporter est vide"
         );
 
         return;
@@ -168,40 +216,66 @@ function exportEnseignants(list) {
 
 
     console.log(
-        "SIGE : préparation export de",
-        list.length,
-        "enseignant(s)"
+        "Nombre d'enseignants à exporter :",
+        liste.length
     );
 
 
-    // ========================================================
-    // DONNÉES DE RÉFÉRENCE
-    // ========================================================
+    // --------------------------------------------------------
+    // Export
+    // --------------------------------------------------------
 
-    const grades =
-        typeof getGradesData === "function"
-            ? getGradesData()
-            : [];
+    exportEnseignants(liste);
 
-    const specialites =
-        typeof getSpecialitesData === "function"
-            ? getSpecialitesData()
-            : [];
+}
 
-    const departements =
-        typeof getDepartementsData === "function"
-            ? getDepartementsData()
-            : [];
 
-    const sifahData =
-        typeof getSifahData === "function"
-            ? getSifahData()
-            : [];
+// ============================================================
+// EXPORT ENSEIGNANTS
+// ============================================================
 
-    const wadhiaData =
-        typeof getWadhiaData === "function"
-            ? getWadhiaData()
-            : [];
+function exportEnseignants(list) {
+
+    // --------------------------------------------------------
+    // Vérification liste
+    // --------------------------------------------------------
+
+    if (
+        !Array.isArray(list) ||
+        list.length === 0
+    ) {
+
+        alert(
+            "لا توجد بيانات الأساتذة للتصدير"
+        );
+
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // Vérification XLSX
+    // --------------------------------------------------------
+
+    if (typeof XLSX === "undefined") {
+
+        alert(
+            "مكتبة Excel غير محملة. يرجى إعادة تحميل الصفحة."
+        );
+
+        console.error(
+            "XLSX n'est pas chargé."
+        );
+
+        return;
+    }
+
+
+    console.log(
+        "Export de",
+        list.length,
+        "enseignant(s)"
+    );
 
 
     // ========================================================
@@ -248,10 +322,121 @@ function exportEnseignants(list) {
 
 
     // ========================================================
+    // PRÉPARER LES DONNÉES DE RÉFÉRENCE
+    // ========================================================
+
+    let grades = [];
+    let specialites = [];
+    let departements = [];
+    let sifahData = [];
+    let wadhiaData = [];
+
+
+    if (typeof getGradesData === "function") {
+
+        try {
+
+            grades = getGradesData() || [];
+
+        }
+        catch (error) {
+
+            console.warn(
+                "Erreur getGradesData :",
+                error
+            );
+
+        }
+
+    }
+
+
+    if (typeof getSpecialitesData === "function") {
+
+        try {
+
+            specialites =
+                getSpecialitesData() || [];
+
+        }
+        catch (error) {
+
+            console.warn(
+                "Erreur getSpecialitesData :",
+                error
+            );
+
+        }
+
+    }
+
+
+    if (typeof getDepartementsData === "function") {
+
+        try {
+
+            departements =
+                getDepartementsData() || [];
+
+        }
+        catch (error) {
+
+            console.warn(
+                "Erreur getDepartementsData :",
+                error
+            );
+
+        }
+
+    }
+
+
+    if (typeof getSifahData === "function") {
+
+        try {
+
+            sifahData =
+                getSifahData() || [];
+
+        }
+        catch (error) {
+
+            console.warn(
+                "Erreur getSifahData :",
+                error
+            );
+
+        }
+
+    }
+
+
+    if (typeof getWadhiaData === "function") {
+
+        try {
+
+            wadhiaData =
+                getWadhiaData() || [];
+
+        }
+        catch (error) {
+
+            console.warn(
+                "Erreur getWadhiaData :",
+                error
+            );
+
+        }
+
+    }
+
+
+    // ========================================================
     // CONVERSION DES DONNÉES
     // ========================================================
 
     const rows = list.map(function (e) {
+
 
         // ----------------------------------------------------
         // GRADE
@@ -259,15 +444,17 @@ function exportEnseignants(list) {
 
         let gradeNom = "";
 
-        const grade = grades.find(function (g) {
+        const grade =
+            grades.find(function (g) {
 
-            return g.id === e.gradeId;
+                return g.id === e.gradeId;
 
-        });
+            });
 
         if (grade) {
 
-            gradeNom = grade.nom || "";
+            gradeNom =
+                grade.nom || "";
 
         }
 
@@ -278,15 +465,17 @@ function exportEnseignants(list) {
 
         let specialiteNom = "";
 
-        const specialite = specialites.find(function (s) {
+        const specialite =
+            specialites.find(function (s) {
 
-            return s.id === e.specialiteId;
+                return s.id === e.specialiteId;
 
-        });
+            });
 
         if (specialite) {
 
-            specialiteNom = specialite.nom || "";
+            specialiteNom =
+                specialite.nom || "";
 
         }
 
@@ -297,15 +486,17 @@ function exportEnseignants(list) {
 
         let departementNom = "";
 
-        const departement = departements.find(function (d) {
+        const departement =
+            departements.find(function (d) {
 
-            return d.id === e.departementId;
+                return d.id === e.departementId;
 
-        });
+            });
 
         if (departement) {
 
-            departementNom = departement.nom || "";
+            departementNom =
+                departement.nom || "";
 
         }
 
@@ -316,24 +507,26 @@ function exportEnseignants(list) {
 
         let sifahNom = "";
 
-        const sifah = sifahData.find(function (s) {
+        const sifah =
+            sifahData.find(function (s) {
 
-            return s.code === e.sifah;
+                return s.code === e.sifah;
 
-        });
+            });
 
         if (sifah) {
 
-            sifahNom = sifah.nom || "";
+            sifahNom =
+                sifah.nom || "";
 
         }
 
-        // Si aucun nom trouvé,
-        // garder le code
+        // Si le code n'a pas de correspondance
 
         if (!sifahNom) {
 
-            sifahNom = e.sifah || "";
+            sifahNom =
+                e.sifah || "";
 
         }
 
@@ -344,34 +537,28 @@ function exportEnseignants(list) {
 
         let wadhiaNom = "";
 
-        const wadhia = wadhiaData.find(function (w) {
+        const wadhia =
+            wadhiaData.find(function (w) {
 
-            return w.code === e.wadhia;
+                return w.code === e.wadhia;
 
-        });
+            });
 
         if (wadhia) {
 
-            wadhiaNom = wadhia.nom || "";
+            wadhiaNom =
+                wadhia.nom || "";
 
         }
 
-        // Si aucun nom trouvé,
-        // garder le code
+        // Si le code n'a pas de correspondance
 
         if (!wadhiaNom) {
 
-            wadhiaNom = e.wadhia || "";
+            wadhiaNom =
+                e.wadhia || "";
 
         }
-
-
-        // ----------------------------------------------------
-        // ANNÉE UNIVERSITAIRE
-        // ----------------------------------------------------
-
-        const annee =
-            e.anneeUniversitaire || "";
 
 
         // ----------------------------------------------------
@@ -392,9 +579,18 @@ function exportEnseignants(list) {
         }
         else {
 
-            genreNom = e.genre || "";
+            genreNom =
+                e.genre || "";
 
         }
+
+
+        // ----------------------------------------------------
+        // ANNÉE UNIVERSITAIRE
+        // ----------------------------------------------------
+
+        const annee =
+            e.anneeUniversitaire || "";
 
 
         // ====================================================
@@ -443,26 +639,16 @@ function exportEnseignants(list) {
 
 
     // ========================================================
-    // VÉRIFICATION
-    // ========================================================
-
-    if (rows.length === 0) {
-
-        alert("لا توجد بيانات للتصدير");
-
-        return;
-    }
-
-
-    // ========================================================
     // CRÉATION FEUILLE
     // ========================================================
 
     const ws =
-        XLSX.utils.aoa_to_sheet([
-            headers,
-            ...rows
-        ]);
+        XLSX.utils.aoa_to_sheet(
+            [
+                headers,
+                ...rows
+            ]
+        );
 
 
     // ========================================================
@@ -471,48 +657,41 @@ function exportEnseignants(list) {
 
     ws["!cols"] = [
 
-        { wch: 8 },       // الرقم
+        { wch: 8 },
 
-        { wch: 18 },      // CNRPS
+        { wch: 20 },
 
-        { wch: 20 },      // اللقب
+        { wch: 20 },
 
-        { wch: 20 },      // الاسم
+        { wch: 20 },
 
-        { wch: 25 },      // الرتبة
+        { wch: 25 },
 
-        { wch: 25 },      // التخصص
+        { wch: 25 },
 
-        { wch: 25 },      // القسم
+        { wch: 25 },
 
-        { wch: 15 },      // الهاتف 1
+        { wch: 15 },
 
-        { wch: 15 },      // الهاتف 2
+        { wch: 15 },
 
-        { wch: 30 },      // email
+        { wch: 30 },
 
-        { wch: 20 },      // الصفة
+        { wch: 20 },
 
-        { wch: 20 },      // الوضعية
+        { wch: 20 },
 
-        { wch: 18 },      // السنة الجامعية
+        { wch: 18 },
 
-        { wch: 12 },      // الجنس
+        { wch: 12 },
 
-        { wch: 18 },      // تاريخ التوظيف
+        { wch: 18 },
 
-        { wch: 18 },      // تاريخ الميلاد
+        { wch: 18 },
 
-        { wch: 18 }       // تاريخ آخر رتبة
+        { wch: 18 }
 
     ];
-
-
-    // ========================================================
-    // ALIGNEMENT
-    // ========================================================
-
-    ws["!rtl"] = true;
 
 
     // ========================================================
@@ -538,15 +717,26 @@ function exportEnseignants(list) {
     // NOM DU FICHIER
     // ========================================================
 
+    const maintenant =
+        new Date();
+
     const date =
-        new Date()
+        maintenant
             .toISOString()
             .slice(0, 10);
+
+    const heure =
+        maintenant
+            .toTimeString()
+            .slice(0, 8)
+            .replace(/:/g, "-");
 
 
     const filename =
         "SIGE_Enseignants_" +
         date +
+        "_" +
+        heure +
         ".xlsx";
 
 
@@ -561,18 +751,47 @@ function exportEnseignants(list) {
             filename
         );
 
+
         console.log(
-            "SIGE : Export Excel effectué avec succès :",
+            "======================================"
+        );
+
+        console.log(
+            "Export Excel réussi"
+        );
+
+        console.log(
+            "Nombre de lignes :",
+            rows.length
+        );
+
+        console.log(
+            "Fichier :",
             filename
         );
 
+        console.log(
+            "======================================"
+        );
+
+
+        // Message de confirmation
+
+        alert(
+            "تم تصدير " +
+            rows.length +
+            " أستاذ(ة) بنجاح إلى ملف Excel"
+        );
+
     }
+
     catch (error) {
 
         console.error(
-            "SIGE : erreur export Excel :",
+            "Erreur export Excel :",
             error
         );
+
 
         alert(
             "حدث خطأ أثناء تصدير ملف Excel : " +
@@ -591,33 +810,6 @@ function exportEnseignants(list) {
 function exportSIAD() {
 
     // --------------------------------------------------------
-    // Récupérer enseignants
-    // --------------------------------------------------------
-
-    let data = [];
-
-    if (
-        Array.isArray(window.enseignantsData)
-    ) {
-
-        data = window.enseignantsData;
-
-    }
-
-
-    // --------------------------------------------------------
-    // Vérification
-    // --------------------------------------------------------
-
-    if (data.length === 0) {
-
-        alert("لا توجد بيانات الأساتذة");
-
-        return;
-    }
-
-
-    // --------------------------------------------------------
     // Vérifier XLSX
     // --------------------------------------------------------
 
@@ -627,8 +819,32 @@ function exportSIAD() {
             "مكتبة Excel غير محملة."
         );
 
-        console.error(
-            "SIGE : XLSX / SheetJS n'est pas chargé."
+        return;
+    }
+
+
+    // --------------------------------------------------------
+    // Récupérer données
+    // --------------------------------------------------------
+
+    let data = [];
+
+
+    if (
+        typeof enseignantsData !== "undefined" &&
+        Array.isArray(enseignantsData)
+    ) {
+
+        data =
+            enseignantsData;
+
+    }
+
+
+    if (data.length === 0) {
+
+        alert(
+            "لا توجد بيانات الأساتذة"
         );
 
         return;
@@ -700,7 +916,7 @@ function exportSIAD() {
 
 
     // ========================================================
-    // CRÉATION CLASSEUR
+    // CLASSEUR
     // ========================================================
 
     const wb =
@@ -708,11 +924,13 @@ function exportSIAD() {
 
 
     // ========================================================
-    // CRÉATION FEUILLE
+    // FEUILLE
     // ========================================================
 
     const ws =
-        XLSX.utils.aoa_to_sheet(kpis);
+        XLSX.utils.aoa_to_sheet(
+            kpis
+        );
 
 
     // ========================================================
@@ -726,13 +944,6 @@ function exportSIAD() {
         { wch: 15 }
 
     ];
-
-
-    // ========================================================
-    // RTL
-    // ========================================================
-
-    ws["!rtl"] = true;
 
 
     // ========================================================
@@ -763,7 +974,7 @@ function exportSIAD() {
 
 
     // ========================================================
-    // TÉLÉCHARGEMENT
+    // EXPORT
     // ========================================================
 
     try {
@@ -773,18 +984,26 @@ function exportSIAD() {
             filename
         );
 
+
         console.log(
-            "SIGE : Export SIAD effectué :",
+            "Export SIAD effectué :",
             filename
         );
 
+
+        alert(
+            "تم تصدير إحصائيات SIAD بنجاح"
+        );
+
     }
+
     catch (error) {
 
         console.error(
-            "SIGE : erreur export SIAD :",
+            "Erreur export SIAD :",
             error
         );
+
 
         alert(
             "حدث خطأ أثناء تصدير إحصائيات SIAD : " +
@@ -792,6 +1011,62 @@ function exportSIAD() {
         );
 
     }
+
+}
+
+
+// ============================================================
+// TEST MANUEL DANS LA CONSOLE
+// ============================================================
+
+function testerExport() {
+
+    console.log(
+        "========== TEST EXPORT =========="
+    );
+
+
+    console.log(
+        "XLSX :",
+        typeof XLSX
+    );
+
+
+    console.log(
+        "enseignantsData :",
+        typeof enseignantsData !== "undefined"
+            ? enseignantsData.length
+            : "undefined"
+    );
+
+
+    console.log(
+        "enseignantsFiltres :",
+        typeof enseignantsFiltres !== "undefined"
+            ? enseignantsFiltres.length
+            : "undefined"
+    );
+
+
+    console.log(
+        "enseignantsFiltresActuels :",
+        Array.isArray(
+            window.enseignantsFiltresActuels
+        )
+            ? window.enseignantsFiltresActuels.length
+            : "undefined"
+    );
+
+
+    console.log(
+        "Bouton export :",
+        document.getElementById("btn-export")
+    );
+
+
+    console.log(
+        "================================"
+    );
 
 }
 
