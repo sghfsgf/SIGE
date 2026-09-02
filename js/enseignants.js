@@ -5,6 +5,7 @@
 // ============================================================
 
 let enseignantsData = [];
+let enseignantsFiltres = [];
 let currentPage = 1;
 const itemsPerPage = 15;
 
