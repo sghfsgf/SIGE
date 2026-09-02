@@ -38,3 +38,32 @@ document.querySelectorAll('.modal').forEach(modal => {
     if (e.target === modal) modal.classList.add('hidden');
   });
 });
+
+// ====================== MENU MOBILE ======================
+const menuToggle = document.getElementById("menu-toggle");
+const sidebar = document.querySelector(".sidebar");
+const overlay = document.getElementById("sidebar-overlay");
+
+if (menuToggle && sidebar && overlay) {
+  // Ouvrir / fermer le menu
+  menuToggle.addEventListener("click", function () {
+    sidebar.classList.toggle("open");
+    overlay.classList.toggle("show");
+  });
+
+  // Fermer en cliquant sur l'overlay
+  overlay.addEventListener("click", function () {
+    sidebar.classList.remove("open");
+    overlay.classList.remove("show");
+  });
+
+  // Fermer le menu quand on clique sur un item (sur mobile)
+  document.querySelectorAll(".menu-item").forEach(function (item) {
+    item.addEventListener("click", function () {
+      if (window.innerWidth <= 950) {
+        sidebar.classList.remove("open");
+        overlay.classList.remove("show");
+      }
+    });
+  });
+}
