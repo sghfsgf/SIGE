@@ -88,84 +88,79 @@ function initialiserExport() {
 // EXPORT DES ENSEIGNANTS FILTRES
 // ============================================================
 
+```javascript
 function exporterEnseignantsFiltres() {
 
-    // --------------------------------------------------------
-    // Récupérer la liste filtrée
-    // --------------------------------------------------------
-
-    let liste = [];
-
+    // ========================================================
+    // Vérifier que les données Firestore sont disponibles
+    // ========================================================
 
     if (
+        typeof enseignantsData === "undefined" ||
+        !Array.isArray(enseignantsData)
+    ) {
+
+        alert(
+            "لا توجد بيانات الأساتذة"
+        );
+
+        return;
+
+    }
+
+
+    if (enseignantsData.length === 0) {
+
+        alert(
+            "لا توجد بيانات الأساتذة"
+        );
+
+        return;
+
+    }
+
+
+    // ========================================================
+    // IMPORTANT :
+    // Recalculer les filtres avant l'export
+    //
+    // Cela garantit que l'export correspond exactement
+    // aux filtres actuellement sélectionnés.
+    // ========================================================
+
+    if (
+        typeof appliquerFiltres ===
+        "function"
+    ) {
+
+        appliquerFiltres();
+
+    }
+
+
+    // ========================================================
+    // Récupérer TOUS les résultats filtrés
+    //
+    // IMPORTANT :
+    // On ne récupère PAS la page actuelle.
+    // La pagination n'intervient pas ici.
+    // ========================================================
+
+    const liste =
         Array.isArray(
             window.enseignantsFiltresActuels
         )
-    ) {
-
-        liste =
-            window.enseignantsFiltresActuels;
-
-    }
+            ? [
+                ...window.enseignantsFiltresActuels
+              ]
+            : [];
 
 
-    // --------------------------------------------------------
-    // Sécurité : si la variable filtrée est vide
-    // mais que les enseignants existent
-    // --------------------------------------------------------
+    // ========================================================
+    // Aucun résultat correspondant aux filtres
+    // ========================================================
 
-    if (
-        liste.length === 0 &&
-        typeof enseignantsData !== "undefined" &&
-        Array.isArray(enseignantsData)
-    ) {
-
-        // Vérifier si réellement aucun enseignant
-        if (enseignantsData.length === 0) {
-
-            alert(
-                "لا توجد بيانات الأساتذة"
-            );
-
-            return;
-
-        }
-
-        // Si les filtres n'ont pas encore été calculés,
-        // utiliser les données disponibles.
-
-        if (
-            typeof appliquerFiltres ===
-            "function"
-        ) {
-
-            appliquerFiltres();
-
-        }
-
-
-        if (
-            Array.isArray(
-                window.enseignantsFiltresActuels
-            )
-        ) {
-
-            liste =
-                window.enseignantsFiltresActuels;
-
-        }
-
-    }
-
-
-    // --------------------------------------------------------
-    // Vérification finale
-    // --------------------------------------------------------
-
-    if (
-        !Array.isArray(liste) ||
-        liste.length === 0
-    ) {
+    if (liste.length === 0) {
 
         alert(
             "لا توجد بيانات مطابقة للتصدير"
@@ -176,17 +171,57 @@ function exporterEnseignantsFiltres() {
     }
 
 
+    // ========================================================
+    // Informations de contrôle
+    // ========================================================
+
     console.log(
-        "Nombre d'enseignants à exporter :",
+        "======================================"
+    );
+
+    console.log(
+        "SIGE - EXPORT EXCEL"
+    );
+
+    console.log(
+        "Total enseignants :",
+        enseignantsData.length
+    );
+
+    console.log(
+        "Total résultats filtrés :",
         liste.length
     );
 
+    console.log(
+        "Page actuelle :",
+        currentPage
+    );
+
+    console.log(
+        "Nombre exporté :",
+        liste.length
+    );
+
+    console.log(
+        "======================================"
+    );
+
+
+    // ========================================================
+    // Export
+    //
+    // liste contient TOUS les résultats filtrés
+    // et non uniquement les 15 de la page actuelle.
+    // ========================================================
 
     exportEnseignants(
         liste
     );
 
 }
+```
+
 
 
 // ============================================================
