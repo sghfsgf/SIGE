@@ -213,14 +213,12 @@ function appliquerFiltres() {
         const matriculeItem = (item.matriculeCNRPS || "").toLowerCase();
         const numero = String(item.numero || "");
 
-        // Recherche
         const matchSearch = !search ||
             nom.includes(search) ||
             prenom.includes(search) ||
             matriculeItem.includes(search) ||
             numero.includes(search);
 
-        // Filtres
         const matchMatricule = !matricule || matriculeItem.includes(matricule);
         const matchGrade = !grade || item.gradeId === grade;
         const matchSpecialite = !specialite || item.specialiteId === specialite;
@@ -233,6 +231,8 @@ function appliquerFiltres() {
         return matchSearch && matchMatricule && matchGrade && matchSpecialite &&
                matchDepartement && matchSifah && matchWadhia && matchAnnee && matchGenre;
     });
+
+    enseignantsFiltresActuels = [...resultat];     // ← LIGNE AJOUTÉE (très important)
 
     afficherAvecPagination(resultat);
 }
