@@ -632,22 +632,123 @@ function trouverNomAnnee(nom) {
     return nom || "";
 }
 
+// ============================================================
+// DASHBOARD COMPLET
+// ============================================================
 function mettreAJourDashboard() {
     const total = enseignantsData.length;
-    const titulaire = enseignantsData.filter(function (item) { return item.sifah === "titulaire"; }).length;
-    const contractuel = enseignantsData.filter(function (item) { return item.sifah === "contractuel"; }).length;
-    const vacataire = enseignantsData.filter(function (item) { return item.sifah === "vacataire"; }).length;
 
+    // Total
     definirTexte("dash-total", total);
     definirTexte("kpi-total", total);
+
+    // KPI SIAD
+    const titulaire = enseignantsData.filter(item => item.sifah === "titulaire").length;
+    const contractuel = enseignantsData.filter(item => item.sifah === "contractuel").length;
+    const vacataire = enseignantsData.filter(item => item.sifah === "vacataire").length;
+    const homme = enseignantsData.filter(item => item.genre === "homme").length;
+    const femme = enseignantsData.filter(item => item.genre === "femme").length;
+
     definirTexte("kpi-titulaire", titulaire);
     definirTexte("kpi-contractuel", contractuel);
     definirTexte("kpi-vacataire", vacataire);
-
-    const homme = enseignantsData.filter(function (item) { return item.genre === "homme"; }).length;
-    const femme = enseignantsData.filter(function (item) { return item.genre === "femme"; }).length;
     definirTexte("kpi-homme", homme);
     definirTexte("kpi-femme", femme);
+
+    // ===== Tableaux de répartition =====
+    remplirTableauRepartition("dashboard-grade-body", "gradeId", getGradesData, "id");
+    remplirTableauRepartition("dashboard-sifah-body", "sifah", getSifahData, "code");
+    remplirTableauRepartition("dashboard-wadhia-body", "wadhia", getWadhiaData, "code");
+    remplirTableauGenre();
+    remplirTableauRepartition("dashboard-departement-body", "departementId", getDepartementsData, "id");
+    remplirTableauRepartition("dashboard-specialite-body", "specialiteId", getSpecialitesData, "id");
+    remplirTableauAnnees();
+}
+
+// ============================================================
+// Fonction générique pour remplir un tableau de répartition
+// ============================================================
+function remplirTableauRepartition(tbodyId, champ, getDataFn, keyField) {
+    const tbody = document.getElementById(tbodyId);
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    if (typeof getDataFn !== "function") return;
+
+    const data = getDataFn().filter(item => item.actif !== false);
+    const total = enseignantsData.length || 1;
+
+    data.forEach(item => {
+        const key = item[keyField];
+        const count = enseignantsData.filter(e => e[champ] === key).length;
+        const percent = total > 0 ? ((count / total) * 100).toFixed(1) : 0;
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${echapperHTML(item.nom || key)}</td>
+            <td>${count}</td>
+            <td>${percent}%</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// ============================================================
+// Répartition par genre
+// ============================================================
+function remplirTableauGenre() {
+    const tbody = document.getElementById("dashboard-genre-body");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+    const total = enseignantsData.length || 1;
+
+    const genres = [
+        { key: "homme", nom: "ذكر" },
+        { key: "femme", nom: "أنثى" }
+    ];
+
+    genres.forEach(g => {
+        const count = enseignantsData.filter(e => e.genre === g.key).length;
+        const percent = ((count / total) * 100).toFixed(1);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${g.nom}</td>
+            <td>${count}</td>
+            <td>${percent}%</td>
+        `;
+        tbody.appendChild(tr);
+    });
+}
+
+// ============================================================
+// Répartition par année universitaire
+// ============================================================
+function remplirTableauAnnees() {
+    const tbody = document.getElementById("dashboard-annee-body");
+    if (!tbody) return;
+
+    tbody.innerHTML = "";
+
+    if (typeof getAnneesData !== "function") return;
+
+    const data = getAnneesData().filter(item => item.actif !== false);
+    const total = enseignantsData.length || 1;
+
+    data.forEach(item => {
+        const count = enseignantsData.filter(e => e.anneeUniversitaire === item.nom).length;
+        const percent = ((count / total) * 100).toFixed(1);
+
+        const tr = document.createElement("tr");
+        tr.innerHTML = `
+            <td>${echapperHTML(item.nom)}</td>
+            <td>${count}</td>
+            <td>${percent}%</td>
+        `;
+        tbody.appendChild(tr);
+    });
 }
 
 function definirTexte(id, valeur) {
