@@ -132,23 +132,26 @@ function afficherEnseignants(liste) {
         const wadhia = trouverNomWadhia(item.wadhia);
         const annee = trouverNomAnnee(item.anneeUniversitaire);
 
-        tr.innerHTML = `
-            <td>${item.numero ?? ""}</td>
-            <td>${echapperHTML(item.matriculeCNRPS ?? "")}</td>
-            <td>${echapperHTML(item.nom ?? "")}</td>
-            <td>${echapperHTML(item.prenom ?? "")}</td>
-            <td>${echapperHTML(grade)}</td>
-            <td>${echapperHTML(specialite)}</td>
-            <td>${echapperHTML(departement)}</td>
-            <td>${echapperHTML(sifah)}</td>
-            <td>${echapperHTML(wadhia)}</td>
-            <td>${echapperHTML(annee)}</td>
-            <td>${item.genre === "femme" ? "أنثى" : "ذكر"}</td>
-            <td>
-                <button class="btn-secondary" onclick="modifierEnseignant('${item.id}')">تعديل</button>
-                <button class="btn-danger" onclick="supprimerEnseignant('${item.id}')">حذف</button>
-            </td>
-        `;
+     const peutSupprimer = window.currentUserRole === "admin";
+const peutSupprimer = window.currentUserRole === "admin";
+
+tr.innerHTML = `
+    <td>${item.numero ?? ""}</td>
+    <td>${echapperHTML(item.matriculeCNRPS ?? "")}</td>
+    <td>${echapperHTML(item.nom ?? "")}</td>
+    <td>${echapperHTML(item.prenom ?? "")}</td>
+    <td>${echapperHTML(grade)}</td>
+    <td>${echapperHTML(specialite)}</td>
+    <td>${echapperHTML(departement)}</td>
+    <td>${echapperHTML(sifah)}</td>
+    <td>${echapperHTML(wadhia)}</td>
+    <td>${echapperHTML(annee)}</td>
+    <td>${item.genre === "femme" ? "أنثى" : "ذكر"}</td>
+    <td>
+        <button class="btn-secondary" onclick="modifierEnseignant('${item.id}')">تعديل</button>
+        ${peutSupprimer ? `<button class="btn-danger" onclick="supprimerEnseignant('${item.id}')">حذف</button>` : ""}
+    </td>
+`;
         tbody.appendChild(tr);
     });
 }
@@ -507,6 +510,13 @@ async function enregistrerEnseignant(event) {
 }
 
 async function supprimerEnseignant(id) {
+
+    // Seul l'admin peut supprimer
+    if (window.currentUserRole !== "admin") {
+        alert("ليس لديك صلاحية لحذف الأساتذة");
+        return;
+    }
+
     if (!confirm("هل أنت متأكد من حذف هذا الأستاذ ؟")) return;
 
     try {
