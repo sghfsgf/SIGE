@@ -672,6 +672,10 @@ function mettreAJourDashboard() {
     remplirTableauRepartition("dashboard-departement-body", "departementId", getDepartementsData, "id");
     remplirTableauRepartition("dashboard-specialite-body", "specialiteId", getSpecialitesData, "id");
     remplirTableauAnnees();
+    // Actualiser le SIAD après chargement des données
+if (typeof loadSIAD === "function") {
+    loadSIAD();
+}
 }
 
 // ============================================================
