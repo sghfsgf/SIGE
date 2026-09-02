@@ -133,7 +133,6 @@ function afficherEnseignants(liste) {
         const annee = trouverNomAnnee(item.anneeUniversitaire);
 
      const peutSupprimer = window.currentUserRole === "admin";
-const peutSupprimer = window.currentUserRole === "admin";
 
 tr.innerHTML = `
     <td>${item.numero ?? ""}</td>
