@@ -15,9 +15,6 @@ document.addEventListener("DOMContentLoaded", function () {
     initialiserEnseignants();
 });
 
-// ============================================================
-// INITIALISATION
-// ============================================================
 function initialiserEnseignants() {
 
     // Bouton Ajouter
@@ -34,7 +31,22 @@ function initialiserEnseignants() {
         form.addEventListener("submit", enregistrerEnseignant);
     }
 
-    // Filtres existants
+    // ===== RECHERCHE =====
+    const searchInput = document.getElementById("search-enseignants");
+    if (searchInput) {
+        searchInput.addEventListener("input", function () {
+            currentPage = 1;
+            appliquerFiltres();
+        });
+        searchInput.addEventListener("keyup", function () {
+            currentPage = 1;
+            appliquerFiltres();
+        });
+    } else {
+        console.error("Champ #search-enseignants introuvable");
+    }
+
+    // Filtres
     const filtres = [
         "filter-matricule",
         "filter-grade",
@@ -60,22 +72,13 @@ function initialiserEnseignants() {
         }
     });
 
-    // ===== NOUVEAU : Recherche =====
-    const searchInput = document.getElementById("search-enseignants");
-    if (searchInput) {
-        searchInput.addEventListener("input", function () {
-            currentPage = 1;
-            appliquerFiltres();
-        });
-    }
-
     // Reset
     const btnReset = document.getElementById("btn-reset-filters");
     if (btnReset) {
         btnReset.addEventListener("click", reinitialiserFiltres);
     }
 
-    // Firestore
+    // Charger les données
     chargerEnseignants();
 }
 
@@ -95,7 +98,6 @@ function chargerEnseignants() {
                     });
                 });
 
-                // On utilise maintenant appliquerFiltres (qui gère aussi la pagination)
                 appliquerFiltres();
                 mettreAJourFiltres();
                 mettreAJourDashboard();
@@ -115,6 +117,11 @@ function afficherEnseignants(liste) {
 
     tbody.innerHTML = "";
 
+    if (liste.length === 0) {
+        tbody.innerHTML = `<tr><td colspan="12" style="text-align:center; padding:20px;">لا توجد نتائج</td></tr>`;
+        return;
+    }
+
     liste.forEach(function (item, index) {
         const tr = document.createElement("tr");
 
@@ -126,7 +133,7 @@ function afficherEnseignants(liste) {
         const annee = trouverNomAnnee(item.anneeUniversitaire);
 
         tr.innerHTML = `
-            <td>${item.numero ?? index + 1}</td>
+            <td>${item.numero ?? ""}</td>
             <td>${echapperHTML(item.matriculeCNRPS ?? "")}</td>
             <td>${echapperHTML(item.nom ?? "")}</td>
             <td>${echapperHTML(item.prenom ?? "")}</td>
@@ -186,26 +193,33 @@ function changePage(page) {
 // FILTRES + RECHERCHE
 // ============================================================
 function appliquerFiltres() {
-    const search = (document.getElementById("search-enseignants")?.value || "").trim().toLowerCase();
-    const matricule = (document.getElementById("filter-matricule")?.value || "").trim().toLowerCase();
-    const grade = document.getElementById("filter-grade")?.value || "";
-    const specialite = document.getElementById("filter-specialite")?.value || "";
-    const departement = document.getElementById("filter-departement")?.value || "";
-    const sifah = document.getElementById("filter-sifah")?.value || "";
-    const wadhia = document.getElementById("filter-wadhia")?.value || "";
-    const annee = document.getElementById("filter-anneeUniversitaire")?.value || "";
-    const genre = document.getElementById("filter-genre")?.value || "";
+    const searchInput = document.getElementById("search-enseignants");
+    const search = searchInput ? searchInput.value.trim().toLowerCase() : "";
+
+    const matricule = (document.getElementById("filter-matricule") ? document.getElementById("filter-matricule").value : "").trim().toLowerCase();
+    const grade = document.getElementById("filter-grade") ? document.getElementById("filter-grade").value : "";
+    const specialite = document.getElementById("filter-specialite") ? document.getElementById("filter-specialite").value : "";
+    const departement = document.getElementById("filter-departement") ? document.getElementById("filter-departement").value : "";
+    const sifah = document.getElementById("filter-sifah") ? document.getElementById("filter-sifah").value : "";
+    const wadhia = document.getElementById("filter-wadhia") ? document.getElementById("filter-wadhia").value : "";
+    const annee = document.getElementById("filter-anneeUniversitaire") ? document.getElementById("filter-anneeUniversitaire").value : "";
+    const genre = document.getElementById("filter-genre") ? document.getElementById("filter-genre").value : "";
 
     const resultat = enseignantsData.filter(function (item) {
-        // Recherche globale
+        const nom = (item.nom || "").toLowerCase();
+        const prenom = (item.prenom || "").toLowerCase();
+        const matriculeItem = (item.matriculeCNRPS || "").toLowerCase();
+        const numero = String(item.numero || "");
+
+        // Recherche
         const matchSearch = !search ||
-            (item.nom || "").toLowerCase().includes(search) ||
-            (item.prenom || "").toLowerCase().includes(search) ||
-            (item.matriculeCNRPS || "").toLowerCase().includes(search) ||
-            String(item.numero || "").includes(search);
+            nom.includes(search) ||
+            prenom.includes(search) ||
+            matriculeItem.includes(search) ||
+            numero.includes(search);
 
         // Filtres
-        const matchMatricule = !matricule || String(item.matriculeCNRPS || "").toLowerCase().includes(matricule);
+        const matchMatricule = !matricule || matriculeItem.includes(matricule);
         const matchGrade = !grade || item.gradeId === grade;
         const matchSpecialite = !specialite || item.specialiteId === specialite;
         const matchDepartement = !departement || item.departementId === departement;
@@ -218,7 +232,6 @@ function appliquerFiltres() {
                matchDepartement && matchSifah && matchWadhia && matchAnnee && matchGenre;
     });
 
-    // Afficher avec pagination
     afficherAvecPagination(resultat);
 }
 
@@ -250,7 +263,7 @@ function reinitialiserFiltres() {
 }
 
 // ============================================================
-// OUVRIR MODAL ENSEIGNANT
+// MODAL
 // ============================================================
 function ouvrirModalEnseignant(id = null) {
     const modal = document.getElementById("modal-enseignant");
@@ -260,7 +273,6 @@ function ouvrirModalEnseignant(id = null) {
     if (form) form.reset();
 
     document.getElementById("enseignant-id").value = id || "";
-
     remplirSelectsEnseignant();
 
     if (!id) {
@@ -310,8 +322,9 @@ function remplirFormulaireEnseignant(item) {
 
 function definirValeur(id, valeur) {
     const element = document.getElementById(id);
-    if (!element) return;
-    element.value = valeur ?? "";
+    if (element) {
+        element.value = valeur ?? "";
+    }
 }
 
 // ============================================================
@@ -334,8 +347,8 @@ function remplirSelectGradesEnseignant() {
     if (typeof getGradesData !== "function") return;
 
     getGradesData()
-        .filter(item => item.actif !== false)
-        .forEach(item => {
+        .filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
             const option = document.createElement("option");
             option.value = item.id;
             option.textContent = item.nom;
@@ -352,8 +365,8 @@ function remplirSelectSpecialitesEnseignant() {
     if (typeof getSpecialitesData !== "function") return;
 
     getSpecialitesData()
-        .filter(item => item.actif !== false)
-        .forEach(item => {
+        .filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
             const option = document.createElement("option");
             option.value = item.id;
             option.textContent = item.nom;
@@ -370,8 +383,8 @@ function remplirSelectDepartementsEnseignant() {
     if (typeof getDepartementsData !== "function") return;
 
     getDepartementsData()
-        .filter(item => item.actif !== false)
-        .forEach(item => {
+        .filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
             const option = document.createElement("option");
             option.value = item.id;
             option.textContent = item.nom;
@@ -388,8 +401,8 @@ function remplirSelectSifahEnseignant() {
     if (typeof getSifahData !== "function") return;
 
     getSifahData()
-        .filter(item => item.actif !== false)
-        .forEach(item => {
+        .filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
             const option = document.createElement("option");
             option.value = item.code;
             option.textContent = item.nom;
@@ -406,8 +419,8 @@ function remplirSelectWadhiaEnseignant() {
     if (typeof getWadhiaData !== "function") return;
 
     getWadhiaData()
-        .filter(item => item.actif !== false)
-        .forEach(item => {
+        .filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
             const option = document.createElement("option");
             option.value = item.code;
             option.textContent = item.nom;
@@ -424,8 +437,8 @@ function remplirSelectAnneesEnseignant() {
     if (typeof getAnneesData !== "function") return;
 
     getAnneesData()
-        .filter(item => item.actif !== false)
-        .forEach(item => {
+        .filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
             const option = document.createElement("option");
             option.value = item.nom;
             option.textContent = item.nom;
@@ -507,11 +520,13 @@ async function supprimerEnseignant(id) {
 
 function fermerModalEnseignant() {
     const modal = document.getElementById("modal-enseignant");
-    if (modal) modal.classList.add("hidden");
+    if (modal) {
+        modal.classList.add("hidden");
+    }
 }
 
 // ============================================================
-// REMPLIR LES FILTRES (selects)
+// REMPLIR LES FILTRES
 // ============================================================
 function mettreAJourFiltres() {
     remplirFiltre("filter-grade", getGradesData(), "كل الرتب");
@@ -528,12 +543,15 @@ function remplirFiltre(id, data, texteDefaut) {
     const valeur = select.value;
     select.innerHTML = `<option value="">${texteDefaut}</option>`;
 
-    data.filter(item => item.actif !== false).forEach(item => {
-        const option = document.createElement("option");
-        option.value = item.id;
-        option.textContent = item.nom;
-        select.appendChild(option);
-    });
+    if (!data) return;
+
+    data.filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
+            const option = document.createElement("option");
+            option.value = item.id;
+            option.textContent = item.nom;
+            select.appendChild(option);
+        });
 
     if (valeur) select.value = valeur;
 }
@@ -544,12 +562,15 @@ function remplirFiltreCodes(id, data, texteDefaut) {
     const valeur = select.value;
     select.innerHTML = `<option value="">${texteDefaut}</option>`;
 
-    data.filter(item => item.actif !== false).forEach(item => {
-        const option = document.createElement("option");
-        option.value = item.code;
-        option.textContent = item.nom;
-        select.appendChild(option);
-    });
+    if (!data) return;
+
+    data.filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
+            const option = document.createElement("option");
+            option.value = item.code;
+            option.textContent = item.nom;
+            select.appendChild(option);
+        });
 
     if (valeur) select.value = valeur;
 }
@@ -560,9 +581,11 @@ function remplirFiltreAnnees() {
     const valeur = select.value;
     select.innerHTML = '<option value="">كل السنوات الجامعية</option>';
 
+    if (typeof getAnneesData !== "function") return;
+
     getAnneesData()
-        .filter(item => item.actif !== false)
-        .forEach(item => {
+        .filter(function (item) { return item.actif !== false; })
+        .forEach(function (item) {
             const option = document.createElement("option");
             option.value = item.nom;
             option.textContent = item.nom;
@@ -576,28 +599,33 @@ function remplirFiltreAnnees() {
 // FONCTIONS UTILITAIRES
 // ============================================================
 function trouverNomGrade(id) {
-    const item = getGradesData().find(el => el.id === id);
+    if (typeof getGradesData !== "function") return "";
+    const item = getGradesData().find(function (el) { return el.id === id; });
     return item ? item.nom : "";
 }
 
 function trouverNomSpecialite(id) {
-    const item = getSpecialitesData().find(el => el.id === id);
+    if (typeof getSpecialitesData !== "function") return "";
+    const item = getSpecialitesData().find(function (el) { return el.id === id; });
     return item ? item.nom : "";
 }
 
 function trouverNomDepartement(id) {
-    const item = getDepartementsData().find(el => el.id === id);
+    if (typeof getDepartementsData !== "function") return "";
+    const item = getDepartementsData().find(function (el) { return el.id === id; });
     return item ? item.nom : "";
 }
 
 function trouverNomSifah(code) {
-    const item = getSifahData().find(el => el.code === code);
-    return item ? item.nom : code || "";
+    if (typeof getSifahData !== "function") return code || "";
+    const item = getSifahData().find(function (el) { return el.code === code; });
+    return item ? item.nom : (code || "");
 }
 
 function trouverNomWadhia(code) {
-    const item = getWadhiaData().find(el => el.code === code);
-    return item ? item.nom : code || "";
+    if (typeof getWadhiaData !== "function") return code || "";
+    const item = getWadhiaData().find(function (el) { return el.code === code; });
+    return item ? item.nom : (code || "");
 }
 
 function trouverNomAnnee(nom) {
@@ -606,9 +634,9 @@ function trouverNomAnnee(nom) {
 
 function mettreAJourDashboard() {
     const total = enseignantsData.length;
-    const titulaire = enseignantsData.filter(item => item.sifah === "titulaire").length;
-    const contractuel = enseignantsData.filter(item => item.sifah === "contractuel").length;
-    const vacataire = enseignantsData.filter(item => item.sifah === "vacataire").length;
+    const titulaire = enseignantsData.filter(function (item) { return item.sifah === "titulaire"; }).length;
+    const contractuel = enseignantsData.filter(function (item) { return item.sifah === "contractuel"; }).length;
+    const vacataire = enseignantsData.filter(function (item) { return item.sifah === "vacataire"; }).length;
 
     definirTexte("dash-total", total);
     definirTexte("kpi-total", total);
@@ -616,15 +644,17 @@ function mettreAJourDashboard() {
     definirTexte("kpi-contractuel", contractuel);
     definirTexte("kpi-vacataire", vacataire);
 
-    const homme = enseignantsData.filter(item => item.genre === "homme").length;
-    const femme = enseignantsData.filter(item => item.genre === "femme").length;
+    const homme = enseignantsData.filter(function (item) { return item.genre === "homme"; }).length;
+    const femme = enseignantsData.filter(function (item) { return item.genre === "femme"; }).length;
     definirTexte("kpi-homme", homme);
     definirTexte("kpi-femme", femme);
 }
 
 function definirTexte(id, valeur) {
     const element = document.getElementById(id);
-    if (element) element.textContent = valeur;
+    if (element) {
+        element.textContent = valeur;
+    }
 }
 
 function echapperHTML(value) {
@@ -639,8 +669,9 @@ function echapperHTML(value) {
 // Fermeture modal
 document.addEventListener("click", function (event) {
     const bouton = event.target.closest("#modal-enseignant .close-modal");
-    if (!bouton) return;
-    fermerModalEnseignant();
+    if (bouton) {
+        fermerModalEnseignant();
+    }
 });
 
-console.log("SIGE - enseignants.js chargé (avec recherche + pagination)");
+console.log("SIGE - enseignants.js chargé (recherche + pagination)");
