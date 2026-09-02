@@ -1,170 +1,226 @@
 ```javascript
-// ====================== NAVIGATION & UTILITAIRES ======================
+// ============================================================
+// SIGE - APP.JS
+// Navigation + Menu mobile + Modals
+// ============================================================
 
-// Navigation entre pages
-document.querySelectorAll('.menu-item[data-page]').forEach(item => {
 
-    item.addEventListener('click', (e) => {
+// ============================================================
+// NAVIGATION ENTRE LES VOLETS
+// ============================================================
 
-        e.preventDefault();
+document.addEventListener("DOMContentLoaded", function () {
 
-        const page = item.dataset.page;
+    console.log("SIGE - app.js démarré");
 
-        // Menu actif
-        document.querySelectorAll('.menu-item').forEach(i => {
-            i.classList.remove('active');
+    const menuItems =
+        document.querySelectorAll(".menu-item[data-page]");
+
+    const pages =
+        document.querySelectorAll(".page-section");
+
+
+    menuItems.forEach(function (item) {
+
+        item.addEventListener("click", function (event) {
+
+            event.preventDefault();
+
+            const pageName =
+                item.getAttribute("data-page");
+
+            const page =
+                document.getElementById(pageName + "-page");
+
+
+            if (!page) {
+                console.error(
+                    "Page introuvable : " +
+                    pageName + "-page"
+                );
+                return;
+            }
+
+
+            // ==============================
+            // MENU ACTIF
+            // ==============================
+
+            menuItems.forEach(function (menu) {
+                menu.classList.remove("active");
+            });
+
+            item.classList.add("active");
+
+
+            // ==============================
+            // CACHER TOUTES LES PAGES
+            // ==============================
+
+            pages.forEach(function (section) {
+                section.classList.add("hidden");
+            });
+
+
+            // ==============================
+            // AFFICHER LA PAGE
+            // ==============================
+
+            page.classList.remove("hidden");
+
+
+            // ==============================
+            // CHARGEMENT SIAD
+            // ==============================
+
+            if (pageName === "siad") {
+
+                if (typeof loadSIAD === "function") {
+                    loadSIAD();
+                }
+
+            }
+
+
+            // ==============================
+            // MENU MOBILE
+            // ==============================
+
+            fermerMenuMobile();
+
         });
-
-        item.classList.add('active');
-
-        // Cacher toutes les pages
-        document.querySelectorAll('.page-section').forEach(s => {
-            s.classList.add('hidden');
-        });
-
-        // Afficher la page demandée
-        const pageElement = document.getElementById(page + '-page');
-
-        if (pageElement) {
-            pageElement.classList.remove('hidden');
-        }
-
-        // ============================
-        // CHARGEMENT DES PAGES
-        // ============================
-
-        if (page === 'siad') {
-
-            if (typeof loadSIAD === 'function') {
-                loadSIAD();
-            }
-
-        }
-
-        if (page === 'enseignants') {
-
-            // Ton enseignants.js actuel utilise
-            // chargerEnseignants() et non loadEnseignants()
-
-            if (typeof chargerEnseignants === 'function') {
-                // Les données sont déjà surveillées par onSnapshot.
-                // On ne relance pas le listener inutilement.
-                appliquerFiltres();
-            }
-
-        }
-
-        if (page === 'categories') {
-
-            if (typeof loadCategories === 'function') {
-                loadCategories();
-            }
-
-        }
 
     });
 
-});
+
+    // ========================================================
+    // BOUTONS FERMETURE DES MODALS
+    // ========================================================
+
+    document.querySelectorAll(".close-modal")
+        .forEach(function (button) {
+
+            button.addEventListener("click", function () {
+
+                const modalId =
+                    button.getAttribute("data-modal");
+
+                if (!modalId) return;
+
+                const modal =
+                    document.getElementById(modalId);
+
+                if (modal) {
+                    modal.classList.add("hidden");
+                }
+
+            });
+
+        });
 
 
-// ====================== MODALS ======================
+    // ========================================================
+    // FERMER MODAL EN CLIQUANT À L'EXTÉRIEUR
+    // ========================================================
 
-function openModal(id) {
+    document.querySelectorAll(".modal")
+        .forEach(function (modal) {
 
-    const modal = document.getElementById(id);
+            modal.addEventListener("click", function (event) {
 
-    if (modal) {
-        modal.classList.remove('hidden');
+                if (event.target === modal) {
+                    modal.classList.add("hidden");
+                }
+
+            });
+
+        });
+
+
+    // ========================================================
+    // MENU MOBILE
+    // ========================================================
+
+    const menuToggle =
+        document.getElementById("menu-toggle");
+
+    const sidebar =
+        document.querySelector(".sidebar");
+
+    const overlay =
+        document.getElementById("sidebar-overlay");
+
+
+    if (menuToggle && sidebar && overlay) {
+
+        menuToggle.addEventListener("click", function () {
+
+            sidebar.classList.toggle("open");
+
+            overlay.classList.toggle("show");
+
+        });
+
+
+        overlay.addEventListener("click", function () {
+
+            sidebar.classList.remove("open");
+
+            overlay.classList.remove("show");
+
+        });
+
     }
 
-}
 
+    // ========================================================
+    // FERMER LE MENU MOBILE
+    // ========================================================
 
-function closeModal(id) {
+    function fermerMenuMobile() {
 
-    const modal = document.getElementById(id);
+        if (!sidebar || !overlay) return;
 
-    if (modal) {
-        modal.classList.add('hidden');
-    }
+        if (window.innerWidth <= 950) {
 
-}
+            sidebar.classList.remove("open");
 
-
-// ====================== FERMETURE DES MODALS ======================
-
-document.querySelectorAll('.close-modal').forEach(btn => {
-
-    btn.addEventListener('click', () => {
-
-        closeModal(btn.dataset.modal);
-
-    });
-
-});
-
-
-// ====================== FERMER MODAL EN CLIQUANT DEHORS ======================
-
-document.querySelectorAll('.modal').forEach(modal => {
-
-    modal.addEventListener('click', (e) => {
-
-        if (e.target === modal) {
-
-            modal.classList.add('hidden');
+            overlay.classList.remove("show");
 
         }
 
-    });
+    }
+
+
+    // ========================================================
+    // FONCTIONS MODALS GLOBALES
+    // ========================================================
+
+    window.openModal = function (id) {
+
+        const modal =
+            document.getElementById(id);
+
+        if (modal) {
+            modal.classList.remove("hidden");
+        }
+
+    };
+
+
+    window.closeModal = function (id) {
+
+        const modal =
+            document.getElementById(id);
+
+        if (modal) {
+            modal.classList.add("hidden");
+        }
+
+    };
+
+
+    console.log("SIGE - Navigation prête");
 
 });
-
-
-// ====================== MENU MOBILE ======================
-
-const menuToggle = document.getElementById("menu-toggle");
-const sidebar = document.querySelector(".sidebar");
-const overlay = document.getElementById("sidebar-overlay");
-
-if (menuToggle && sidebar && overlay) {
-
-    // Ouvrir / fermer le menu
-    menuToggle.addEventListener("click", function () {
-
-        sidebar.classList.toggle("open");
-        overlay.classList.toggle("show");
-
-    });
-
-
-    // Fermer avec l'overlay
-    overlay.addEventListener("click", function () {
-
-        sidebar.classList.remove("open");
-        overlay.classList.remove("show");
-
-    });
-
-
-    // Fermer le menu après sélection
-    document.querySelectorAll(".menu-item").forEach(function (item) {
-
-        item.addEventListener("click", function () {
-
-            if (window.innerWidth <= 950) {
-
-                sidebar.classList.remove("open");
-                overlay.classList.remove("show");
-
-            }
-
-        });
-
-    });
-
-}
-
-
-console.log("SIGE - app.js chargé correctement");
 ```
