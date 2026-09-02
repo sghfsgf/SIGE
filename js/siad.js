@@ -1,226 +1,185 @@
+```javascript
 // ============================================================
 // SIGE - SIAD
-// ============================================================
-// Statistiques des enseignants
-// Compatible avec enseignants.js actuel
+// Statistiques et indicateurs d'aide à la décision
 // ============================================================
 
+// ============================================================
+// CHARGEMENT DU SIAD
+// ============================================================
 async function loadSIAD() {
 
-    console.log("SIGE - Chargement SIAD...");
+    console.log("===== Chargement SIAD =====");
 
-    // ========================================================
-    // Vérification des données enseignants
-    // ========================================================
-
+    // Vérifier que les données enseignants existent
     if (typeof enseignantsData === "undefined") {
-        console.error("Erreur SIAD : enseignantsData est introuvable.");
+        console.error("enseignantsData est introuvable.");
         return;
     }
 
-    const enseignants = enseignantsData;
+    const total = enseignantsData.length;
 
-
-    // ========================================================
-    // TOTAL
-    // ========================================================
-
-    definirKPI("kpi-total", enseignants.length);
-
+    console.log("Nombre total d'enseignants :", total);
 
     // ========================================================
-    // الصفة
+    // KPI TOTAL
     // ========================================================
 
-    definirKPI(
-        "kpi-titulaire",
-        enseignants.filter(e => e.sifah === "titulaire").length
-    );
-
-    definirKPI(
-        "kpi-contractuel",
-        enseignants.filter(e => e.sifah === "contractuel").length
-    );
-
-    definirKPI(
-        "kpi-vacataire",
-        enseignants.filter(e => e.sifah === "vacataire").length
-    );
-
+    definirTexteSIAD("kpi-total", total);
 
     // ========================================================
-    // الجنس
+    // KPI - الصفة
     // ========================================================
 
-    definirKPI(
-        "kpi-homme",
-        enseignants.filter(e => e.genre === "homme").length
-    );
+    const titulaire = enseignantsData.filter(function (e) {
+        return e.sifah === "titulaire";
+    }).length;
 
-    definirKPI(
-        "kpi-femme",
-        enseignants.filter(e => e.genre === "femme").length
-    );
+    const contractuel = enseignantsData.filter(function (e) {
+        return e.sifah === "contractuel";
+    }).length;
 
+    const vacataire = enseignantsData.filter(function (e) {
+        return e.sifah === "vacataire";
+    }).length;
 
-    // ========================================================
-    // GRADES
-    // ========================================================
-
-    const grades =
-        typeof getGradesData === "function"
-            ? getGradesData().filter(item => item.actif !== false)
-            : [];
-
-    remplirTableauSIAD(
-        grades,
-        "gradeId",
-        "id",
-        "stats-grade-body",
-        enseignants
-    );
-
+    definirTexteSIAD("kpi-titulaire", titulaire);
+    definirTexteSIAD("kpi-contractuel", contractuel);
+    definirTexteSIAD("kpi-vacataire", vacataire);
 
     // ========================================================
-    // DEPARTEMENTS
+    // KPI - الجنس
     // ========================================================
 
-    const departements =
-        typeof getDepartementsData === "function"
-            ? getDepartementsData().filter(item => item.actif !== false)
-            : [];
+    const homme = enseignantsData.filter(function (e) {
+        return e.genre === "homme";
+    }).length;
 
-    remplirTableauSIAD(
-        departements,
-        "departementId",
-        "id",
-        "stats-departement-body",
-        enseignants
-    );
+    const femme = enseignantsData.filter(function (e) {
+        return e.genre === "femme";
+    }).length;
 
+    definirTexteSIAD("kpi-homme", homme);
+    definirTexteSIAD("kpi-femme", femme);
 
     // ========================================================
-    // SPECIALITES
+    // DISTRIBUTION PAR GRADE
     // ========================================================
 
-    const specialites =
-        typeof getSpecialitesData === "function"
-            ? getSpecialitesData().filter(item => item.actif !== false)
-            : [];
+    if (typeof getGradesData === "function") {
 
-    remplirTableauSIAD(
-        specialites,
-        "specialiteId",
-        "id",
-        "stats-specialite-body",
-        enseignants
-    );
+        const grades = getGradesData();
 
+        console.log("Grades :", grades);
 
-    // ========================================================
-    // الصفة
-    // ========================================================
+        remplirTableauSIAD(
+            "stats-grade-body",
+            grades,
+            "gradeId",
+            "id"
+        );
 
-    const sifah =
-        typeof getSifahData === "function"
-            ? getSifahData().filter(item => item.actif !== false)
-            : [];
+    } else {
 
-    remplirTableauSIAD(
-        sifah,
-        "sifah",
-        "code",
-        "stats-sifah-body",
-        enseignants
-    );
+        console.error("getGradesData() est introuvable.");
 
-
-    // ========================================================
-    // الوضعية
-    // ========================================================
-
-    const wadhia =
-        typeof getWadhiaData === "function"
-            ? getWadhiaData().filter(item => item.actif !== false)
-            : [];
-
-    remplirTableauSIAD(
-        wadhia,
-        "wadhia",
-        "code",
-        "stats-wadhia-body",
-        enseignants
-    );
-
-
-    // ========================================================
-    // ANNEE UNIVERSITAIRE
-    // ========================================================
-
-    const annees =
-        typeof getAnneesData === "function"
-            ? getAnneesData().filter(item => item.actif !== false)
-            : [];
-
-    remplirTableauSIAD(
-        annees,
-        "anneeUniversitaire",
-        "nom",
-        "stats-annee-body",
-        enseignants
-    );
-
-
-    // ========================================================
-    // GENRE
-    // ========================================================
-
-    remplirTableauGenreSIAD(enseignants);
-
-
-    console.log("SIGE - SIAD chargé avec succès.");
-}
-
-
-// ============================================================
-// KPI
-// ============================================================
-
-function definirKPI(id, valeur) {
-
-    const element = document.getElementById(id);
-
-    if (element) {
-        element.textContent = valeur;
     }
+
+    // ========================================================
+    // DISTRIBUTION PAR DEPARTEMENT
+    // ========================================================
+
+    if (typeof getDepartementsData === "function") {
+
+        const departements = getDepartementsData();
+
+        console.log("Départements :", departements);
+
+        remplirTableauSIAD(
+            "stats-departement-body",
+            departements,
+            "departementId",
+            "id"
+        );
+
+    } else {
+
+        console.error("getDepartementsData() est introuvable.");
+
+    }
+
+    // ========================================================
+    // DISTRIBUTION PAR SPECIALITE
+    // ========================================================
+
+    if (typeof getSpecialitesData === "function") {
+
+        const specialites = getSpecialitesData();
+
+        console.log("Spécialités :", specialites);
+
+        remplirTableauSIAD(
+            "stats-specialite-body",
+            specialites,
+            "specialiteId",
+            "id"
+        );
+
+    } else {
+
+        console.error("getSpecialitesData() est introuvable.");
+
+    }
+
+    console.log("===== SIAD chargé =====");
 }
 
 
 // ============================================================
-// TABLEAUX SIAD
+// TABLEAU STATISTIQUE GENERIQUE
 // ============================================================
 
 function remplirTableauSIAD(
-    liste,
-    champ,
-    keyField,
     tbodyId,
-    enseignants
+    liste,
+    champEnseignant,
+    champReference
 ) {
 
     const tbody = document.getElementById(tbodyId);
 
     if (!tbody) {
-        console.warn(
-            "Tableau SIAD introuvable : " + tbodyId
+        console.error(
+            "Élément HTML introuvable :",
+            tbodyId
         );
         return;
     }
 
     tbody.innerHTML = "";
 
+    // --------------------------------------------------------
+    // Vérification
+    // --------------------------------------------------------
 
-    if (!Array.isArray(liste) || liste.length === 0) {
+    if (!Array.isArray(liste)) {
+
+        console.error(
+            "La liste n'est pas un tableau :",
+            tbodyId,
+            liste
+        );
+
+        return;
+    }
+
+    const total = enseignantsData.length;
+
+    // --------------------------------------------------------
+    // Aucun enseignant
+    // --------------------------------------------------------
+
+    if (total === 0) {
 
         tbody.innerHTML = `
             <tr>
@@ -233,103 +192,77 @@ function remplirTableauSIAD(
         return;
     }
 
+    // --------------------------------------------------------
+    // Parcours des catégories
+    // --------------------------------------------------------
 
-    const total = enseignants.length;
+    liste
+        .filter(function (item) {
+            return item.actif !== false;
+        })
+        .forEach(function (item) {
 
+            const valeurReference =
+                item[champReference];
 
-    liste.forEach(function (item) {
+            // ------------------------------------------------
+            // Compter les enseignants
+            // ------------------------------------------------
 
-        const key = item[keyField];
+            const count =
+                enseignantsData.filter(function (enseignant) {
 
-        const count =
-            enseignants.filter(function (enseignant) {
+                    return enseignant[champEnseignant] ===
+                           valeurReference;
 
-                return enseignant[champ] === key;
+                }).length;
 
-            }).length;
+            // ------------------------------------------------
+            // Pourcentage
+            // ------------------------------------------------
 
+            const percent =
+                ((count / total) * 100).toFixed(1);
 
-        const percent =
-            total > 0
-                ? ((count / total) * 100).toFixed(1)
-                : "0.0";
+            // ------------------------------------------------
+            // Création ligne
+            // ------------------------------------------------
 
+            const tr = document.createElement("tr");
 
-        const tr = document.createElement("tr");
+            tr.innerHTML = `
+                <td>${echapperHTMLSIAD(item.nom || "")}</td>
+                <td>${count}</td>
+                <td>${percent}%</td>
+            `;
 
+            tbody.appendChild(tr);
 
-        tr.innerHTML = `
-            <td>${echapperHTML(item.nom || key || "")}</td>
-            <td>${count}</td>
-            <td>${percent}%</td>
-        `;
-
-
-        tbody.appendChild(tr);
-    });
+        });
 }
 
 
 // ============================================================
-// GENRE
+// AFFICHAGE DES KPI
 // ============================================================
 
-function remplirTableauGenreSIAD(enseignants) {
+function definirTexteSIAD(id, valeur) {
 
-    const tbody =
-        document.getElementById("stats-genre-body");
+    const element =
+        document.getElementById(id);
 
-    if (!tbody) {
-        return;
+    if (element) {
+
+        element.textContent = valeur;
+
+    } else {
+
+        console.warn(
+            "Élément KPI introuvable :",
+            id
+        );
+
     }
-
-
-    tbody.innerHTML = "";
-
-
-    const total = enseignants.length;
-
-
-    const genres = [
-        {
-            key: "homme",
-            nom: "ذكر"
-        },
-        {
-            key: "femme",
-            nom: "أنثى"
-        }
-    ];
-
-
-    genres.forEach(function (genre) {
-
-        const count =
-            enseignants.filter(function (enseignant) {
-
-                return enseignant.genre === genre.key;
-
-            }).length;
-
-
-        const percent =
-            total > 0
-                ? ((count / total) * 100).toFixed(1)
-                : "0.0";
-
-
-        const tr = document.createElement("tr");
-
-
-        tr.innerHTML = `
-            <td>${genre.nom}</td>
-            <td>${count}</td>
-            <td>${percent}%</td>
-        `;
-
-
-        tbody.appendChild(tr);
-    });
 }
 
 
@@ -345,4 +278,9 @@ function echapperHTMLSIAD(value) {
         .replace(/>/g, "&gt;")
         .replace(/"/g, "&quot;")
         .replace(/'/g, "&#039;");
+
 }
+
+
+console.log("SIGE - siad.js chargé correctement");
+```
