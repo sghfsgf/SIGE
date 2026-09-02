@@ -7,6 +7,7 @@
 let enseignantsData = [];
 let currentPage = 1;
 const itemsPerPage = 15;
+window.enseignantsFiltresActuels = [];   // ← AJOUTE CETTE LIGNE
 
 // ============================================================
 // INITIALISATION
