@@ -430,6 +430,13 @@ function afficherEnseignants(liste) {
                 )}
             </td>
 
+            
+            <td>
+              ${echapperHTML(
+                  item.email ?? ""
+              )}
+           </td>
+
             <td>
                 ${echapperHTML(grade)}
             </td>
