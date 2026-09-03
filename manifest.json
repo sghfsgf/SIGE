@@ -2,19 +2,14 @@
   "name": "SIGE - نظام تسيير الأساتذة",
   "short_name": "SIGE",
   "description": "نظام تسيير الأساتذة",
-
   "start_url": "./index.html",
   "scope": "./",
-
   "display": "standalone",
   "orientation": "portrait-primary",
-
   "background_color": "#fff4e6",
   "theme_color": "#f97316",
-
   "lang": "ar",
   "dir": "rtl",
-
   "icons": [
     {
       "src": "./icons/icon-192.png",
