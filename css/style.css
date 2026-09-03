@@ -378,3 +378,17 @@ padding: 15px 10px;
 
 
 }
+/* ============================================================
+   CHAMP DE RECHERCHE ENSEIGNANTS
+   ============================================================ */
+
+#search-enseignants {
+    background-color: #ffe0b2;
+    border: 1px solid #f4b183;
+}
+
+#search-enseignants:focus {
+    background-color: #fff0dc;
+    border-color: #e67e22;
+    outline: none;
+}
