@@ -383,12 +383,12 @@ padding: 15px 10px;
    ============================================================ */
 
 #search-enseignants {
-    background-color: #ffe0b2;
-    border: 1px solid #f4b183;
+    background-color: #eaf4ff;
+    border: 1px solid #9ec5e8;
 }
 
 #search-enseignants:focus {
-    background-color: #fff0dc;
-    border-color: #e67e22;
+    background-color: #ffffff;
+    border-color: #3498db;
     outline: none;
 }
