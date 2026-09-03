@@ -24,7 +24,9 @@ const firebaseConfig = {
 // ============================================================
 
 if (!firebase.apps.length) {
+
     firebase.initializeApp(firebaseConfig);
+
 }
 
 
@@ -57,10 +59,6 @@ const anneesRef = db.collection("anneesUniversitaires");
 
 const etablissementRef = db.collection("etablissement");
 
-
-// ============================================================
-// INFORMATIONS
-// ============================================================
 
 console.log("======================================");
 console.log("SIGE - Firebase initialisé");
